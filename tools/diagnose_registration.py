@@ -21,6 +21,7 @@ import os
 import re
 import sys
 import urllib.parse
+from pathlib import Path
 
 import requests
 
@@ -145,13 +146,29 @@ def attempt(name: str, token: str, body_template: str, content_type: str) -> boo
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--return-to", choices=sorted(RETURN_TO), default="gp")
+    # A terminal in canonical mode drops input past ~1024 bytes per line, and
+    # these redirect URLs are longer than that — pasting one at a prompt looks
+    # like a keyboard that stopped working. Take it from a file instead.
+    parser.add_argument("--redirect-file", help="file holding the redirect URL")
+    parser.add_argument("--redirect-url", help="the redirect URL, quoted")
     args = parser.parse_args()
 
     verifier = b64url(os.urandom(32))
-    print("Open this URL, sign in, then paste the final URL from the address bar.")
-    print("(It may bounce; the one carrying openid.oa2.authorization_code is the one.)\n")
+    print("Open this URL, sign in, then take the final URL from the address bar.")
+    print("(It may bounce; the one carrying openid.oa2.authorization_code is it.)\n")
     print(signin_url(verifier, RETURN_TO[args.return_to]))
-    redirect = input("\nredirect URL: ").strip()
+
+    if args.redirect_url:
+        redirect = args.redirect_url.strip()
+    elif args.redirect_file:
+        redirect = Path(args.redirect_file).read_text().strip()
+    else:
+        print(
+            "\nSave that URL to a file, then run again with"
+            " --redirect-file <path> (a paste at a prompt is truncated at ~1024"
+            " characters, and these URLs are longer)."
+        )
+        return
 
     code = urllib.parse.parse_qs(urllib.parse.urlparse(redirect).query).get(
         "openid.oa2.authorization_code", [""]
