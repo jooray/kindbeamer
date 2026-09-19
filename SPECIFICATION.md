@@ -169,7 +169,16 @@ All bodies are JSON with a `ClientInfo` block (`appName: ShellExtension`,
 
 `inputFormat` is derived from the file extension (see §7); `archive` mirrors the
 "Archive document in your Kindle Library" checkbox; `targetDevices` are the
-serials ticked in the device list. Multiple queued documents are sent
+serials ticked in the device list.
+
+`title` and `author` must be at least one character each — an empty author is
+refused with `400 … 'documentMetadata.author' failed to satisfy constraint:
+Member must have length greater than or equal to 1` — so a blank title falls back
+to the file's base name, a blank author to `Unknown`, and both are truncated at
+255 characters (the official client truncates too, logging "Truncating author
+to"). `GetListOfOwnedDevices` can also return the same device twice under one
+serial, which is collapsed on the way in: keyed by serial, duplicates would tick
+and untick together in the device list. Multiple queued documents are sent
 sequentially, each with its own metadata and upload. The S3 `PUT` is fed from
 `File.openRead()` through `StreamedRequest.sink.addStream`, so the socket sets
 the pace and the file never sits in memory in one piece; bytes written are
@@ -285,6 +294,10 @@ uploads each as an artifact.
 - USB/MTP transfer for 2024+ Kindles (no mass-storage mode on macOS).
 - Library management (list/delete personal documents).
 - Windows packaging; iOS build.
+- The official client now prefers a proxy endpoint,
+  `/import/kindle-doc/send-to-kindle`, over the `/SendToKindle` used here (it
+  calls the latter its "Legacy STK Service"); worth moving to before Amazon
+  retires it.
 - Derive a `pid` for a generated `deviceSerialNumber`, so two machines can hold
   their own registration on one account instead of evicting each other.
 - Localization.

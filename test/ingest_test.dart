@@ -57,6 +57,21 @@ void main() {
     expect(Ingest.unsupported([pdf.path]), isEmpty);
   });
 
+  test('metadata sent to the service is never empty', () {
+    final pdf = write('d.pdf', 10);
+    final item = Ingest.itemsFor([pdf.path]).single;
+    expect(item.effectiveTitle, 'd');
+    expect(item.effectiveAuthor, 'Unknown');
+
+    item.title = '   ';
+    item.author = '  Jane Roe ';
+    expect(item.effectiveTitle, 'd', reason: 'blank title falls back');
+    expect(item.effectiveAuthor, 'Jane Roe');
+
+    item.title = 'x' * 400;
+    expect(item.effectiveTitle.length, DocItem.metadataLimit);
+  });
+
   test('human readable sizes', () {
     expect(DocItem.humanSize(512), '512 B');
     expect(DocItem.humanSize(9680 * 1024 ~/ 10), startsWith('968'));

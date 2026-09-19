@@ -57,6 +57,17 @@ class OwnedDevice {
   final String deviceName;
   final String deviceSerialNumber;
 
+  /// The service can list the same device more than once — the official client
+  /// stores the duplicates too. Keyed by serial they would tick and untick in
+  /// lockstep, so collapse them.
+  static List<OwnedDevice> dedupe(List<OwnedDevice> devices) {
+    final seen = <String>{};
+    return [
+      for (final device in devices)
+        if (seen.add(device.deviceSerialNumber)) device,
+    ];
+  }
+
   static OwnedDevice fromMap(Map<String, dynamic> d) => OwnedDevice(
     deviceCapabilities:
         (d['deviceCapabilities'] as Map<String, dynamic>?) ?? const {},

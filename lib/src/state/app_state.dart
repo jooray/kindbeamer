@@ -232,8 +232,8 @@ class AppState extends ChangeNotifier {
         await c.sendFile(
           File(doc.path),
           targets,
-          author: doc.author,
-          title: doc.title,
+          author: doc.effectiveAuthor,
+          title: doc.effectiveTitle,
           format: doc.format.inputFormat,
           archive: archive,
           onProgress: (sent, total) {

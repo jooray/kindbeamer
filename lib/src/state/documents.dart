@@ -54,6 +54,25 @@ class DocItem {
   String title;
   String author;
 
+  /// `SendToKindle` rejects empty metadata ("Member must have length greater
+  /// than or equal to 1"), and the official client truncates long values rather
+  /// than letting the service refuse them.
+  static const int metadataLimit = 255;
+  static const String unknownAuthor = 'Unknown';
+
+  String get effectiveTitle {
+    final trimmed = title.trim();
+    return _clamp(trimmed.isEmpty ? _defaultTitle(name) : trimmed);
+  }
+
+  String get effectiveAuthor {
+    final trimmed = author.trim();
+    return _clamp(trimmed.isEmpty ? unknownAuthor : trimmed);
+  }
+
+  static String _clamp(String value) =>
+      value.length <= metadataLimit ? value : value.substring(0, metadataLimit);
+
   static String _defaultTitle(String name) {
     final base = p.basenameWithoutExtension(name);
     return base.isEmpty ? name : base;

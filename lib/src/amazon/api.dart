@@ -226,7 +226,7 @@ Future<List<OwnedDevice>> getOwnedDevices(AdpSigner signer) async {
       .cast<Map<String, dynamic>>()
       .map(OwnedDevice.fromMap)
       .toList();
-  return devices;
+  return OwnedDevice.dedupe(devices);
 }
 
 Future<UploadUrlResponse> getUploadUrl(AdpSigner signer, int fileSize) async {
