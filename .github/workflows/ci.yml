@@ -42,10 +42,16 @@ jobs:
           sudo apt-get install -y clang cmake ninja-build pkg-config \
             libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev
       - run: flutter build linux --release
+      # A tarball rather than the raw directory: the zip GitHub would make of it
+      # loses the executable bit, and this is what ships on the release.
+      - name: Package the bundle
+        run: |
+          tar -czf kindbeamer-linux-x64.tar.gz \
+            -C build/linux/x64/release bundle
       - uses: actions/upload-artifact@v4
         with:
           name: kindbeamer-linux-x64
-          path: build/linux/x64/release/bundle
+          path: kindbeamer-linux-x64.tar.gz
 
   linux-arm64:
     name: Build Linux (arm64)
