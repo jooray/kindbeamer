@@ -122,6 +122,22 @@ Map<String, String> _flattenXml(XmlElement root) {
 const String deviceSerialNumber = 'ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG';
 const String devicePid = 'D21NN3GG';
 
+Future<http.Response> _postBytes(
+  String url,
+  Map<String, String> headers,
+  List<int> bodyBytes,
+) async {
+  final client = http.Client();
+  try {
+    final request = http.Request('POST', Uri.parse(url))
+      ..headers.addAll(headers)
+      ..bodyBytes = bodyBytes;
+    return await http.Response.fromStream(await client.send(request));
+  } finally {
+    client.close();
+  }
+}
+
 Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
   const deviceType = 'A1K6D1WRW0MALS';
   const serial = deviceSerialNumber;
@@ -141,16 +157,15 @@ Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
       '<os_version>$osVersion</os_version>'
       '<device_model>$deviceModel</device_model>'
       '</parameters></request>';
-  final res = await http.post(
-    Uri.parse('$_firsUrl/FirsProxy/registerDeviceWithToken'),
-    headers: {
-      'Content-Type': 'text/xml',
-      'Expect': '',
-      'Accept-Language': 'en-US,*',
-      'User-Agent': 'Mozilla/5.0',
-    },
-    body: body,
-  );
+  // Sent as bytes on purpose: handing `package:http` a string body rewrites
+  // `text/xml` into `text/xml; charset=utf-8`, and this endpoint is matched
+  // against what the official client sends.
+  final res = await _postBytes('$_firsUrl/FirsProxy/registerDeviceWithToken', {
+    'Content-Type': 'text/xml',
+    'Expect': '',
+    'Accept-Language': 'en-US,*',
+    'User-Agent': 'Mozilla/5.0',
+  }, utf8.encode(body));
   if (res.statusCode != 200) {
     throw ApiError(
       'device registration failed: HTTP ${res.statusCode}',
