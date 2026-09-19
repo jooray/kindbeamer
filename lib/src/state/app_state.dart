@@ -73,7 +73,9 @@ class AppState extends ChangeNotifier {
         deviceSerial = m['device_serial'] as String? ?? '';
       }
     } catch (_) {}
-    if (deviceSerial.isEmpty) {
+    // Serials written by an older build may be outside the accepted alphabet,
+    // which registration rejects; replace those instead of failing forever.
+    if (!api.isValidDeviceSerial(deviceSerial)) {
       deviceSerial = api.generateDeviceSerial();
       await _savePrefs();
     }

@@ -42,7 +42,8 @@ class LoginDialog extends StatefulWidget {
 }
 
 class _LoginDialogState extends State<LoginDialog> {
-  late final String _signinUrl;
+  late String _signinUrl;
+  InAppWebViewController? _controller;
   final TextEditingController _paste = TextEditingController();
   bool _busy = false;
   bool _showPaste = false;
@@ -55,6 +56,18 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   bool _isRedirect(String url) => OAuth2.isRedirectUrl(url);
+
+  /// A failed exchange burns the authorization code, so a retry needs a fresh
+  /// sign-in URL, not a reload of the old one.
+  Future<void> _startOver() async {
+    final url = widget.state.beginLogin();
+    setState(() {
+      _signinUrl = url;
+      _error = null;
+      _busy = false;
+    });
+    await _controller?.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
+  }
 
   Future<void> _scanHistory(InAppWebViewController controller) async {
     if (_busy) return;
@@ -126,10 +139,36 @@ class _LoginDialogState extends State<LoginDialog> {
             ),
             if (_error != null)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 96),
+                      child: SingleChildScrollView(
+                        child: SelectableText(
+                          _error!,
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: _busy ? null : _startOver,
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 28),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text(
+                        'Start the sign-in over',
+                        style: TextStyle(color: StkColors.link, fontSize: 13),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             Expanded(

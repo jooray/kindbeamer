@@ -89,10 +89,12 @@ blue-grey surfaces with a teal accent instead of charcoal and Kindle orange.
    `client_domain=DeviceLegacy`, same public client id).
 4. `POST https://firs-ta-g7g.amazon.com/FirsProxy/registerDeviceWithToken` with an
    XML body (device type / serial / pid / software version mimicking the official
-   Mac client) returns the long-lived device credentials as XML. The serial is a
-   random 32-character `[0-9A-Z]` string generated once per installation and kept
-   in `settings.json`, so signing in again replaces this device's entry in the
-   account's device list instead of adding another one:
+   Mac client) returns the long-lived device credentials as XML. The serial is
+   generated once per installation and kept in `settings.json`, so signing in
+   again replaces this device's entry in the account's device list instead of
+   adding another one. Its shape is not free-form: known-good serials are
+   unpadded base32 of 20 random bytes (`[A-Z2-7]{32}`), and a serial outside that
+   alphabet is rejected at registration:
    `device_private_key` (PKCS#1 RSA PEM), `adp_token`, plus account metadata.
 5. The access token is discarded; only the device credentials are persisted
    (keychain / encrypted shared preferences; a mode-600 file as a last-resort

@@ -71,20 +71,61 @@ Future<String> tokenExchange(
   if (res.statusCode != 200) {
     throw ApiError('token exchange failed: HTTP ${res.statusCode}', res.body);
   }
-  return json.decode(res.body)['access_token'] as String;
+  final token = (json.decode(res.body) as Map<String, dynamic>)['access_token'];
+  if (token is! String || token.isEmpty) {
+    throw ApiError(
+      'token exchange returned no access token',
+      _snippet(res.body),
+    );
+  }
+  return token;
+}
+
+/// Enough of a response body to diagnose a failure, without pasting a whole
+/// error page into the UI.
+String _snippet(String body, [int max = 400]) {
+  final flat = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+  return flat.length <= max ? flat : '${flat.substring(0, max)}…';
+}
+
+/// Amazon has moved these fields between nesting levels before, so take every
+/// leaf element regardless of where it sits.
+Map<String, String> _flattenXml(XmlElement root) {
+  final out = <String, String>{};
+  void walk(XmlElement el) {
+    final children = el.children.whereType<XmlElement>().toList();
+    if (children.isEmpty) {
+      out.putIfAbsent(el.name.local, () => el.innerText.trim());
+      return;
+    }
+    for (final child in children) {
+      walk(child);
+    }
+  }
+
+  walk(root);
+  return out;
 }
 
 /// A per-installation device serial. The official clients ship one serial per
 /// install; reusing a single hard-coded value would make two installs on the
 /// same account fight over one entry in the device list.
+///
+/// The shape matters: known-good serials are unpadded RFC 4648 base32 of 20
+/// random bytes, so the alphabet is A-Z and 2-7 — a serial carrying 0, 1, 8 or
+/// 9 is not decodable and registration rejects it.
 String generateDeviceSerial() {
-  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
   final rnd = Random.secure();
   return List.generate(
     32,
     (_) => alphabet[rnd.nextInt(alphabet.length)],
   ).join();
 }
+
+final RegExp _serialPattern = RegExp(r'^[A-Z2-7]{32}$');
+
+bool isValidDeviceSerial(String serial) => _serialPattern.hasMatch(serial);
 
 Future<DeviceInfo> registerDeviceWithToken(
   String accessToken, {
@@ -124,10 +165,24 @@ Future<DeviceInfo> registerDeviceWithToken(
       res.body,
     );
   }
-  final doc = XmlDocument.parse(res.body);
-  final info = <String, String>{};
-  for (final el in doc.rootElement.children.whereType<XmlElement>()) {
-    info[el.name.local] = el.innerText;
+  final XmlDocument doc;
+  try {
+    doc = XmlDocument.parse(res.body);
+  } on XmlException catch (e) {
+    throw ApiError(
+      'device registration returned malformed XML (${e.message})',
+      _snippet(res.body),
+    );
+  }
+  final info = _flattenXml(doc.rootElement);
+  const required = ['device_private_key', 'adp_token', 'device_type'];
+  final missing = required.where((k) => (info[k] ?? '').isEmpty).toList();
+  if (missing.isNotEmpty) {
+    throw ApiError(
+      'device registration returned no credentials '
+      '(missing ${missing.join(', ')}; got ${info.keys.join(', ')})',
+      _snippet(res.body),
+    );
   }
   return DeviceInfo.fromMap(info);
 }
