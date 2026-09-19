@@ -47,13 +47,10 @@ class OAuth2 {
     return 'https://www.amazon.com/ap/signin?$qs';
   }
 
-  Future<DeviceInfo> complete(
-    String redirectUrl, {
-    required String deviceSerial,
-  }) async {
+  Future<DeviceInfo> complete(String redirectUrl) async {
     final code = parseAuthorizationCode(redirectUrl);
     final token = await api.tokenExchange(code, _verifier);
-    return api.registerDeviceWithToken(token, deviceSerial: deviceSerial);
+    return api.registerDeviceWithToken(token);
   }
 
   static bool isRedirectUrl(String url) {

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
-import '../amazon/api.dart' as api;
 import '../amazon/client.dart';
 import '../amazon/models.dart';
 import '../amazon/oauth.dart';
@@ -39,9 +38,6 @@ class AppState extends ChangeNotifier {
   String statusMessage = '';
   String? notice;
 
-  /// Stable per-installation serial sent at device registration.
-  String deviceSerial = '';
-
   OAuth2? _pendingOAuth;
 
   StkClient? get client => _client;
@@ -70,15 +66,8 @@ class AppState extends ChangeNotifier {
             .cast<String>()
             .toSet();
         archive = m['archive'] as bool? ?? true;
-        deviceSerial = m['device_serial'] as String? ?? '';
       }
     } catch (_) {}
-    // Serials written by an older build may be outside the accepted alphabet,
-    // which registration rejects; replace those instead of failing forever.
-    if (!api.isValidDeviceSerial(deviceSerial)) {
-      deviceSerial = api.generateDeviceSerial();
-      await _savePrefs();
-    }
     notifyListeners();
   }
 
@@ -86,11 +75,7 @@ class AppState extends ChangeNotifier {
     try {
       await supportDir.create(recursive: true);
       await _prefsFile.writeAsString(
-        json.encode({
-          'selected': selectedSerials.toList(),
-          'archive': archive,
-          'device_serial': deviceSerial,
-        }),
+        json.encode({'selected': selectedSerials.toList(), 'archive': archive}),
       );
     } catch (_) {}
   }
@@ -178,10 +163,7 @@ class AppState extends ChangeNotifier {
     final oauth = _pendingOAuth;
     if (oauth == null) return false;
     try {
-      final info = await oauth.complete(
-        redirectUrl,
-        deviceSerial: deviceSerial,
-      );
+      final info = await oauth.complete(redirectUrl);
       _client = StkClient(info);
       await _store.save(_client!);
       await refreshDevices();

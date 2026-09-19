@@ -89,12 +89,20 @@ blue-grey surfaces with a teal accent instead of charcoal and Kindle orange.
    `client_domain=DeviceLegacy`, same public client id).
 4. `POST https://firs-ta-g7g.amazon.com/FirsProxy/registerDeviceWithToken` with an
    XML body (device type / serial / pid / software version mimicking the official
-   Mac client) returns the long-lived device credentials as XML. The serial is
-   generated once per installation and kept in `settings.json`, so signing in
-   again replaces this device's entry in the account's device list instead of
-   adding another one. Its shape is not free-form: known-good serials are
-   unpadded base32 of 20 random bytes (`[A-Z2-7]{32}`), and a serial outside that
-   alphabet is rejected at registration:
+   Mac client) returns the long-lived device credentials as XML.
+
+   The `deviceSerialNumber` / `pid` pair is fixed
+   (`ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG` / `D21NN3GG`) and cannot be invented:
+   registering a freshly generated serial of the same shape (the known-good one
+   is unpadded base32, `[A-Z2-7]{32}`) against this pid answers HTTP 200 with
+   `<error><message>Internal Error</message></error>`, so the pid evidently has
+   to correspond to the serial. Both independent ports of this protocol
+   (`stkclient`, `stkclient-swift`) ship the same pair. The consequence is that
+   one account holds one KindBeamer registration at a time: signing in on a
+   second machine re-registers that serial and retires the first machine's
+   credentials.
+
+   The response body:
    `device_private_key` (PKCS#1 RSA PEM), `adp_token`, plus account metadata.
 5. The access token is discarded; only the device credentials are persisted
    (keychain / encrypted shared preferences; a mode-600 file as a last-resort
@@ -210,8 +218,8 @@ Anything else is rejected at intake with a snackbar explaining the supported set
   `credentials.json` (mode 600) in the app-support dir when no keychain is
   reachable. The pre-rename key `stk_next_client` is still read so an existing
   session survives the upgrade.
-- `settings.json` in the app-support dir: last selected device serials, the
-  archive checkbox and this installation's device serial.
+- `settings.json` in the app-support dir: last selected device serials and the
+  archive checkbox.
 - Nothing else leaves the device; uploads go directly to Amazon endpoints.
 
 ## 9. UI
@@ -237,8 +245,8 @@ Single window, 880×700 (minimum 620×520), dark:
 - `oauth_test.dart`: redirect parsing, signin URL parameters (PKCE, client id).
 - `ingest_test.dart`: PDF+EPUB acceptance, rejection/dedup, `file://` handling,
   unsupported-path reporting, human-readable sizes.
-- `app_state_test.dart`: device serial shape/uniqueness/persistence, prefs
-  round-trip, selection after removal, skip notice, send gating.
+- `app_state_test.dart`: prefs round-trip, selection after removal, skip notice,
+  send gating.
 - `home_page_test.dart`: window is a `DropTarget`; dropped PDF+EPUB populate the
   queue and drive the format banner; metadata editing; send gating; removal.
 
@@ -270,5 +278,7 @@ uploads each as an artifact.
 - USB/MTP transfer for 2024+ Kindles (no mass-storage mode on macOS).
 - Library management (list/delete personal documents).
 - Windows packaging; iOS build.
+- Derive a `pid` for a generated `deviceSerialNumber`, so two machines can hold
+  their own registration on one account instead of evicting each other.
 - Localization.
 - Notarized macOS build + signed Android release in CI.

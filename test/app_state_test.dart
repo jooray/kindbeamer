@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kindbeamer/src/amazon/api.dart' as api;
 import 'package:kindbeamer/src/state/app_state.dart';
 import 'package:kindbeamer/src/state/credentials_store.dart';
 
@@ -25,42 +23,6 @@ void main() {
     f.writeAsBytesSync(List.filled(64, 0x43));
     return f;
   }
-
-  test('device serial looks like a device serial and is unique per call', () {
-    final a = api.generateDeviceSerial();
-    final b = api.generateDeviceSerial();
-    expect(a, hasLength(32));
-    expect(a, matches(RegExp(r'^[A-Z2-7]{32}$')), reason: 'base32 alphabet');
-    expect(a, isNot(b));
-  });
-
-  test('device serial is generated once and reused across launches', () async {
-    final first = newState();
-    await first.loadPrefs();
-    expect(first.deviceSerial, hasLength(32));
-
-    final stored =
-        json.decode(await File('${tmp.path}/settings.json').readAsString())
-            as Map<String, dynamic>;
-    expect(stored['device_serial'], first.deviceSerial);
-
-    final second = newState();
-    await second.loadPrefs();
-    expect(second.deviceSerial, first.deviceSerial);
-  });
-
-  test('a serial from an older build is replaced, not reused', () async {
-    await File('${tmp.path}/settings.json').writeAsString(
-      json.encode({
-        'selected': <String>[],
-        'archive': true,
-        'device_serial': '0123456789ABCDEFGHIJKLMNOPQRSTUV',
-      }),
-    );
-    final state = newState();
-    await state.loadPrefs();
-    expect(state.deviceSerial, matches(RegExp(r'^[A-Z2-7]{32}$')));
-  });
 
   test('archive flag and device selection survive a restart', () async {
     final first = newState();

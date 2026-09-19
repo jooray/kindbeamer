@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
@@ -107,33 +106,26 @@ Map<String, String> _flattenXml(XmlElement root) {
   return out;
 }
 
-/// A per-installation device serial. The official clients ship one serial per
-/// install; reusing a single hard-coded value would make two installs on the
-/// same account fight over one entry in the device list.
+/// Serial and pid of the registered device.
 ///
-/// The shape matters: known-good serials are unpadded RFC 4648 base32 of 20
-/// random bytes, so the alphabet is A-Z and 2-7 — a serial carrying 0, 1, 8 or
-/// 9 is not decodable and registration rejects it.
-String generateDeviceSerial() {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  final rnd = Random.secure();
-  return List.generate(
-    32,
-    (_) => alphabet[rnd.nextInt(alphabet.length)],
-  ).join();
-}
+/// These two travel together and cannot be made up: registering with a freshly
+/// generated serial (base32, same shape) against this pid answers
+/// `<error><message>Internal Error</message></error>`, so the pid evidently has
+/// to correspond to the serial. Both independent ports of this protocol —
+/// `stkclient` (Python) and `stkclient-swift` — ship this same pair, which is
+/// what the service accepts.
+///
+/// The cost is that one Amazon account can hold one KindBeamer registration at
+/// a time: signing in on a second machine re-registers the same serial and
+/// retires the first machine's credentials. Deriving a matching pid would lift
+/// that; see the roadmap.
+const String deviceSerialNumber = 'ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG';
+const String devicePid = 'D21NN3GG';
 
-final RegExp _serialPattern = RegExp(r'^[A-Z2-7]{32}$');
-
-bool isValidDeviceSerial(String serial) => _serialPattern.hasMatch(serial);
-
-Future<DeviceInfo> registerDeviceWithToken(
-  String accessToken, {
-  required String deviceSerial,
-}) async {
+Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
   const deviceType = 'A1K6D1WRW0MALS';
-  final serial = deviceSerial;
-  const pid = 'D21NN3GG';
+  const serial = deviceSerialNumber;
+  const pid = devicePid;
   const softwareVersion = '253';
   const osVersion = 'MacOSX_10.14.6_x64';
   const deviceModel = 'KindBeamer';
