@@ -45,8 +45,20 @@ xattr -dr com.apple.quarantine /Applications/KindBeamer.app
 
 ### Linux
 
-No prebuilt package yet: build it from source (below). The `.desktop` file in
-`packaging/linux/` registers KindBeamer as an "Open With" target once installed.
+For arm64 (Omarchy on Apple silicon, Asahi, ARM boxes), take
+`KindBeamer-<version>-linux-arm64.tar.gz` from the
+[latest release](https://github.com/jooray/kindbeamer/releases/latest):
+
+```bash
+tar -xzf KindBeamer-1.0.0-linux-arm64.tar.gz
+./bundle/kindbeamer
+```
+
+It needs GTK 3 and glibc 2.34 or newer, which any current distribution has. On
+Arch: `pacman -S gtk3 libsecret`. Install it wherever you like and point the
+`.desktop` file in `packaging/linux/` at it to get "Open With" support.
+
+On x86-64 there is no prebuilt package yet, so build it from source (below).
 
 ## Features
 
