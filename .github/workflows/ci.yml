@@ -47,6 +47,37 @@ jobs:
           name: kindbeamer-linux-x64
           path: build/linux/x64/release/bundle
 
+  linux-arm64:
+    name: Build Linux (arm64)
+    runs-on: ubuntu-24.04-arm
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev \
+            git curl unzip xz-utils
+      # Flutter publishes no arm64 Linux SDK archive, so the SDK comes from git.
+      # The arm64 engine artifacts it then downloads do exist.
+      - name: Install Flutter
+        run: |
+          git clone --depth 1 --branch ${{ env.FLUTTER_VERSION }} \
+            https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter build linux --release
+      - name: Package the bundle
+        run: |
+          tar -czf kindbeamer-linux-arm64.tar.gz \
+            -C build/linux/arm64/release bundle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kindbeamer-linux-arm64
+          path: kindbeamer-linux-arm64.tar.gz
+
   android:
     name: Build Android
     runs-on: ubuntu-latest
