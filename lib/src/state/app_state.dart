@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
+import '../amazon/api.dart' as api;
 import '../amazon/client.dart';
 import '../amazon/models.dart';
 import '../amazon/oauth.dart';
@@ -18,11 +19,13 @@ class AppState extends ChangeNotifier {
     required this.supportDir,
     required CredentialsStore store,
     StkClient? client,
-  })  : _store = store,
-        _client = client;
+  }) : _store = store,
+       _client = client;
 
   final Directory supportDir;
   final CredentialsStore _store;
+
+  CredentialsBackend get credentialsBackend => _store.backend;
   StkClient? _client;
 
   List<OwnedDevice> devices = [];
@@ -36,28 +39,44 @@ class AppState extends ChangeNotifier {
   String statusMessage = '';
   String? notice;
 
+  /// Stable per-installation serial sent at device registration.
+  String deviceSerial = '';
+
   OAuth2? _pendingOAuth;
 
   StkClient? get client => _client;
   bool get signedIn => _client != null;
   String get accountName => _client?.accountName ?? '';
 
-  DocItem? get selectedDoc =>
-      selectedIndex >= 0 && selectedIndex < docs.length ? docs[selectedIndex] : null;
+  DocItem? get selectedDoc => selectedIndex >= 0 && selectedIndex < docs.length
+      ? docs[selectedIndex]
+      : null;
 
   bool get canSend =>
-      signedIn && docs.isNotEmpty && selectedSerials.isNotEmpty && phase != SendPhase.sending;
+      signedIn &&
+      docs.isNotEmpty &&
+      selectedSerials.isNotEmpty &&
+      phase != SendPhase.sending;
 
   File get _prefsFile => File(p.join(supportDir.path, 'settings.json'));
 
   Future<void> loadPrefs() async {
     try {
       if (await _prefsFile.exists()) {
-        final m = json.decode(await _prefsFile.readAsString()) as Map<String, dynamic>;
-        selectedSerials = ((m['selected'] as List?) ?? []).cast<String>().toSet();
+        final m =
+            json.decode(await _prefsFile.readAsString())
+                as Map<String, dynamic>;
+        selectedSerials = ((m['selected'] as List?) ?? [])
+            .cast<String>()
+            .toSet();
         archive = m['archive'] as bool? ?? true;
+        deviceSerial = m['device_serial'] as String? ?? '';
       }
     } catch (_) {}
+    if (deviceSerial.isEmpty) {
+      deviceSerial = api.generateDeviceSerial();
+      await _savePrefs();
+    }
     notifyListeners();
   }
 
@@ -65,16 +84,22 @@ class AppState extends ChangeNotifier {
     try {
       await supportDir.create(recursive: true);
       await _prefsFile.writeAsString(
-        json.encode({'selected': selectedSerials.toList(), 'archive': archive}),
+        json.encode({
+          'selected': selectedSerials.toList(),
+          'archive': archive,
+          'device_serial': deviceSerial,
+        }),
       );
     } catch (_) {}
   }
 
   void addFiles(List<String> paths) {
     final items = Ingest.itemsFor(paths);
+    final skipped = Ingest.unsupported(paths).length;
     if (items.isEmpty) {
       if (paths.isNotEmpty) {
-        notice = 'Unsupported file type. Drop PDF, EPUB or other Kindle documents.';
+        notice =
+            'Unsupported file type. Drop PDF, EPUB or other Kindle documents.';
         notifyListeners();
       }
       return;
@@ -83,7 +108,16 @@ class AppState extends ChangeNotifier {
       if (docs.any((d) => d.path == item.path)) continue;
       docs.add(item);
     }
+    if (skipped > 0) {
+      notice = skipped == 1
+          ? 'Skipped 1 file with an unsupported format.'
+          : 'Skipped $skipped files with unsupported formats.';
+    }
     if (selectedIndex < 0) selectedIndex = 0;
+    if (phase != SendPhase.sending) {
+      phase = SendPhase.idle;
+      statusMessage = '';
+    }
     notifyListeners();
   }
 
@@ -94,6 +128,7 @@ class AppState extends ChangeNotifier {
 
   void removeDoc(int i) {
     docs.removeAt(i);
+    if (i < selectedIndex) selectedIndex--;
     if (selectedIndex >= docs.length) selectedIndex = docs.length - 1;
     notifyListeners();
   }
@@ -141,7 +176,10 @@ class AppState extends ChangeNotifier {
     final oauth = _pendingOAuth;
     if (oauth == null) return false;
     try {
-      final info = await oauth.complete(redirectUrl);
+      final info = await oauth.complete(
+        redirectUrl,
+        deviceSerial: deviceSerial,
+      );
       _client = StkClient(info);
       await _store.save(_client!);
       await refreshDevices();
@@ -205,6 +243,7 @@ class AppState extends ChangeNotifier {
       final doc = docs[i];
       statusMessage = 'Sending ${doc.name} (${i + 1}/${docs.length})…';
       notifyListeners();
+      var lastPct = -1;
       try {
         await c.sendFile(
           File(doc.path),
@@ -213,6 +252,15 @@ class AppState extends ChangeNotifier {
           title: doc.title,
           format: doc.format.inputFormat,
           archive: archive,
+          onProgress: (sent, total) {
+            if (total <= 0) return;
+            final pct = (sent * 100 / total).clamp(0, 100).round();
+            if (pct == lastPct) return;
+            lastPct = pct;
+            statusMessage =
+                'Sending ${doc.name} (${i + 1}/${docs.length}) — $pct%';
+            notifyListeners();
+          },
         );
       } catch (e) {
         ok = false;

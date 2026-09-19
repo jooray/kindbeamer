@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:send_to_kindle_next/src/state/documents.dart';
+import 'package:kindbeamer/src/state/documents.dart';
 
 void main() {
   late Directory tmp;
@@ -44,6 +44,17 @@ void main() {
     final pdf = write('b.pdf', 10);
     final out = Ingest.filterAccepted([Uri.file(pdf.path).toString()]);
     expect(out, [pdf.path]);
+  });
+
+  test('unsupported paths are reported for the skip notice', () {
+    final pdf = write('c.pdf', 10);
+    final exe = write('evil.exe', 10);
+    final zip = write('bundle.zip', 10);
+    expect(
+      Ingest.unsupported([pdf.path, exe.path, Uri.file(zip.path).toString()]),
+      [exe.path, zip.path],
+    );
+    expect(Ingest.unsupported([pdf.path]), isEmpty);
   });
 
   test('human readable sizes', () {

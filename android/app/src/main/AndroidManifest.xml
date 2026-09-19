@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="Send to Kindle"
+        android:label="KindBeamer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -30,8 +30,11 @@
                 <data android:mimeType="application/pdf"/>
                 <data android:mimeType="application/epub+zip"/>
                 <data android:mimeType="application/x-mobipocket-ebook"/>
+                <data android:mimeType="application/vnd.amazon.ebook"/>
                 <data android:mimeType="text/plain"/>
                 <data android:mimeType="text/html"/>
+                <data android:mimeType="text/rtf"/>
+                <data android:mimeType="application/rtf"/>
                 <data android:mimeType="application/msword"/>
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
                 <data android:mimeType="image/png"/>
@@ -45,8 +48,11 @@
                 <data android:mimeType="application/pdf"/>
                 <data android:mimeType="application/epub+zip"/>
                 <data android:mimeType="application/x-mobipocket-ebook"/>
+                <data android:mimeType="application/vnd.amazon.ebook"/>
                 <data android:mimeType="text/plain"/>
                 <data android:mimeType="text/html"/>
+                <data android:mimeType="text/rtf"/>
+                <data android:mimeType="application/rtf"/>
                 <data android:mimeType="application/msword"/>
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
                 <data android:mimeType="image/png"/>
@@ -57,8 +63,21 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:mimeType="application/pdf"/>
                 <data android:mimeType="application/epub+zip"/>
+                <data android:mimeType="application/x-mobipocket-ebook"/>
+                <data android:mimeType="application/vnd.amazon.ebook"/>
+                <data android:mimeType="text/plain"/>
+                <data android:mimeType="text/html"/>
+                <data android:mimeType="text/rtf"/>
+                <data android:mimeType="application/rtf"/>
+                <data android:mimeType="application/msword"/>
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+                <data android:mimeType="image/png"/>
+                <data android:mimeType="image/jpeg"/>
+                <data android:mimeType="image/gif"/>
+                <data android:mimeType="image/bmp"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

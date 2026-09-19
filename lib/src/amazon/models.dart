@@ -22,28 +22,28 @@ class DeviceInfo {
   final String? homeRegion;
 
   static DeviceInfo fromMap(Map<String, dynamic> d) => DeviceInfo(
-        devicePrivateKey: d['device_private_key'] as String,
-        adpToken: d['adp_token'] as String,
-        deviceType: d['device_type'] as String,
-        givenName: d['given_name'] as String? ?? '',
-        name: d['name'] as String? ?? '',
-        accountPool: d['account_pool'] as String? ?? 'Amazon',
-        userDirectedId: d['user_directed_id'] as String? ?? '',
-        userDeviceName: d['user_device_name'] as String? ?? '',
-        homeRegion: d['home_region'] as String?,
-      );
+    devicePrivateKey: d['device_private_key'] as String,
+    adpToken: d['adp_token'] as String,
+    deviceType: d['device_type'] as String,
+    givenName: d['given_name'] as String? ?? '',
+    name: d['name'] as String? ?? '',
+    accountPool: d['account_pool'] as String? ?? 'Amazon',
+    userDirectedId: d['user_directed_id'] as String? ?? '',
+    userDeviceName: d['user_device_name'] as String? ?? '',
+    homeRegion: d['home_region'] as String?,
+  );
 
   Map<String, dynamic> toMap() => {
-        'device_private_key': devicePrivateKey,
-        'adp_token': adpToken,
-        'device_type': deviceType,
-        'given_name': givenName,
-        'name': name,
-        'account_pool': accountPool,
-        'user_directed_id': userDirectedId,
-        'user_device_name': userDeviceName,
-        'home_region': homeRegion,
-      };
+    'device_private_key': devicePrivateKey,
+    'adp_token': adpToken,
+    'device_type': deviceType,
+    'given_name': givenName,
+    'name': name,
+    'account_pool': accountPool,
+    'user_directed_id': userDirectedId,
+    'user_device_name': userDeviceName,
+    'home_region': homeRegion,
+  };
 }
 
 class OwnedDevice {
@@ -58,11 +58,11 @@ class OwnedDevice {
   final String deviceSerialNumber;
 
   static OwnedDevice fromMap(Map<String, dynamic> d) => OwnedDevice(
-        deviceCapabilities:
-            (d['deviceCapabilities'] as Map<String, dynamic>?) ?? const {},
-        deviceName: d['deviceName'] as String? ?? '',
-        deviceSerialNumber: d['deviceSerialNumber'] as String? ?? '',
-      );
+    deviceCapabilities:
+        (d['deviceCapabilities'] as Map<String, dynamic>?) ?? const {},
+    deviceName: d['deviceName'] as String? ?? '',
+    deviceSerialNumber: d['deviceSerialNumber'] as String? ?? '',
+  );
 }
 
 class UploadUrlResponse {
@@ -78,13 +78,12 @@ class UploadUrlResponse {
   final String stkToken;
   final String uploadUrl;
 
-  static UploadUrlResponse fromMap(Map<String, dynamic> d) =>
-      UploadUrlResponse(
-        expiryTime: d['expiryTime'] as int? ?? 0,
-        statusCode: d['statusCode'] as int? ?? -1,
-        stkToken: d['stkToken'] as String,
-        uploadUrl: d['uploadUrl'] as String,
-      );
+  static UploadUrlResponse fromMap(Map<String, dynamic> d) => UploadUrlResponse(
+    expiryTime: d['expiryTime'] as int? ?? 0,
+    statusCode: d['statusCode'] as int? ?? -1,
+    stkToken: d['stkToken'] as String,
+    uploadUrl: d['uploadUrl'] as String,
+  );
 }
 
 class SendToKindleResponse {

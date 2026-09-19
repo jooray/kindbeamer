@@ -73,11 +73,15 @@ class DocItem {
 }
 
 class Ingest {
+  /// `file://` URLs (drag & drop, share intents) become plain paths.
+  static String normalize(String raw) =>
+      raw.startsWith('file://') ? Uri.parse(raw).toFilePath() : raw;
+
   static List<String> filterAccepted(Iterable<String> paths) {
     final seen = <String>{};
     final out = <String>[];
     for (final raw in paths) {
-      final path = raw.startsWith('file://') ? Uri.parse(raw).toFilePath() : raw;
+      final path = normalize(raw);
       if (DocFormat.forPath(path) == null) continue;
       if (!seen.add(path)) continue;
       out.add(path);
@@ -85,17 +89,25 @@ class Ingest {
     return out;
   }
 
+  /// Paths the app cannot send, so the UI can say what it dropped on the floor.
+  static List<String> unsupported(Iterable<String> paths) => paths
+      .map(normalize)
+      .where((path) => DocFormat.forPath(path) == null)
+      .toList();
+
   static List<DocItem> itemsFor(Iterable<String> paths) {
     final items = <DocItem>[];
     for (final path in filterAccepted(paths)) {
       final file = File(path);
       final size = file.existsSync() ? file.lengthSync() : 0;
-      items.add(DocItem(
-        path: path,
-        name: p.basename(path),
-        size: size,
-        format: DocFormat.forPath(path)!,
-      ));
+      items.add(
+        DocItem(
+          path: path,
+          name: p.basename(path),
+          size: size,
+          format: DocFormat.forPath(path)!,
+        ),
+      );
     }
     return items;
   }

@@ -16,7 +16,9 @@ class OAuth2 {
   late final String _verifier;
 
   String get signinUrl {
-    final challenge = _base64UrlEncode(sha256.convert(utf8.encode(_verifier)).bytes);
+    final challenge = _base64UrlEncode(
+      sha256.convert(utf8.encode(_verifier)).bytes,
+    );
     final q = {
       'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
       'openid.ns.oa2': 'http://www.amazon.com/ap/ext/oauth/2',
@@ -28,7 +30,7 @@ class OAuth2 {
       'openid.oa2.response_type': 'code',
       'openid.oa2.code_challenge': challenge,
       'openid.oa2.code_challenge_method': 'S256',
-      'openid.return_to': 'https://www.amazon.com/gp/sendtokindle',
+      'openid.return_to': 'https://www.amazon.com/sendtokindle/maplanding',
       'openid.ns.pape': 'http://specs.openid.net/extensions/pape/1.0',
       'openid.pape.max_auth_age': '0',
       'accountStatusPolicy': 'P1',
@@ -37,15 +39,32 @@ class OAuth2 {
       'disableLoginPrepopulate': '1',
     };
     final qs = q.entries
-        .map((e) => '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
+        )
         .join('&');
     return 'https://www.amazon.com/ap/signin?$qs';
   }
 
-  Future<DeviceInfo> complete(String redirectUrl) async {
+  Future<DeviceInfo> complete(
+    String redirectUrl, {
+    required String deviceSerial,
+  }) async {
     final code = parseAuthorizationCode(redirectUrl);
     final token = await api.tokenExchange(code, _verifier);
-    return api.registerDeviceWithToken(token);
+    return api.registerDeviceWithToken(token, deviceSerial: deviceSerial);
+  }
+
+  static bool isRedirectUrl(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return false;
+    final code = uri.queryParameters['openid.oa2.authorization_code'];
+    if (code == null || code.isEmpty) return false;
+    if (uri.scheme == 'sendtokindle') return true;
+    return uri.host == 'www.amazon.com' &&
+        (uri.path.startsWith('/sendtokindle/maplanding') ||
+            uri.path.startsWith('/gp/sendtokindle'));
   }
 
   static String parseAuthorizationCode(String redirectUrl) {

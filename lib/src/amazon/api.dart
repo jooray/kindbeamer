@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
@@ -42,7 +44,10 @@ const Map<String, String> _commonHeaders = {
   'User-Agent': 'Mozilla/5.0',
 };
 
-Future<String> tokenExchange(String authorizationCode, String codeVerifier) async {
+Future<String> tokenExchange(
+  String authorizationCode,
+  String codeVerifier,
+) async {
   final body = json.encode({
     'app_name': 'Unknown',
     'client_domain': 'DeviceLegacy',
@@ -69,14 +74,30 @@ Future<String> tokenExchange(String authorizationCode, String codeVerifier) asyn
   return json.decode(res.body)['access_token'] as String;
 }
 
-Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
+/// A per-installation device serial. The official clients ship one serial per
+/// install; reusing a single hard-coded value would make two installs on the
+/// same account fight over one entry in the device list.
+String generateDeviceSerial() {
+  const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  final rnd = Random.secure();
+  return List.generate(
+    32,
+    (_) => alphabet[rnd.nextInt(alphabet.length)],
+  ).join();
+}
+
+Future<DeviceInfo> registerDeviceWithToken(
+  String accessToken, {
+  required String deviceSerial,
+}) async {
   const deviceType = 'A1K6D1WRW0MALS';
-  const serial = 'ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG';
+  final serial = deviceSerial;
   const pid = 'D21NN3GG';
   const softwareVersion = '253';
   const osVersion = 'MacOSX_10.14.6_x64';
-  const deviceModel = 'Send to Kindle Next';
-  final body = "<?xml version='1.0' encoding='UTF-8'?>\n"
+  const deviceModel = 'KindBeamer';
+  final body =
+      "<?xml version='1.0' encoding='UTF-8'?>\n"
       '<request><parameters>'
       '<deviceType>$deviceType</deviceType>'
       '<deviceSerialNumber>$serial</deviceSerialNumber>'
@@ -98,7 +119,10 @@ Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
     body: body,
   );
   if (res.statusCode != 200) {
-    throw ApiError('device registration failed: HTTP ${res.statusCode}', res.body);
+    throw ApiError(
+      'device registration failed: HTTP ${res.statusCode}',
+      res.body,
+    );
   }
   final doc = XmlDocument.parse(res.body);
   final info = <String, String>{};
@@ -113,10 +137,9 @@ Future<Map<String, dynamic>> _request(
   AdpSigner signer,
   Map<String, dynamic> body,
 ) async {
-  final data = const JsonEncoder.withIndent('    ').convert({
-    'ClientInfo': _clientInfo(),
-    ...body,
-  });
+  final data = const JsonEncoder.withIndent(
+    '    ',
+  ).convert({'ClientInfo': _clientInfo(), ...body});
   final res = await http.post(
     Uri.parse(_stkUrl + path),
     headers: {
@@ -149,19 +172,35 @@ Future<UploadUrlResponse> getUploadUrl(AdpSigner signer, int fileSize) async {
   return UploadUrlResponse.fromMap(res);
 }
 
-Future<void> uploadFile(String url, List<int> bytes) async {
-  final res = await http.put(
-    Uri.parse(url),
-    headers: {
-      'Accept-Encoding': 'gzip, deflate',
-      'Accept-Language': 'en-US,*',
-      'Content-Length': '${bytes.length}',
-      'User-Agent': 'Mozilla/5.0',
-    },
-    body: bytes,
-  );
-  if (res.statusCode != 200) {
-    throw ApiError('upload failed: HTTP ${res.statusCode}', res.body);
+/// Streams [file] to the presigned S3 URL, reporting bytes written so the UI can
+/// show progress for large books.
+Future<void> uploadFile(
+  String url,
+  File file, {
+  required int length,
+  void Function(int sent, int total)? onProgress,
+}) async {
+  final client = http.Client();
+  try {
+    final request = http.StreamedRequest('PUT', Uri.parse(url))
+      ..contentLength = length
+      ..headers.addAll({'Accept-Encoding': 'gzip, deflate', ..._commonHeaders});
+    var sent = 0;
+    final body = file.openRead().map((chunk) {
+      sent += chunk.length;
+      onProgress?.call(sent, length);
+      return chunk;
+    });
+    // Feeding through `addStream` keeps the socket in charge of the pace, so a
+    // large file never has to sit in memory in one piece.
+    unawaited(request.sink.addStream(body).whenComplete(request.sink.close));
+    final res = await client.send(request);
+    final resBody = await res.stream.bytesToString();
+    if (res.statusCode != 200) {
+      throw ApiError('upload failed: HTTP ${res.statusCode}', resBody);
+    }
+  } finally {
+    client.close();
   }
 }
 

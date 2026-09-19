@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:send_to_kindle_next/src/state/app_state.dart';
-import 'package:send_to_kindle_next/src/state/credentials_store.dart';
-import 'package:send_to_kindle_next/src/ui/home_page.dart';
+import 'package:kindbeamer/src/state/app_state.dart';
+import 'package:kindbeamer/src/state/credentials_store.dart';
+import 'package:kindbeamer/src/ui/home_page.dart';
 
 void main() {
   late Directory tmp;
@@ -13,10 +13,7 @@ void main() {
 
   setUp(() async {
     tmp = await Directory.systemTemp.createTemp('stk_ui');
-    state = AppState(
-      supportDir: tmp,
-      store: CredentialsStore(tmp),
-    );
+    state = AppState(supportDir: tmp, store: CredentialsStore(tmp));
     await state.loadPrefs();
   });
 
@@ -50,8 +47,9 @@ void main() {
     );
   });
 
-  testWidgets('dropped pdf and epub appear and drive the status strip',
-      (tester) async {
+  testWidgets('dropped pdf and epub appear and drive the status strip', (
+    tester,
+  ) async {
     final pdf = write('bluehat.pdf', 9680 * 1024 ~/ 1000 * 1000);
     final epub = write('novel.epub', 2 * 1024 * 1024);
 
@@ -61,22 +59,32 @@ void main() {
 
     expect(find.text('bluehat.pdf'), findsOneWidget);
     expect(find.text('novel.epub'), findsOneWidget);
-    expect(find.text('Your document will be sent in PDF format.'), findsOneWidget);
+    expect(
+      find.text('Your document will be sent in PDF format.'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text('novel.epub'));
     await tester.pumpAndSettle();
-    expect(find.text('Your document will be sent in EPUB format.'), findsOneWidget);
+    expect(
+      find.text('Your document will be sent in EPUB format.'),
+      findsOneWidget,
+    );
     expect(find.text('2.00 MB'), findsNWidgets(2));
   });
 
-  testWidgets('title and author fields edit the selected document',
-      (tester) async {
+  testWidgets('title and author fields edit the selected document', (
+    tester,
+  ) async {
     final pdf = write('doc.pdf', 100);
     await pump(tester);
     state.addFiles([pdf.path]);
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byKey(const ValueKey('title-field')), 'My Title');
+    await tester.enterText(
+      find.byKey(const ValueKey('title-field')),
+      'My Title',
+    );
     await tester.enterText(find.byKey(const ValueKey('author-field')), 'Me');
     await tester.pump();
 
@@ -84,8 +92,9 @@ void main() {
     expect(state.docs.single.author, 'Me');
   });
 
-  testWidgets('send button stays disabled without login and devices',
-      (tester) async {
+  testWidgets('send button stays disabled without login and devices', (
+    tester,
+  ) async {
     final pdf = write('doc.pdf', 100);
     await pump(tester);
     state.addFiles([pdf.path]);

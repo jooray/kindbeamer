@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Send to Kindle</string>
+	<string>KindBeamer</string>
 	<key>CFBundleDisplayName</key>
-	<string>Send to Kindle</string>
+	<string>KindBeamer</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -43,12 +43,26 @@
 			</array>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>public.archive</string>
+				<string>org.idpf.epub-container</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Document</string>
+			<string>Kindle book</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>mobi</string>
+				<string>azw</string>
+				<string>azw3</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Text document</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
@@ -58,12 +72,40 @@
 				<string>txt</string>
 				<string>html</string>
 				<string>htm</string>
-				<string>mobi</string>
-				<string>azw3</string>
-				<string>azw</string>
 				<string>doc</string>
 				<string>docx</string>
 				<string>rtf</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+				<string>public.html</string>
+				<string>com.microsoft.word.doc</string>
+				<string>org.openxmlformats.wordprocessingml.document</string>
+				<string>public.rtf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Image</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>png</string>
+				<string>jpg</string>
+				<string>jpeg</string>
+				<string>gif</string>
+				<string>bmp</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.png</string>
+				<string>public.jpeg</string>
+				<string>com.compuserve.gif</string>
+				<string>com.microsoft.bmp</string>
 			</array>
 		</dict>
 	</array>
@@ -77,12 +119,12 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>Send to Kindle Next</string>
+				<string>Send with KindBeamer</string>
 			</dict>
 			<key>NSSendFileTypes</key>
 			<array>
 				<string>com.adobe.pdf</string>
-				<string>public.archive</string>
+				<string>org.idpf.epub-container</string>
 				<string>public.plain-text</string>
 				<string>public.html</string>
 				<string>com.microsoft.word.doc</string>

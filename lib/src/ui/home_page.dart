@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         border: Border(bottom: BorderSide(color: Color(0xFF1C1C1C))),
       ),
-      padding: const EdgeInsets.fromLTRB(24, 18, 24, 18),
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
       child: Row(
         children: [
           Expanded(
@@ -131,34 +131,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               alignment: Alignment.centerLeft,
               child: RichText(
                 text: const TextSpan(
-              children: [
-                TextSpan(
-                  text: 'send to ',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w300,
-                    color: StkColors.textPrimary,
-                  ),
-                ),
-                TextSpan(
-                  text: 'kindle',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w600,
-                    color: StkColors.orange,
-                  ),
-                ),
-                  TextSpan(
-                    text: '  next',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: StkColors.textSecondary,
+                  children: [
+                    TextSpan(
+                      text: 'kind',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: StkColors.accent,
+                      ),
                     ),
-                  ),
-                ],
+                    TextSpan(
+                      text: 'beamer',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w300,
+                        color: StkColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             ),
           ),
           const SizedBox(width: 12),
@@ -168,9 +160,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               foregroundColor: StkColors.textPrimary,
               side: const BorderSide(color: StkColors.borderLight),
               shape: const StadiumBorder(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             ),
-            child: const Text('Add files…', style: TextStyle(fontSize: 15)),
+            child: const Text('Add files…', style: TextStyle(fontSize: 13)),
           ),
         ],
       ),
@@ -179,30 +171,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _body() {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 10),
       children: [
         Text('Your document', style: heading()),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         if (state.docs.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Text(
               'Drop files anywhere in this window, use “Add files…”, '
               'or share from another app.',
-              style: TextStyle(color: StkColors.textFaint, fontSize: 14),
+              style: TextStyle(color: StkColors.textFaint, fontSize: 12.5),
             ),
           )
         else
           _docList(),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         _metadataFields(),
-        const SizedBox(height: 22),
+        const SizedBox(height: 14),
         Text('Delivery options', style: heading()),
         const SizedBox(height: 12),
         _devicesBox(),
-        const SizedBox(height: 16),
-        _archiveBox(),
         const SizedBox(height: 10),
+        _archiveBox(),
+        const SizedBox(height: 6),
         if (state.selectedDoc != null)
           Text(
             DocItem.humanSize(state.selectedDoc!.size),
@@ -230,7 +222,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             onTap: () => state.selectDoc(i),
             child: Container(
               color: selected ? const Color(0xFF333333) : null,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: Row(
                 children: [
                   Icon(
@@ -255,12 +247,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   ),
                   Text(
                     DocItem.humanSize(doc.size),
-                    style: const TextStyle(color: StkColors.textFaint, fontSize: 12),
+                    style: const TextStyle(
+                      color: StkColors.textFaint,
+                      fontSize: 12,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () => state.removeDoc(i),
-                    child: const Icon(Icons.close, size: 16, color: StkColors.textFaint),
+                    child: const Icon(
+                      Icons.close,
+                      size: 16,
+                      color: StkColors.textFaint,
+                    ),
                   ),
                 ],
               ),
@@ -280,20 +279,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           controller: _title,
           enabled: doc != null,
           onChanged: (v) => doc?.title = v,
-          style: const TextStyle(color: StkColors.textPrimary, fontSize: 15),
+          style: const TextStyle(color: StkColors.textPrimary, fontSize: 13.5),
           decoration: const InputDecoration(
             isDense: true,
             hintText: '<Document Title>',
             hintStyle: TextStyle(color: StkColors.textFaint),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         TextField(
           key: const ValueKey('author-field'),
           controller: _author,
           enabled: doc != null,
           onChanged: (v) => doc?.author = v,
-          style: const TextStyle(color: StkColors.textPrimary, fontSize: 15),
+          style: const TextStyle(color: StkColors.textPrimary, fontSize: 13.5),
           decoration: const InputDecoration(
             isDense: true,
             hintText: '<Document Author>',
@@ -308,7 +307,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (!state.signedIn) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: StkColors.panel,
           border: Border.all(color: StkColors.border),
@@ -318,12 +317,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             const Text(
               'Sign in with your Amazon account to see your devices.',
-              style: TextStyle(color: StkColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: StkColors.textSecondary, fontSize: 12.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             FilledButton(
               onPressed: () => showLoginDialog(context, state),
-              style: FilledButton.styleFrom(backgroundColor: StkColors.blue),
+              style: FilledButton.styleFrom(
+                backgroundColor: StkColors.accentDark,
+              ),
               child: const Text('Sign in'),
             ),
           ],
@@ -331,7 +332,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       );
     }
     return Container(
-      constraints: const BoxConstraints(maxHeight: 210),
+      constraints: const BoxConstraints(maxHeight: 168),
       decoration: BoxDecoration(
         color: StkColors.panel,
         border: Border.all(color: StkColors.border),
@@ -354,12 +355,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 for (final d in state.devices)
                   CheckboxListTile(
                     value: state.selectedSerials.contains(d.deviceSerialNumber),
-                    onChanged: (v) => state.toggleDevice(d.deviceSerialNumber, v),
+                    onChanged: (v) =>
+                        state.toggleDevice(d.deviceSerialNumber, v),
                     title: Text(
                       d.deviceName,
                       style: const TextStyle(
                         color: StkColors.textPrimary,
-                        fontSize: 15,
+                        fontSize: 13.5,
                       ),
                     ),
                     controlAffinity: ListTileControlAffinity.leading,
@@ -381,9 +383,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         onChanged: (v) => state.setArchive(v ?? true),
         title: const Text(
           'Archive document in your Kindle Library',
-          style: TextStyle(color: StkColors.textPrimary, fontSize: 15),
+          style: TextStyle(color: StkColors.textPrimary, fontSize: 13.5),
         ),
         controlAffinity: ListTileControlAffinity.leading,
+        dense: true,
       ),
     );
   }
@@ -393,7 +396,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     String text;
     if (state.phase == SendPhase.sending) {
       text = state.statusMessage;
-    } else if (state.phase == SendPhase.done || state.phase == SendPhase.error) {
+    } else if (state.phase == SendPhase.done ||
+        state.phase == SendPhase.error) {
       text = state.statusMessage;
     } else if (doc == null) {
       text = 'No valid document is selected to send.';
@@ -402,18 +406,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: const BoxDecoration(
-        color: Color(0xFF2F2F2F),
+        color: StkColors.statusStrip,
         border: Border(
-          top: BorderSide(color: Color(0xFF1A1A1A)),
-          left: BorderSide(color: Color(0xFF454545), width: 3),
+          top: BorderSide(color: Color(0xFF151B23)),
+          left: BorderSide(color: StkColors.accent, width: 3),
         ),
       ),
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: StkColors.textPrimary, fontSize: 15),
+        style: const TextStyle(color: StkColors.textPrimary, fontSize: 13),
       ),
     );
   }
@@ -422,7 +426,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final canSend = state.canSend;
     return Container(
       color: StkColors.footer,
-      padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
       child: Row(
         children: [
           Expanded(
@@ -435,7 +439,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 _sep(),
                 _link(
                   'Need Help?',
-                  () => _openUrl('https://github.com/jooray/send-to-kindle-next'),
+                  () => _openUrl('https://github.com/jooray/kindbeamer'),
                 ),
                 _sep(),
                 _link(
@@ -452,11 +456,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             Colors.black87,
             state.phase == SendPhase.sending ? null : () => state.clearDocs(),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           _pillButton(
             state.phase == SendPhase.sending ? 'Sending…' : 'Send',
-            canSend ? StkColors.blue : const Color(0xFFB9B9B9),
-            canSend ? Colors.white : const Color(0xFF6E6E6E),
+            canSend ? StkColors.accentDark : const Color(0xFFB9C2CC),
+            canSend ? Colors.white : const Color(0xFF5A6472),
             canSend ? () => state.send() : null,
           ),
         ],
@@ -471,7 +475,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         label,
         style: const TextStyle(
           color: StkColors.link,
-          fontSize: 15,
+          fontSize: 13,
           decoration: TextDecoration.underline,
         ),
       ),
@@ -479,22 +483,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _sep() => const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Text('|', style: TextStyle(color: StkColors.textFaint)),
-      );
+    padding: EdgeInsets.symmetric(horizontal: 10),
+    child: Text('|', style: TextStyle(color: StkColors.textFaint)),
+  );
 
   Widget _pillButton(String label, Color bg, Color fg, VoidCallback? onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 9),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(22),
         ),
         child: Text(
           label,
-          style: TextStyle(color: fg, fontSize: 16, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: fg,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -502,21 +510,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _dropOverlay() {
     return Container(
-      color: const Color(0xCC202020),
+      color: const Color(0xCC141A22),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: const [
-            Icon(Icons.file_upload_rounded, size: 170, color: Color(0xFF8F8F8F)),
+            Icon(
+              Icons.file_upload_rounded,
+              size: 110,
+              color: Color(0xFF93A3B5),
+            ),
             SizedBox(height: 8),
             Text(
               'Drop files here',
-              style: TextStyle(fontSize: 36, color: StkColors.orange),
+              style: TextStyle(fontSize: 26, color: StkColors.accent),
             ),
             SizedBox(height: 6),
             Text(
               'to send to your Kindle',
-              style: TextStyle(fontSize: 21, color: StkColors.orange),
+              style: TextStyle(fontSize: 16, color: StkColors.accent),
             ),
           ],
         ),

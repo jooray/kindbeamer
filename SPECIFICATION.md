@@ -1,4 +1,4 @@
-# Specification — Send to Kindle Next
+# Specification — KindBeamer
 
 Unofficial cross-platform (macOS / Linux / Android) client for Amazon's
 *Send to Kindle* cloud service, built with Flutter. This document describes the
@@ -50,8 +50,8 @@ lib/
 
 State management is a single `ChangeNotifier` (`AppState`) consumed through
 `ListenableBuilder`; no external state package. UI is Material 3 with a custom
-dark palette sampled from the official app (charcoal surfaces, Kindle orange
-accent, blue primary action).
+dark palette — the official app's layout, deliberately not its colours: slate
+blue-grey surfaces with a teal accent instead of charcoal and Kindle orange.
 
 ## 3. Authentication
 
@@ -60,22 +60,45 @@ accent, blue primary action).
    parameters used by official device clients, notably
    `openid.oa2.client_id=device:<client-id>`, `openid.oa2.scope=device_auth_access`,
    `openid.oa2.code_challenge_method=S256` and
-   `openid.return_to=https://www.amazon.com/gp/sendtokindle`.
-2. The URL is loaded in an embedded webview (macOS/Android/iOS/Windows). When the
-   webview navigates to the `return_to` URL carrying
-   `openid.oa2.authorization_code=…`, the code is captured and the webview closes.
-   Platforms without a webview (Linux) open the system browser and offer a
-   "paste the redirect URL" field.
+   `openid.return_to=https://www.amazon.com/sendtokindle/maplanding` (the same
+   return target the official desktop apps use).
+2. The URL is loaded in an embedded webview (macOS/Android/iOS/Windows) that
+   presents the platform's stock browser user agent, because Amazon serves a
+   degraded sign-in page to unknown ones. After login Amazon redirects to the
+   `return_to` URL carrying `openid.oa2.authorization_code=…`; that page then
+   bounces (after ~100 ms) to the `sendtokindle://` scheme URL of the official
+   app. The webview captures the code from whichever hop it observes:
+
+   - `shouldOverrideUrlLoading` (`useShouldOverrideUrlLoading: true`) — the only
+     hook that sees the `sendtokindle://` navigation, which the webview would
+     otherwise swallow without a word;
+   - `onLoadStart` / `onLoadStop` / `onUpdateVisitedHistory` for the landing page
+     itself, plus a `window.location.href` read after load in case the code only
+     ever existed in a server-side redirect hop;
+   - `onReceivedError` and a back/forward history scan as the last nets.
+
+   Whichever fires first wins (`_complete` is idempotent), the dialog shows a
+   "Completing sign-in…" veil and closes. Platforms without a webview (Linux)
+   open the system browser and offer a "paste the redirect URL" field.
+
+   (Flow confirmed by analyzing the official macOS Qt binary: it registers the
+   `sendtokindle:` URL scheme and uses the `…/sendtokindle/maplanding` return
+   target, whose served JS performs the scheme bounce.)
 3. `POST https://api.amazon.com/auth/token` exchanges the code (+ verifier) for
    an access token (`source_token_type=authorization_code`,
    `client_domain=DeviceLegacy`, same public client id).
 4. `POST https://firs-ta-g7g.amazon.com/FirsProxy/registerDeviceWithToken` with an
    XML body (device type / serial / pid / software version mimicking the official
-   Mac client) returns the long-lived device credentials as XML:
+   Mac client) returns the long-lived device credentials as XML. The serial is a
+   random 32-character `[0-9A-Z]` string generated once per installation and kept
+   in `settings.json`, so signing in again replaces this device's entry in the
+   account's device list instead of adding another one:
    `device_private_key` (PKCS#1 RSA PEM), `adp_token`, plus account metadata.
 5. The access token is discarded; only the device credentials are persisted
-   (keychain / encrypted shared preferences; plaintext file with default
-   permissions only as a last-resort fallback on Linux without a secret service).
+   (keychain / encrypted shared preferences; a mode-600 file as a last-resort
+   fallback where no keychain is reachable — Linux without a secret service, or
+   an ad-hoc signed macOS build, which has no keychain access group). The
+   Settings dialog says which of the two is in use.
 
 Sign-out calls `GET /FirsProxy/disownFiona?contentDeleted=false` (signed) and
 deletes local credentials.
@@ -110,7 +133,7 @@ All bodies are JSON with a `ClientInfo` block (`appName: ShellExtension`,
 |---|---|---|
 | list devices | `POST stkservice.amazon.com/GetListOfOwnedDevices` `{}` | `ownedDevices[]` with names, serials, capabilities |
 | upload url | `POST stkservice.amazon.com/GetUploadUrl` `{"fileSize": n}` | presigned `uploadUrl` + `stkToken` |
-| upload | `PUT <uploadUrl>` body = raw file bytes, `Content-Length` set | S3 |
+| upload | `PUT <uploadUrl>` body = the file streamed from disk, `Content-Length` set | S3 |
 | deliver | `POST stkservice.amazon.com/SendToKindle` | see below |
 | logout | `GET firs-ta-g7g.amazon.com/FirsProxy/disownFiona?contentDeleted=false` | unregister device |
 
@@ -130,21 +153,32 @@ All bodies are JSON with a `ClientInfo` block (`appName: ShellExtension`,
 `inputFormat` is derived from the file extension (see §7); `archive` mirrors the
 "Archive document in your Kindle Library" checkbox; `targetDevices` are the
 serials ticked in the device list. Multiple queued documents are sent
-sequentially, each with its own metadata and upload.
+sequentially, each with its own metadata and upload. The S3 `PUT` is fed from
+`File.openRead()` through `StreamedRequest.sink.addStream`, so the socket sets
+the pace and the file never sits in memory in one piece; bytes written are
+reported per whole percent and shown in the status strip.
 
 ## 6. File intake ("share recipient")
 
 Common path: `Ingest.filterAccepted` normalizes `file://` URLs, drops unknown
 extensions and duplicates; `Ingest.itemsFor` stats each file and builds
-`DocItem`s (default title = basename without extension).
+`DocItem`s (default title = basename without extension); `Ingest.unsupported`
+feeds the "skipped N files" notice for mixed drops.
+
+On macOS both native sources (Services, `application(_:open:)`) hand their paths
+to one `FileIntake` queue. Files can land there before the engine is up, so
+native only ever *queues* and nudges — Dart drains with `takePendingFiles` over
+`MethodChannel('dev.stkn.kindbeamer/intake')` at startup, on the `filesAvailable`
+callback and on app resume. Nothing is lost during launch and nothing arrives
+twice.
 
 | Source | Wiring |
 |---|---|
 | window drag & drop (desktop) | `desktop_drop` `DropTarget` around the whole window |
 | file dialog | `file_selector` `openFiles` with extension type group |
-| CLI args / "Open With" (desktop) | `main(List<String> args)` |
-| macOS Services menu | `NSServices` entry (`sendFilesToKindle`) in `Info.plist`; `AppDelegate` installs an `NSPasteboard` service provider; paths are queued in-process and pulled over `MethodChannel('dev.stkn/services')` `takePendingFiles` on launch/resume |
-| macOS Open With / dock drop | `CFBundleDocumentTypes` (pdf, epub, txt/html/doc(x)/mobi/azw…) |
+| CLI args (Linux/Windows) | `main(List<String> args)` |
+| macOS Services menu | `NSServices` entry (`sendFilesToKindle`) in `Info.plist`; `AppDelegate` installs an `NSPasteboard` service provider |
+| macOS Open With / dock drop / `open -a` | `CFBundleDocumentTypes` (pdf, epub, kindle formats, text, images) + `application(_:open:)` in `AppDelegate` |
 | Android share sheet & open-with | `ACTION_SEND` / `SEND_MULTIPLE` / `VIEW` intent filters with document MIME types; `receive_sharing_intent` streams media file paths into the same ingest |
 | Linux Open With | `.desktop` file with `MimeType=` list (`packaging/linux/`) + argv intake |
 
@@ -169,28 +203,30 @@ Anything else is rejected at intake with a snackbar explaining the supported set
 
 ## 8. Persistence
 
-- `credentials.json` equivalent: OS keychain / encrypted storage key
-  `stk_next_client` (JSON: `{version: 1, device_info: {...}}`), plaintext file in
-  the app-support dir only if secure storage is unavailable.
-- `settings.json` in the app-support dir: last selected device serials and the
-  archive checkbox.
+- Device credentials: OS keychain / encrypted storage under `kindbeamer_client`
+  (JSON: `{version: 1, device_info: {...}}`), falling back to
+  `credentials.json` (mode 600) in the app-support dir when no keychain is
+  reachable. The pre-rename key `stk_next_client` is still read so an existing
+  session survives the upgrade.
+- `settings.json` in the app-support dir: last selected device serials, the
+  archive checkbox and this installation's device serial.
 - Nothing else leaves the device; uploads go directly to Amazon endpoints.
 
 ## 9. UI
 
-Single window, ~1024×860, dark:
+Single window, 880×700 (minimum 620×520), dark:
 
-- header: wordmark (`send to` light + `kindle` orange + `next` tag), *Add files…*
+- header: wordmark (`kind` teal + `beamer` light), *Add files…*
 - "Your document": queued file list (select/remove), title + author fields for
   the selected item
 - "Delivery options": checkbox list of owned devices; sign-in prompt when logged out
 - archive checkbox in an outlined box; selected document size
 - status strip: "Your document will be sent in <FORMAT> format." /
-  "No valid document is selected to send." / send progress
+  "No valid document is selected to send." / `Sending <name> (1/3) — 42%`
 - footer: Settings | Need Help? | Manage your Kindle links, Cancel + Send pills
   (Send enabled only when signed in, queue non-empty, ≥1 device selected)
 - drag overlay: translucent veil, upload glyph, "Drop files here / to send to
-  your Kindle" in orange
+  your Kindle" in teal
 
 ## 10. Testing
 
@@ -198,12 +234,15 @@ Single window, ~1024×860, dark:
   an independent Python implementation of the padding/signing math.
 - `oauth_test.dart`: redirect parsing, signin URL parameters (PKCE, client id).
 - `ingest_test.dart`: PDF+EPUB acceptance, rejection/dedup, `file://` handling,
-  human-readable sizes.
+  unsupported-path reporting, human-readable sizes.
+- `app_state_test.dart`: device serial shape/uniqueness/persistence, prefs
+  round-trip, selection after removal, skip notice, send gating.
 - `home_page_test.dart`: window is a `DropTarget`; dropped PDF+EPUB populate the
   queue and drive the format banner; metadata editing; send gating; removal.
 
-CI suggestion: `flutter analyze && flutter test`, then
-`flutter build macos|linux|apk`.
+CI (`.github/workflows/ci.yml`) runs `dart format --set-exit-if-changed`,
+`flutter analyze` and `flutter test`, then builds macOS, Linux and Android and
+uploads each as an artifact.
 
 ## 11. Build notes / known issues
 
@@ -214,11 +253,20 @@ CI suggestion: `flutter analyze && flutter test`, then
   targets to match.
 - Android release signing is left to the packager (default debug keystore for
   `flutter run`).
+- macOS builds here are ad-hoc signed (`CODE_SIGN_IDENTITY = "-"`), which means
+  no keychain access group: `flutter_secure_storage` fails and the app falls
+  back to the mode-600 credentials file inside its sandbox container. Signing
+  with a real team identity restores keychain storage with no code change.
+- The macOS sandbox needs `com.apple.security.network.client` (webview + API)
+  and `com.apple.security.files.user-selected.read-only` (file dialog); both are
+  in `Debug`/`Release` entitlements. Dropping either yields a blank sign-in
+  webview or unreadable documents *only in release*, which is a miserable bug to
+  chase.
 
 ## 12. Roadmap
 
 - USB/MTP transfer for 2024+ Kindles (no mass-storage mode on macOS).
 - Library management (list/delete personal documents).
 - Windows packaging; iOS build.
-- Progress bars per document (S3 PUT with streamed body + length).
 - Localization.
+- Notarized macOS build + signed Android release in CI.

@@ -1,4 +1,4 @@
-package dev.stkn.send_to_kindle_next
+package dev.stkn.kindbeamer
 
 import io.flutter.embedding.android.FlutterActivity
 

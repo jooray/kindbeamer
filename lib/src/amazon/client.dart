@@ -22,10 +22,16 @@ class StkClient {
     required String title,
     required String format,
     required bool archive,
+    void Function(int sent, int total)? onProgress,
   }) async {
-    final bytes = await file.readAsBytes();
-    final upload = await api.getUploadUrl(signer, bytes.length);
-    await api.uploadFile(upload.uploadUrl, bytes);
+    final length = await file.length();
+    final upload = await api.getUploadUrl(signer, length);
+    await api.uploadFile(
+      upload.uploadUrl,
+      file,
+      length: length,
+      onProgress: onProgress,
+    );
     final res = await api.sendToKindle(
       signer,
       stkToken: upload.stkToken,
@@ -41,12 +47,14 @@ class StkClient {
   Future<void> logout() => api.logout(signer);
 
   Map<String, dynamic> toMap() => {
-        'version': 1,
-        'device_info': deviceInfo.toMap(),
-      };
+    'version': 1,
+    'device_info': deviceInfo.toMap(),
+  };
 
   static StkClient fromMap(Map<String, dynamic> m) {
-    if (m['version'] != 1) throw const FormatException('invalid credentials version');
+    if (m['version'] != 1) {
+      throw const FormatException('invalid credentials version');
+    }
     return StkClient(
       DeviceInfo.fromMap((m['device_info'] as Map).cast<String, dynamic>()),
     );

@@ -6,7 +6,11 @@ import 'package:crypto/crypto.dart';
 import 'models.dart';
 
 class AdpSigner {
-  AdpSigner({required this.modulus, required this.privateExponent, required this.adpToken});
+  AdpSigner({
+    required this.modulus,
+    required this.privateExponent,
+    required this.adpToken,
+  });
 
   final BigInt modulus;
   final BigInt privateExponent;
@@ -29,7 +33,9 @@ class AdpSigner {
   }) {
     final date = signingDate ?? _now();
     final dateStr = _format(date);
-    final sigData = utf8.encode([method, path, dateStr, postData, adpToken].join('\n'));
+    final sigData = utf8.encode(
+      [method, path, dateStr, postData, adpToken].join('\n'),
+    );
     final digest = sha256.convert(sigData).bytes;
 
     final padded = Uint8List(256 - digest.length);
@@ -55,8 +61,9 @@ class AdpSigner {
         'T${two(u.hour)}:${two(u.minute)}:${two(u.second)}Z';
   }
 
-  static DateTime _now() =>
-      DateTime.now().toUtc().subtract(Duration(milliseconds: DateTime.now().millisecond));
+  static DateTime _now() => DateTime.now().toUtc().subtract(
+    Duration(milliseconds: DateTime.now().millisecond),
+  );
 }
 
 Uint8List _intToBytes(BigInt v, int length) {

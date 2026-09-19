@@ -31,9 +31,9 @@ Future<void> main(List<String> args) async {
   if (isDesktop) {
     await windowManager.ensureInitialized();
     const options = WindowOptions(
-      size: Size(1024, 860),
-      minimumSize: Size(720, 560),
-      title: 'Send to Kindle',
+      size: Size(880, 700),
+      minimumSize: Size(620, 520),
+      title: 'KindBeamer',
       titleBarStyle: TitleBarStyle.normal,
     );
     await windowManager.waitUntilReadyToShow(options, () async {
@@ -42,18 +42,18 @@ Future<void> main(List<String> args) async {
     });
   }
 
-  runApp(SendToKindleNextApp(state: state));
+  runApp(KindBeamerApp(state: state));
 }
 
-class SendToKindleNextApp extends StatelessWidget {
-  const SendToKindleNextApp({super.key, required this.state});
+class KindBeamerApp extends StatelessWidget {
+  const KindBeamerApp({super.key, required this.state});
 
   final AppState state;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Send to Kindle Next',
+      title: 'KindBeamer',
       debugShowCheckedModeBanner: false,
       theme: stkTheme(),
       home: HomePage(state: state),

@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Send to Kindle Next
-Comment=Send PDFs, EPUBs and more to your Kindle devices
-Exec=send_to_kindle_next %F
-Icon=send_to_kindle_next
+Name=KindBeamer
+Comment=Beam PDFs, EPUBs and more to your Kindle devices
+Exec=kindbeamer %F
+Icon=dev.stkn.kindbeamer
 Terminal=false
 Categories=Utility;FileTools;
 MimeType=application/pdf;application/epub+zip;application/x-mobipocket-ebook;text/plain;text/html;application/msword;application/vnd.openxmlformats-officedocument.wordprocessingml.document;image/png;image/jpeg;image/gif;image/bmp;
-StartupWMClass=send_to_kindle_next
+StartupWMClass=dev.stkn.kindbeamer

@@ -38,7 +38,10 @@ class SettingsDialog extends StatelessWidget {
                   state.signedIn
                       ? 'Signed in as ${state.accountName}'
                       : 'Not signed in',
-                  style: const TextStyle(color: StkColors.textSecondary, fontSize: 14),
+                  style: const TextStyle(
+                    color: StkColors.textSecondary,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Wrap(
@@ -65,10 +68,12 @@ class SettingsDialog extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 18),
-                const Text(
-                  'Credentials are stored locally on this device '
-                  '(keychain / encrypted storage where available).',
-                  style: TextStyle(color: StkColors.textFaint, fontSize: 12),
+                Text(
+                  state.credentialsBackend.description,
+                  style: const TextStyle(
+                    color: StkColors.textFaint,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),

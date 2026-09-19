@@ -11,16 +11,17 @@ class MainFlutterWindow: NSWindow {
     RegisterGeneratedPlugins(registry: flutterViewController)
 
     let channel = FlutterMethodChannel(
-      name: "dev.stkn/services",
+      name: "dev.stkn.kindbeamer/intake",
       binaryMessenger: flutterViewController.engine.binaryMessenger
     )
     channel.setMethodCallHandler { call, result in
       if call.method == "takePendingFiles" {
-        result(ServicesProvider.shared.takePending())
+        result(FileIntake.shared.takePending())
       } else {
         result(FlutterMethodNotImplemented)
       }
     }
+    FileIntake.shared.attach(channel: channel)
 
     super.awakeFromNib()
   }
