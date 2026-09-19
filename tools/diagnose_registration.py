@@ -16,6 +16,7 @@ Credentials in the responses (`device_private_key`, `adp_token`,
 
 import argparse
 import base64
+import binascii
 import hashlib
 import os
 import re
@@ -92,6 +93,24 @@ def token_exchange(code: str, verifier: str) -> str:
 def generated_serial() -> str:
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
     return "".join(alphabet[b % 32] for b in os.urandom(32))
+
+
+PID_ALPHABET = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
+
+
+def pid_for(serial: str) -> str:
+    """The pid the service expects for `serial` (see device_id.dart)."""
+    data = serial.encode()
+    crc = (~binascii.crc32(data, -1)) & 0xFFFFFFFF
+    folded = [0] * 8
+    for i, byte in enumerate(data):
+        folded[i % 8] ^= byte
+    crc_bytes = [crc >> 24 & 0xFF, crc >> 16 & 0xFF, crc >> 8 & 0xFF, crc & 0xFF]
+    out = ""
+    for i in range(8):
+        b = (folded[i] ^ crc_bytes[i & 3]) & 0xFF
+        out += PID_ALPHABET[(b >> 7) + ((b >> 5 & 3) ^ (b & 0x1F))]
+    return out
 
 
 def build_body(serial: str, pid: str | None, software: str, model: str) -> str:
@@ -196,7 +215,14 @@ def main() -> None:
             "text/xml",
         ),
         (
-            "generated serial + reference pid",
+            "generated serial + its derived pid (what the app now sends)",
+            (lambda serial: build_body(serial, pid_for(serial), "253", "KindBeamer"))(
+                generated_serial()
+            ),
+            "text/xml",
+        ),
+        (
+            "generated serial + reference pid (known bad, kept as a control)",
             build_body(generated_serial(), REFERENCE_PID, "253", "KindBeamer"),
             "text/xml",
         ),

@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
+
+import 'package:kindbeamer/src/amazon/device_id.dart';
 import 'package:kindbeamer/src/convert/markdown.dart';
 import 'package:kindbeamer/src/state/documents.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
@@ -28,6 +31,37 @@ void main() {
     f.writeAsBytesSync(List.filled(64, 0x43));
     return f;
   }
+
+  test('the device identity is generated once and then reused', () async {
+    final first = newState();
+    await first.loadPrefs();
+    expect(DeviceId.isValidSerial(first.deviceId.serial), isTrue);
+    expect(first.deviceId.pid, DeviceId.pidFor(first.deviceId.serial));
+
+    final stored =
+        json.decode(await File('${tmp.path}/settings.json').readAsString())
+            as Map<String, dynamic>;
+    expect(stored['device_serial'], first.deviceId.serial);
+
+    final second = newState();
+    await second.loadPrefs();
+    expect(second.deviceId.serial, first.deviceId.serial);
+    expect(second.deviceId.pid, first.deviceId.pid);
+  });
+
+  test('a serial an older build wrote is replaced, not reused', () async {
+    await File('${tmp.path}/settings.json').writeAsString(
+      json.encode({
+        'selected': <String>[],
+        'archive': true,
+        'device_serial': '0123456789ABCDEFGHIJKLMNOPQRSTUV',
+      }),
+    );
+    final state = newState();
+    await state.loadPrefs();
+    expect(DeviceId.isValidSerial(state.deviceId.serial), isTrue);
+    expect(state.deviceId.serial, isNot('0123456789ABCDEFGHIJKLMNOPQRSTUV'));
+  });
 
   test('archive flag and device selection survive a restart', () async {
     final first = newState();

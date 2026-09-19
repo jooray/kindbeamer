@@ -91,16 +91,33 @@ blue-grey surfaces with a teal accent instead of charcoal and Kindle orange.
    XML body (device type / serial / pid / software version mimicking the official
    Mac client) returns the long-lived device credentials as XML.
 
-   The `deviceSerialNumber` / `pid` pair is fixed
-   (`ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG` / `D21NN3GG`) and cannot be invented:
-   registering a freshly generated serial of the same shape (the known-good one
-   is unpadded base32, `[A-Z2-7]{32}`) against this pid answers HTTP 200 with
-   `<error><message>Internal Error</message></error>`, so the pid evidently has
-   to correspond to the serial. Both independent ports of this protocol
-   (`stkclient`, `stkclient-swift`) ship the same pair. The consequence is that
-   one account holds one KindBeamer registration at a time: signing in on a
-   second machine re-registers that serial and retires the first machine's
-   credentials.
+   The `deviceSerialNumber` / `pid` pair is generated per installation and kept
+   in `settings.json`. The two are not independent — registering a fresh serial
+   against the reference pid answers HTTP 200 with
+   `<error><message>Internal Error</message></error>`, which is what makes both
+   reference ports (`stkclient`, `stkclient-swift`) ship one hard-coded pair and
+   accept one registration per account.
+
+   The pid is the Mobipocket PID derivation applied to the serial, the same
+   function DeDRM's `kindlepid.py` uses (`lib/src/amazon/device_id.dart`):
+
+   ```
+   crc      = CRC-32(serial)            (0xEDB88320 table, no initial or final inversion)
+   folded[i] = XOR of serial bytes at positions ≡ i (mod 8)
+   pid[i]   = ALPHABET[(b >> 7) + ((b >> 5 & 3) ^ (b & 0x1f))]
+              where b = folded[i] ^ crc_bytes[i & 3]
+   ALPHABET = ABCDEFGHIJKLMNPQRSTUVWXYZ123456789    (34 characters, no O, no 0)
+   ```
+
+   It reproduces the reference pair exactly — `pidFor('ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG')`
+   is `D21NN3GG` — which is how the derivation was confirmed without spending a
+   sign-in per guess (`test/device_id_test.dart` pins it). Serials keep the shape
+   the reference has: unpadded base32 of 20 random bytes, `[A-Z2-7]{32}`.
+
+   So each installation registers as its own device and two machines can hold a
+   session at the same time, each appearing in the account's device list under
+   `device_model` — `KindBeamer (<hostname>)`, or `KindBeamer (Android)`, within
+   the 51 characters the official client allows.
 
    The response body:
    `device_private_key` (PKCS#1 RSA PEM), `adp_token`, plus account metadata.
@@ -264,8 +281,9 @@ accepts, and sending is blocked only while it runs.
   `credentials.json` (mode 600) in the app-support dir when no keychain is
   reachable. The pre-rename key `stk_next_client` is still read so an existing
   session survives the upgrade.
-- `settings.json` in the app-support dir: last selected device serials and the
-  archive checkbox.
+- `settings.json` in the app-support dir: last selected device serials, the
+  archive checkbox and this installation's device serial (the pid is derived
+  from it, so it is not stored).
 - Nothing else leaves the device; uploads go directly to Amazon endpoints.
 
 ## 9. UI
@@ -291,8 +309,12 @@ Single window, 880×700 (minimum 620×520), dark:
 - `oauth_test.dart`: redirect parsing, signin URL parameters (PKCE, client id).
 - `ingest_test.dart`: PDF+EPUB acceptance, rejection/dedup, `file://` handling,
   unsupported-path reporting, human-readable sizes.
-- `app_state_test.dart`: prefs round-trip, selection after removal, skip notice,
-  send gating.
+- `app_state_test.dart`: prefs round-trip, device identity persistence and
+  migration, selection after removal, skip notice, send gating.
+- `device_id_test.dart`: the pid derivation against the reference pair, plus the
+  shape of generated serials and pids.
+- `platform_capabilities_test.dart`: the per-platform network declarations and
+  file-type registrations that only fail in a release build.
 - `home_page_test.dart`: window is a `DropTarget`; dropped PDF+EPUB populate the
   queue and drive the format banner; metadata editing; send gating; removal.
 
@@ -335,7 +357,5 @@ uploads each as an artifact.
   `/import/kindle-doc/send-to-kindle`, over the `/SendToKindle` used here (it
   calls the latter its "Legacy STK Service"); worth moving to before Amazon
   retires it.
-- Derive a `pid` for a generated `deviceSerialNumber`, so two machines can hold
-  their own registration on one account instead of evicting each other.
 - Localization.
 - Notarized macOS build + signed Android release in CI.

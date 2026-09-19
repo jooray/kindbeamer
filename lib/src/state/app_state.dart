@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 import '../amazon/client.dart';
+import '../amazon/device_id.dart';
 import '../convert/markdown.dart';
 import '../amazon/models.dart';
 import '../amazon/oauth.dart';
@@ -45,6 +46,11 @@ class AppState extends ChangeNotifier {
   String statusMessage = '';
   String? notice;
 
+  /// This installation's device identity. Generated once and kept, so signing
+  /// in again replaces this machine's entry in the account's device list rather
+  /// than adding another — and so a second machine keeps its own.
+  DeviceId deviceId = DeviceId.generate();
+
   OAuth2? _pendingOAuth;
 
   StkClient? get client => _client;
@@ -77,8 +83,13 @@ class AppState extends ChangeNotifier {
             .cast<String>()
             .toSet();
         archive = m['archive'] as bool? ?? true;
+        final stored = m['device_serial'] as String? ?? '';
+        if (DeviceId.isValidSerial(stored)) {
+          deviceId = DeviceId.forSerial(stored);
+        }
       }
     } catch (_) {}
+    await _savePrefs();
     notifyListeners();
   }
 
@@ -86,7 +97,11 @@ class AppState extends ChangeNotifier {
     try {
       await supportDir.create(recursive: true);
       await _prefsFile.writeAsString(
-        json.encode({'selected': selectedSerials.toList(), 'archive': archive}),
+        json.encode({
+          'selected': selectedSerials.toList(),
+          'archive': archive,
+          'device_serial': deviceId.serial,
+        }),
       );
     } catch (_) {}
   }
@@ -198,7 +213,7 @@ class AppState extends ChangeNotifier {
     final oauth = _pendingOAuth;
     if (oauth == null) return false;
     try {
-      final info = await oauth.complete(redirectUrl);
+      final info = await oauth.complete(redirectUrl, device: deviceId);
       _client = StkClient(info);
       await _store.save(_client!);
       await refreshDevices();

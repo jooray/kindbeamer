@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 
+import 'device_id.dart';
 import 'models.dart';
 import 'signer.dart';
 
@@ -106,21 +107,23 @@ Map<String, String> _flattenXml(XmlElement root) {
   return out;
 }
 
-/// Serial and pid of the registered device.
-///
-/// These two travel together and cannot be made up: registering with a freshly
-/// generated serial (base32, same shape) against this pid answers
-/// `<error><message>Internal Error</message></error>`, so the pid evidently has
-/// to correspond to the serial. Both independent ports of this protocol —
-/// `stkclient` (Python) and `stkclient-swift` — ship this same pair, which is
-/// what the service accepts.
-///
-/// The cost is that one Amazon account can hold one KindBeamer registration at
-/// a time: signing in on a second machine re-registers the same serial and
-/// retires the first machine's credentials. Deriving a matching pid would lift
-/// that; see the roadmap.
-const String deviceSerialNumber = 'ZYSQ37GQ5JQDAIKDZ3WYH6I74MJCVEGG';
-const String devicePid = 'D21NN3GG';
+/// How this installation names itself in the account's device list. The
+/// official client sends the computer's name here, and enforces 51 characters.
+String deviceModel() {
+  String name;
+  if (Platform.isAndroid) {
+    name = 'KindBeamer (Android)';
+  } else {
+    String host;
+    try {
+      host = Platform.localHostname.trim();
+    } catch (_) {
+      host = '';
+    }
+    name = host.isEmpty ? 'KindBeamer' : 'KindBeamer ($host)';
+  }
+  return name.length <= 51 ? name : name.substring(0, 51);
+}
 
 Future<http.Response> _postBytes(
   String url,
@@ -138,13 +141,16 @@ Future<http.Response> _postBytes(
   }
 }
 
-Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
+Future<DeviceInfo> registerDeviceWithToken(
+  String accessToken, {
+  required DeviceId device,
+}) async {
   const deviceType = 'A1K6D1WRW0MALS';
-  const serial = deviceSerialNumber;
-  const pid = devicePid;
+  final serial = device.serial;
+  final pid = device.pid;
   const softwareVersion = '253';
   const osVersion = 'MacOSX_10.14.6_x64';
-  const deviceModel = 'KindBeamer';
+  final model = deviceModel();
   final body =
       "<?xml version='1.0' encoding='UTF-8'?>\n"
       '<request><parameters>'
@@ -155,7 +161,7 @@ Future<DeviceInfo> registerDeviceWithToken(String accessToken) async {
       '<authTokenType>AccessToken</authTokenType>'
       '<softwareVersion>$softwareVersion</softwareVersion>'
       '<os_version>$osVersion</os_version>'
-      '<device_model>$deviceModel</device_model>'
+      '<device_model>$model</device_model>'
       '</parameters></request>';
   // Sent as bytes on purpose: handing `package:http` a string body rewrites
   // `text/xml` into `text/xml; charset=utf-8`, and this endpoint is matched

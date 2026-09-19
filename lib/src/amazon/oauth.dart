@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:crypto/crypto.dart';
 
 import 'api.dart' as api;
+import 'device_id.dart';
 import 'models.dart';
 
 class OAuth2 {
@@ -47,10 +48,13 @@ class OAuth2 {
     return 'https://www.amazon.com/ap/signin?$qs';
   }
 
-  Future<DeviceInfo> complete(String redirectUrl) async {
+  Future<DeviceInfo> complete(
+    String redirectUrl, {
+    required DeviceId device,
+  }) async {
     final code = parseAuthorizationCode(redirectUrl);
     final token = await api.tokenExchange(code, _verifier);
-    return api.registerDeviceWithToken(token);
+    return api.registerDeviceWithToken(token, device: device);
   }
 
   static bool isRedirectUrl(String url) {
