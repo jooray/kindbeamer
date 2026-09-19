@@ -104,10 +104,21 @@ class _LoginDialogState extends State<LoginDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // A phone needs the whole screen for a sign-in page; a desktop window does
+    // not, and a 640x560 panel sits better inside it.
+    final media = MediaQuery.of(context);
+    final compact = media.size.width < 600;
     return Dialog(
       backgroundColor: StkColors.background,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 40,
+        vertical: compact ? 12 : 24,
+      ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 640, maxHeight: 560),
+        constraints: BoxConstraints(
+          maxWidth: 640,
+          maxHeight: compact ? media.size.height : 560,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

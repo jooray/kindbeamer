@@ -307,8 +307,15 @@ uploads each as an artifact.
   which older `flutter_tools` `thinFramework` does not handle).
 - macOS deployment target is 12.0; the Podfile post-install hook lifts older pod
   targets to match.
-- Android release signing is left to the packager (default debug keystore for
-  `flutter run`).
+- Android release signing reads `~/.apk-signing-keystore/signing.properties`
+  when present and falls back to the debug keystore, so a fresh checkout builds
+  without the publisher's key.
+- The `INTERNET` permission has to be declared in the *main* Android manifest.
+  Flutter's template declares it only in the debug and profile manifests (for
+  the Dart VM service), so a release APK without it installs and runs while
+  quietly having no network: a blank sign-in webview and every API call failing.
+  This is the same class of bug as the missing macOS entitlement below, and
+  `test/platform_capabilities_test.dart` now guards both.
 - macOS builds here are ad-hoc signed (`CODE_SIGN_IDENTITY = "-"`), which means
   no keychain access group: `flutter_secure_storage` fails and the app falls
   back to the mode-600 credentials file inside its sandbox container. Signing

@@ -86,25 +86,29 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         });
         return Scaffold(
           backgroundColor: StkColors.background,
-          body: DropTarget(
-            onDragEntered: (_) => setState(() => _dragging = true),
-            onDragExited: (_) => setState(() => _dragging = false),
-            onDragDone: (details) {
-              setState(() => _dragging = false);
-              state.addFiles(details.files.map((f) => f.path).toList());
-            },
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    _header(),
-                    Expanded(child: _body()),
-                    _statusStrip(),
-                    _footer(),
-                  ],
-                ),
-                if (_dragging) _dropOverlay(),
-              ],
+          // On a phone the header would otherwise sit under the status bar and
+          // the footer links under the gesture bar; a no-op on desktop.
+          body: SafeArea(
+            child: DropTarget(
+              onDragEntered: (_) => setState(() => _dragging = true),
+              onDragExited: (_) => setState(() => _dragging = false),
+              onDragDone: (details) {
+                setState(() => _dragging = false);
+                state.addFiles(details.files.map((f) => f.path).toList());
+              },
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      _header(),
+                      Expanded(child: _body()),
+                      _statusStrip(),
+                      _footer(),
+                    ],
+                  ),
+                  if (_dragging) _dropOverlay(),
+                ],
+              ),
             ),
           ),
         );

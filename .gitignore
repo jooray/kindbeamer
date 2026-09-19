@@ -49,3 +49,10 @@ session-*.md
 
 # Agent working notes, kept out of the repo
 AGENTS.md
+
+# Signing material never belongs in the repo
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+android/local.properties

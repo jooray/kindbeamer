@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Flutter's template declares this only in the debug and profile
+         manifests, so without it here a debug run reaches the network and
+         the release build silently cannot: a blank sign-in webview and
+         every API call failing. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="KindBeamer"
         android:name="${applicationName}"
