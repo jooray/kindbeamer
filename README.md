@@ -45,20 +45,21 @@ xattr -dr com.apple.quarantine /Applications/KindBeamer.app
 
 ### Linux
 
-For arm64 (Omarchy on Apple silicon, Asahi, ARM boxes), take
-`KindBeamer-<version>-linux-arm64.tar.gz` from the
+Take the tarball for your architecture from the
 [latest release](https://github.com/jooray/kindbeamer/releases/latest):
+`-linux-x64` for a normal PC, `-linux-arm64` for Omarchy on Apple silicon,
+Asahi or an ARM box.
 
 ```bash
-tar -xzf KindBeamer-1.0.0-linux-arm64.tar.gz
+tar -xzf KindBeamer-1.0.0-linux-x64.tar.gz
 ./bundle/kindbeamer
 ```
 
 It needs GTK 3 and glibc 2.34 or newer, which any current distribution has. On
-Arch: `pacman -S gtk3 libsecret`. Install it wherever you like and point the
-`.desktop` file in `packaging/linux/` at it to get "Open With" support.
-
-On x86-64 there is no prebuilt package yet, so build it from source (below).
+Arch: `pacman -S gtk3 libsecret`, the second being what puts your Amazon
+credentials in the keyring rather than a file. Move the bundle wherever you
+keep such things and point the `.desktop` file in `packaging/linux/` at it for
+"Open With" support.
 
 ## Features
 
@@ -174,7 +175,7 @@ reference vectors, OAuth code parsing, file ingestion (PDF and EPUB drops,
 filtering, dedup), Markdown conversion, app state (device identity,
 preferences, queue handling), the per-platform release declarations that only
 fail in a release build, and the main window widget tree. CI runs the same
-checks and builds macOS, Linux and Android on every push.
+checks and builds macOS, Android and Linux (x86-64 and arm64) on every push.
 
 ## License
 
