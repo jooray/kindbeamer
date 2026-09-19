@@ -11,9 +11,42 @@ It talks to the same Send to Kindle cloud service the official app uses, so your
 documents arrive over Wi-Fi on the devices you pick, and in your Kindle Library
 if you want them there.
 
-> **Disclaimer:** this project is not affiliated with, endorsed by, or sponsored by
-> Amazon. "Kindle" and "Send to Kindle" are trademarks of Amazon.com, Inc.
-> Use at your own risk; Amazon may change or block the undocumented API at any time.
+<img src="docs/screenshot-macos.png" alt="KindBeamer on macOS: a PDF queued with its title and author, four Kindle devices ticked, and the Send button" width="620">
+
+> **Disclaimer:** this project is not affiliated with, endorsed by, or sponsored
+> by Amazon. Use at your own risk; Amazon may change or block the undocumented
+> API at any time.
+
+## Install
+
+### Android
+
+Install it from [Zapstore](https://zapstore.dev/apps/dev.stkn.kindbeamer),
+which will also keep it updated. Zapstore itself is at
+[zapstore.dev](https://zapstore.dev).
+
+Otherwise grab `KindBeamer-<version>.apk` from the
+[latest release](https://github.com/jooray/kindbeamer/releases/latest) and open
+it on the phone. Android will ask you to allow installs from that source.
+
+### macOS
+
+Download `KindBeamer-<version>.dmg` from the
+[latest release](https://github.com/jooray/kindbeamer/releases/latest) and drag
+the app into Applications.
+
+The build is signed with a self-managed key rather than an Apple Developer
+certificate, so Gatekeeper will refuse it on the first launch. Either right
+click the app and choose Open, or clear the quarantine flag:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/KindBeamer.app
+```
+
+### Linux
+
+No prebuilt package yet: build it from source (below). The `.desktop` file in
+`packaging/linux/` registers KindBeamer as an "Open With" target once installed.
 
 ## Features
 
@@ -44,7 +77,43 @@ if you want them there.
 | Linux | drag & drop, file-manager *Open With* (`.desktop` file with MIME types, see `packaging/linux/`), command-line args |
 | Android | system **share sheet** (single & multiple files), *Open with* for documents |
 
-## Getting started
+## Usage
+
+1. Launch the app and press **Sign in**, then complete the Amazon login in the
+   window that opens. (Linux has no embedded browser, so there the app opens
+   your system browser and lets you paste the redirect URL instead.)
+2. Drop one or more documents onto the window, or use **Add files…**, the share
+   sheet, the Services menu.
+3. Adjust the title and author of the selected document, tick the target
+   devices, and choose whether to archive in your Kindle Library.
+4. Press **Send**. The documents are uploaded to Amazon and delivered to the
+   devices you ticked over Wi-Fi.
+
+Signing in registers that installation as a device on your Amazon account, shown
+as "KindBeamer (your computer's name)" or "KindBeamer (Android)". Each
+installation registers on its own, so a laptop and a phone can both stay signed
+in. **Settings → Sign out** unregisters the one you are on and deletes its local
+credentials.
+
+### Where credentials live
+
+The Amazon device credentials go into the OS keychain or encrypted storage.
+Where no keychain is reachable, on Linux without a secret service or in a
+macOS build signed with a self-managed key, the app falls back to a mode-600
+file in its application-support directory, and **Settings** says which of the
+two it used.
+
+## How it works
+
+See [SPECIFICATION.md](SPECIFICATION.md) for the architecture and a full
+description of the wire protocol: OAuth PKCE device registration, signed
+`stkservice.amazon.com` calls, S3 upload, delivery.
+
+The protocol implementation is a clean-room Dart port of the approach taken by
+[stkclient](https://github.com/maxdjohnson/stkclient) (MIT). Thanks to its
+author for working the protocol out first.
+
+## Building from source
 
 Requirements: Flutter 3.47+ (stable).
 
@@ -68,7 +137,7 @@ anything newer. If your default JDK is more recent:
 flutter config --jdk-dir=/path/to/jdk-17
 ```
 
-### Linux installation (optional, for "Open With" support)
+### Installing the Linux desktop entry
 
 ```bash
 sudo install -Dm644 packaging/linux/dev.stkn.kindbeamer.png \
@@ -81,42 +150,7 @@ update-desktop-database /usr/share/applications
 
 Point the `Exec=` line at your installed binary or bundle first.
 
-## Usage
-
-1. Launch the app and press **Sign in**, then complete the Amazon login in the
-   window that opens. (Linux has no embedded browser, so there the app opens
-   your system browser and lets you paste the redirect URL instead.)
-2. Drop one or more documents onto the window, or use **Add files…**, the share
-   sheet, the Services menu.
-3. Adjust the title and author of the selected document, tick the target
-   devices, and choose whether to archive in your Kindle Library.
-4. Press **Send**. The documents are uploaded to Amazon and delivered to the
-   devices you ticked over Wi-Fi.
-
-Signing in registers that installation as a device on your Amazon account, shown
-as "KindBeamer (your computer's name)" or "KindBeamer (Android)". Each
-installation registers on its own, so a laptop and a phone can both stay signed
-in. **Settings → Sign out** unregisters the one you are on and deletes its local
-credentials.
-
-### Where credentials live
-
-The Amazon device credentials go into the OS keychain or encrypted storage.
-Where no keychain is reachable, on Linux without a secret service or in an
-ad-hoc signed macOS build, the app falls back to a mode-600 file in its
-application-support directory, and **Settings** says which of the two it used.
-
-## How it works
-
-See [SPECIFICATION.md](SPECIFICATION.md) for the architecture and a full
-description of the wire protocol: OAuth PKCE device registration, signed
-`stkservice.amazon.com` calls, S3 upload, delivery.
-
-The protocol implementation is a clean-room Dart port of the approach taken by
-[stkclient](https://github.com/maxdjohnson/stkclient) (MIT). Thanks to its
-author for working the protocol out first.
-
-## Development
+### Tests
 
 ```bash
 flutter analyze
