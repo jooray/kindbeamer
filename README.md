@@ -30,6 +30,11 @@ archived in your Kindle Library.
   storage. No password is ever stored.
 - Supported input formats: PDF, EPUB, MOBI, AZW/AZW3, TXT, RTF, DOC, DOCX,
   HTML, PNG, JPG, GIF, BMP.
+- **Markdown too**: a dropped `.md` is typeset into a PDF sized for a 6" reader
+  when `pandoc` and a PDF engine (or a headless Chrome) are available — in
+  practice on Linux — and otherwise rendered to styled HTML, which Kindle
+  converts on its side. macOS takes the HTML route as well, because its sandbox
+  does not allow running external tools.
 
 ### Share / open recipient matrix
 

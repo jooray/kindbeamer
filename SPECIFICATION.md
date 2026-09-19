@@ -224,8 +224,38 @@ twice.
 | jpg / jpeg | JPG |
 | gif | GIF |
 | bmp | BMP |
+| md / markdown | *converted first, see below* |
 
 Anything else is rejected at intake with a snackbar explaining the supported set.
+
+### Markdown
+
+The service has no Markdown input format, so a `.md` is converted as soon as it
+is queued — before the format banner and the size are shown, so what the UI says
+is what is sent. `lib/src/convert/markdown.dart` tries, in order:
+
+1. `pandoc` with a PDF engine (`xelatex`, `pdflatex`, `lualatex`, `tectonic`,
+   then `typst`, `weasyprint`, `wkhtmltopdf`, `prince`) — pages are 6×8in with
+   0.4in margins, not A4, because a PDF does not reflow and a letter-sized page
+   on a 6" reader is a page of specks;
+2. headless Chrome printing the rendered HTML, for a desktop with a browser but
+   no TeX;
+3. in-process Markdown → styled HTML, which the service converts on its side.
+
+Which path a platform actually takes:
+
+| Platform | Path | Why |
+|---|---|---|
+| Linux | pandoc → PDF | no sandbox in the way |
+| macOS | HTML | the App Sandbox denies spawning binaries outside the app; the tools are found and the spawn then fails, so the fallback carries it |
+| Android | HTML | no command line tools to speak of |
+
+The macOS behaviour is a deliberate trade: dropping `com.apple.security.app-sandbox`
+would enable the PDF path (and keychain credential storage), and the official
+Send to Kindle app indeed ships with no entitlements at all — but the sandbox is
+worth more here than typeset output, given HTML is converted competently on
+Amazon's side. The conversion therefore always produces something the service
+accepts, and sending is blocked only while it runs.
 
 ## 8. Persistence
 

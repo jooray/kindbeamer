@@ -1,3 +1,20 @@
+import java.util.Properties
+
+// Release signing comes from a keystore outside the repo, the same layout the
+// other apps on this machine use: ~/.apk-signing-keystore/signing.properties
+// with storeFile, storePassword, keyAlias and keyPassword. Without it the build
+// falls back to debug signing, so a checkout still builds for anyone else.
+val signingPropertiesFile =
+    File(System.getProperty("user.home"), ".apk-signing-keystore/signing.properties")
+val signingProperties = Properties().apply {
+    if (signingPropertiesFile.exists()) {
+        signingPropertiesFile.inputStream().use { load(it) }
+    } else {
+        println("No signing.properties at $signingPropertiesFile — release will use debug signing.")
+    }
+}
+val hasReleaseSigning = signingProperties.getProperty("storeFile") != null
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -30,11 +47,26 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(signingProperties.getProperty("storeFile"))
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

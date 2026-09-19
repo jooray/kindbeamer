@@ -6,5 +6,5 @@ Exec=kindbeamer %F
 Icon=dev.stkn.kindbeamer
 Terminal=false
 Categories=Utility;FileTools;
-MimeType=application/pdf;application/epub+zip;application/x-mobipocket-ebook;text/plain;text/html;application/msword;application/vnd.openxmlformats-officedocument.wordprocessingml.document;image/png;image/jpeg;image/gif;image/bmp;
+MimeType=text/markdown;application/pdf;application/epub+zip;application/x-mobipocket-ebook;text/plain;text/html;application/msword;application/vnd.openxmlformats-officedocument.wordprocessingml.document;image/png;image/jpeg;image/gif;image/bmp;
 StartupWMClass=dev.stkn.kindbeamer

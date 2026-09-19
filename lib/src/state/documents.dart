@@ -3,11 +3,20 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 class DocFormat {
-  const DocFormat._(this.extension, this.inputFormat, this.label);
+  const DocFormat._(
+    this.extension,
+    this.inputFormat,
+    this.label, {
+    this.needsConversion = false,
+  });
 
   final String extension;
   final String inputFormat;
   final String label;
+
+  /// The service has no Markdown input format, so these are converted before
+  /// they are uploaded (see `convert/markdown.dart`).
+  final bool needsConversion;
 
   static const supported = [
     DocFormat._('pdf', 'PDF', 'PDF'),
@@ -26,7 +35,16 @@ class DocFormat {
     DocFormat._('jpeg', 'JPG', 'JPG'),
     DocFormat._('gif', 'GIF', 'GIF'),
     DocFormat._('bmp', 'BMP', 'BMP'),
+    DocFormat._('md', 'MD', 'Markdown', needsConversion: true),
+    DocFormat._('markdown', 'MD', 'Markdown', needsConversion: true),
   ];
+
+  static DocFormat? forExtension(String extension) {
+    for (final format in supported) {
+      if (format.extension == extension) return format;
+    }
+    return null;
+  }
 
   static DocFormat? forPath(String path) {
     final ext = p.extension(path).replaceFirst('.', '').toLowerCase();
@@ -45,14 +63,24 @@ class DocItem {
     required this.format,
     String? title,
     this.author = '',
-  }) : title = title ?? _defaultTitle(name);
+  }) : title = title ?? _defaultTitle(name),
+       uploadPath = path;
 
   final String path;
   final String name;
-  final int size;
-  final DocFormat format;
+
+  /// The file actually uploaded: the same file, unless it was converted.
+  String uploadPath;
+  int size;
+  DocFormat format;
   String title;
   String author;
+
+  /// Set while a converter is running, and afterwards to say what happened.
+  bool converting = false;
+  String? conversionNote;
+
+  bool get needsConversion => format.needsConversion;
 
   /// `SendToKindle` rejects empty metadata ("Member must have length greater
   /// than or equal to 1"), and the official client truncates long values rather

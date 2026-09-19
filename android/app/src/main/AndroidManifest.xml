@@ -32,6 +32,8 @@
                 <data android:mimeType="application/x-mobipocket-ebook"/>
                 <data android:mimeType="application/vnd.amazon.ebook"/>
                 <data android:mimeType="text/plain"/>
+                <data android:mimeType="text/markdown"/>
+                <data android:mimeType="text/x-markdown"/>
                 <data android:mimeType="text/html"/>
                 <data android:mimeType="text/rtf"/>
                 <data android:mimeType="application/rtf"/>
@@ -50,6 +52,8 @@
                 <data android:mimeType="application/x-mobipocket-ebook"/>
                 <data android:mimeType="application/vnd.amazon.ebook"/>
                 <data android:mimeType="text/plain"/>
+                <data android:mimeType="text/markdown"/>
+                <data android:mimeType="text/x-markdown"/>
                 <data android:mimeType="text/html"/>
                 <data android:mimeType="text/rtf"/>
                 <data android:mimeType="application/rtf"/>
@@ -69,6 +73,8 @@
                 <data android:mimeType="application/x-mobipocket-ebook"/>
                 <data android:mimeType="application/vnd.amazon.ebook"/>
                 <data android:mimeType="text/plain"/>
+                <data android:mimeType="text/markdown"/>
+                <data android:mimeType="text/x-markdown"/>
                 <data android:mimeType="text/html"/>
                 <data android:mimeType="text/rtf"/>
                 <data android:mimeType="application/rtf"/>

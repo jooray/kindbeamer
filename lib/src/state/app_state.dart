@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 import '../amazon/client.dart';
+import '../convert/markdown.dart';
 import '../amazon/models.dart';
 import '../amazon/oauth.dart';
 import '../platform/intake.dart';
@@ -48,11 +50,15 @@ class AppState extends ChangeNotifier {
       ? docs[selectedIndex]
       : null;
 
+  bool get converting => docs.any((d) => d.converting);
+
   bool get canSend =>
       signedIn &&
       docs.isNotEmpty &&
       selectedSerials.isNotEmpty &&
-      phase != SendPhase.sending;
+      phase != SendPhase.sending &&
+      !converting &&
+      !docs.any((d) => d.needsConversion);
 
   File get _prefsFile => File(p.join(supportDir.path, 'settings.json'));
 
@@ -106,6 +112,33 @@ class AppState extends ChangeNotifier {
       statusMessage = '';
     }
     notifyListeners();
+    unawaited(_convertPending());
+  }
+
+  /// Markdown has no input format on the service, so it is turned into a PDF
+  /// (or HTML, where no converter exists) as soon as it lands in the queue —
+  /// that way the format banner and the size shown are the ones really sent.
+  Future<void> _convertPending() async {
+    for (final doc in docs) {
+      if (!doc.needsConversion || doc.converting) continue;
+      doc.converting = true;
+      notifyListeners();
+      try {
+        final result = await MarkdownConverter.convert(
+          File(doc.path),
+          supportDir,
+        );
+        doc.uploadPath = result.path;
+        doc.format = result.format;
+        doc.size = await File(result.path).length();
+        doc.conversionNote = result.note;
+      } catch (e) {
+        doc.conversionNote = 'could not convert: $e';
+      } finally {
+        doc.converting = false;
+        notifyListeners();
+      }
+    }
   }
 
   void selectDoc(int i) {
@@ -230,7 +263,7 @@ class AppState extends ChangeNotifier {
       var lastPct = -1;
       try {
         await c.sendFile(
-          File(doc.path),
+          File(doc.uploadPath),
           targets,
           author: doc.effectiveAuthor,
           title: doc.effectiveTitle,

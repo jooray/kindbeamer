@@ -46,3 +46,6 @@ app.*.map.json
 
 # Session transcripts kept beside the project
 session-*.md
+
+# Agent working notes, kept out of the repo
+AGENTS.md
