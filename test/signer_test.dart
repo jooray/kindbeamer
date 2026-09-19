@@ -27,8 +27,13 @@ i5NQbpOI94zm8WfCCr0KQ46M8ZTAJzjEcOH38/8c485sPnfa+Mh+/p5W1DsLaiIpCU5b
 -----END RSA PRIVATE KEY-----
 ''';
 
+// Produced with stkclient's own padding constant (0x01 + 0xFF*221 + 0x00, a
+// 255-byte block for a 2048-bit key) rather than a vector of our own making —
+// an earlier vector was generated from this implementation and so agreed with
+// its off-by-one, which the service rejected with "Couldn't decrypt the
+// request's signature using the device info's public key".
 const String _expectedHeader =
-    'dHAGtXErOAefp9XcLZySqnAgI+fbqO9BsLt4IrQzEO38sqw1p6T3c11i9vr1dW02lVQ5aqHZaPkrt3qNJxWqAVt7WjDmNuAyyzgGezogzbSvLeGgIplXNNpX/SgzC82cCDWVob7dHd6j6ONQAAP7GglNF9RkDqJZnWI9uHxAySVNVi8Un95L0HxWEOhvw0Q2Cd5hDFxonyoBea3WdWjHRLeBP3m82hKGHyY8yeoRjwYSktPDFNsJWaPNSQWKQ9+zJTpY75pyQtbB0IFe1FxmDVc1sK2GXFO11MAFV/6ucjd7DKazymFl3YcMn+8BrqE8ccx+sENj8wl0qaT5JbV6EQ==:2024-05-01T12:34:56Z';
+    'XIcrlEfeMChuBDGMIn5KM2Ba4OkOeVPuFUdsCDs5A6Ux+ne3H0aDZMAzG0T6V+2pWBQ3YcEndTd7FowluWsrD50JIhEHyeCuaOvPlt1qaFLL700HLa1kJJaFdoCXQb+niUZ8WwZp4wVhqLzjx3rzWBmb33864cy/xUTM/4bToFdPZ+Zg3q3LHbGnM6mIXD8jGsor/mVYrSrM0OK4KQ6E3ysrefBZJHCcUwMFnByUSCV1tXVAsSkqgrQGJsAeABRaAWmKRq5OXhL5Xt8bR22KE0DLSoS0AWTHOiTNub96wWfxk+CLBX+c4YYktMGsOICTOggI7l7vMnbpWbBDZzdPpQ==:2024-05-01T12:34:56Z';
 
 void main() {
   test('parses PKCS#1 PEM private key', () {

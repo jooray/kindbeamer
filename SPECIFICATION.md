@@ -124,15 +124,22 @@ where `sig` is raw RSA over a custom PKCS#1-v1.5-style block:
 
 ```
 sig_data  = METHOD \n PATH \n DATE \n BODY \n ADP_TOKEN      (UTF-8, SHA-256)
-EM        = 0x01 || 0xFF * (256 - 32 - 2) || 0x00 || sha256(sig_data)
-sig       = (EM as big-endian integer) ^ d mod n            (256-byte output)
+EM        = 0x01 || 0xFF * (k - 35) || 0x00 || sha256(sig_data)   (k - 1 bytes)
+sig       = (EM as big-endian integer) ^ d mod n                  (k-byte output)
 ```
 
-Note the padding omits the ASN.1 DigestInfo prefix used by textbook PKCS#1; this
-matches what the service verifies. `lib/src/amazon/signer.dart` implements this
-with `BigInt.modPow` and a minimal DER parser for PKCS#1 PEM private keys, and is
-validated against a reference vector generated with the original algorithm
-(`test/signer_test.dart`).
+where `k` is the modulus size in bytes (256 for the 2048-bit keys the service
+issues), so `EM` is **255** bytes — one short of the modulus — with 221 `0xFF`
+bytes. Two details that look cosmetic and are not: the padding omits the ASN.1
+DigestInfo prefix of textbook PKCS#1, and `EM` must not be padded out to the full
+`k` bytes. Getting the length wrong costs an extra `0xFF`, and every signed call
+comes back `403 Couldn't decrypt the request's signature using the device info's
+public key`.
+
+`lib/src/amazon/signer.dart` implements this with `BigInt.modPow` and a minimal
+DER parser for PKCS#1 PEM private keys. `test/signer_test.dart` checks it against
+a vector computed with `stkclient`'s own padding constant — not one generated
+from this implementation, which is how the off-by-one survived its first test.
 
 ## 5. Send-to-Kindle API
 

@@ -38,7 +38,13 @@ class AdpSigner {
     );
     final digest = sha256.convert(sigData).bytes;
 
-    final padded = Uint8List(256 - digest.length);
+    // PKCS#1-v1.5-ish, but one byte short of the modulus and without the ASN.1
+    // DigestInfo prefix: 0x01 || 0xFF * (k - 2 - 32) || 0x00 || sha256. Padding
+    // out to the full k bytes instead leaves the service unable to decrypt the
+    // signature ("Couldn't decrypt the request's signature using the device
+    // info's public key"), so the length here is not a free choice.
+    final keyBytes = (modulus.bitLength + 7) ~/ 8;
+    final padded = Uint8List(keyBytes - 1 - digest.length);
     padded[0] = 0x01;
     for (var i = 1; i < padded.length - 1; i++) {
       padded[i] = 0xff;
@@ -50,7 +56,7 @@ class AdpSigner {
       m = (m << 8) | BigInt.from(b);
     }
     final s = m.modPow(privateExponent, modulus);
-    final sig = _intToBytes(s, 256);
+    final sig = _intToBytes(s, keyBytes);
     return '${base64.encode(sig)}:$dateStr';
   }
 
