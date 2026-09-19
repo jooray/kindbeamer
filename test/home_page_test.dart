@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kindbeamer/src/convert/markdown.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
+import 'package:kindbeamer/src/state/documents.dart';
 import 'package:kindbeamer/src/state/credentials_store.dart';
 import 'package:kindbeamer/src/ui/home_page.dart';
 
@@ -19,6 +22,47 @@ void main() {
 
   tearDown(() async {
     await tmp.delete(recursive: true);
+  });
+
+  testWidgets('a dropped markdown file reports its conversion', (tester) async {
+    final converted = File('${tmp.path}/notes.html')
+      ..writeAsStringSync('<p>x</p>');
+    final gate = Completer<ConvertedDoc>();
+    state = AppState(
+      supportDir: tmp,
+      store: CredentialsStore(tmp),
+      convertMarkdown: (_, _) => gate.future,
+    );
+    // loadPrefs touches the filesystem, so it needs the real event loop too.
+    await tester.runAsync(() => state.loadPrefs());
+
+    tester.view.physicalSize = const Size(1024, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(home: HomePage(state: state)));
+
+    final md = File('${tmp.path}/notes.md')..writeAsStringSync('# Hello');
+    state.addFiles([md.path]);
+    await tester.pump();
+    expect(find.textContaining('Converting notes.md'), findsOneWidget);
+
+    // The state layer stats the converted file, which is real I/O: it only
+    // completes if the test lets the real event loop run.
+    await tester.runAsync(() async {
+      gate.complete(
+        ConvertedDoc(
+          path: converted.path,
+          format: DocFormat.forExtension('html')!,
+          note: 'converted to HTML',
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pump();
+    expect(
+      find.textContaining('sent in HTML format (converted to HTML)'),
+      findsOneWidget,
+    );
   });
 
   File write(String name, int size) {

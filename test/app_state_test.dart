@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kindbeamer/src/convert/markdown.dart';
+import 'package:kindbeamer/src/state/documents.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
 import 'package:kindbeamer/src/state/credentials_store.dart';
 
@@ -15,8 +17,11 @@ void main() {
     await tmp.delete(recursive: true);
   });
 
-  AppState newState() =>
-      AppState(supportDir: tmp, store: CredentialsStore(tmp));
+  AppState newState({MarkdownConversionFn? convertMarkdown}) => AppState(
+    supportDir: tmp,
+    store: CredentialsStore(tmp),
+    convertMarkdown: convertMarkdown,
+  );
 
   File write(String name) {
     final f = File('${tmp.path}/$name');
@@ -76,6 +81,54 @@ void main() {
     state.addFiles([pdf]);
     expect(state.docs, hasLength(1));
     expect(state.notice, isNull);
+  });
+
+  test('markdown is converted before it can be sent', () async {
+    final converted = File('${tmp.path}/notes.html')
+      ..writeAsStringSync('<p>x</p>');
+    var started = 0;
+    Future<ConvertedDoc> fakeConvert(File source, Directory workDir) async {
+      started++;
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      return ConvertedDoc(
+        path: converted.path,
+        format: DocFormat.forExtension('html')!,
+        note: 'converted to HTML',
+      );
+    }
+
+    final state = newState(convertMarkdown: fakeConvert);
+    await state.loadPrefs();
+    final md = File('${tmp.path}/notes.md')..writeAsStringSync('# Hello\n');
+    state.addFiles([md.path]);
+
+    final doc = state.docs.single;
+    expect(doc.needsConversion, isTrue, reason: 'queued as Markdown');
+    expect(state.canSend, isFalse, reason: 'not sendable while unconverted');
+
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+    expect(started, 1);
+    expect(doc.converting, isFalse);
+    expect(doc.needsConversion, isFalse);
+    expect(doc.format.inputFormat, 'HTML');
+    expect(doc.uploadPath, converted.path);
+    expect(doc.path, md.path, reason: 'original kept for the file name shown');
+    expect(doc.conversionNote, 'converted to HTML');
+  });
+
+  test('a conversion that throws leaves the document unsendable', () async {
+    Future<ConvertedDoc> failing(File source, Directory workDir) async =>
+        throw const FileSystemException('no converter');
+
+    final state = newState(convertMarkdown: failing);
+    await state.loadPrefs();
+    final md = File('${tmp.path}/bad.md')..writeAsStringSync('# Hello\n');
+    state.addFiles([md.path]);
+    await Future<void>.delayed(const Duration(milliseconds: 60));
+
+    expect(state.docs.single.converting, isFalse);
+    expect(state.docs.single.conversionNote, contains('could not convert'));
+    expect(state.canSend, isFalse);
   });
 
   test('send is gated on a session, documents and a target device', () async {

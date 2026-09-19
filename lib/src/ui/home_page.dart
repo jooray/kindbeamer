@@ -401,6 +401,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       text = state.statusMessage;
     } else if (doc == null) {
       text = 'No valid document is selected to send.';
+    } else if (doc.converting) {
+      text = 'Converting ${doc.name} for your Kindle…';
+    } else if (doc.conversionNote != null) {
+      text =
+          'Your document will be sent in ${doc.format.label} format '
+          '(${doc.conversionNote}).';
     } else {
       text = 'Your document will be sent in ${doc.format.label} format.';
     }

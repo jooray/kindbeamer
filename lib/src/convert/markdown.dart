@@ -5,6 +5,10 @@ import 'package:path/path.dart' as p;
 
 import '../state/documents.dart';
 
+/// Signature of [MarkdownConverter.convert], so callers can substitute it.
+typedef MarkdownConversionFn =
+    Future<ConvertedDoc> Function(File source, Directory workDir);
+
 /// What a Markdown file turns into before it is uploaded.
 class ConvertedDoc {
   const ConvertedDoc({

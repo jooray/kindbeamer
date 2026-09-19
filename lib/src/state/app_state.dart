@@ -20,11 +20,16 @@ class AppState extends ChangeNotifier {
     required this.supportDir,
     required CredentialsStore store,
     StkClient? client,
+    MarkdownConversionFn? convertMarkdown,
   }) : _store = store,
-       _client = client;
+       _client = client,
+       _convertMarkdown = convertMarkdown ?? MarkdownConverter.convert;
 
   final Directory supportDir;
   final CredentialsStore _store;
+
+  /// Injectable so tests need not depend on the machine's toolchain.
+  final MarkdownConversionFn _convertMarkdown;
 
   CredentialsBackend get credentialsBackend => _store.backend;
   StkClient? _client;
@@ -124,10 +129,7 @@ class AppState extends ChangeNotifier {
       doc.converting = true;
       notifyListeners();
       try {
-        final result = await MarkdownConverter.convert(
-          File(doc.path),
-          supportDir,
-        );
+        final result = await _convertMarkdown(File(doc.path), supportDir);
         doc.uploadPath = result.path;
         doc.format = result.format;
         doc.size = await File(result.path).length();
