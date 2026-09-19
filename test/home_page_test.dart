@@ -79,6 +79,35 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('cancel empties the queue, then closes the app', (tester) async {
+    var closeRequests = 0;
+    tester.view.physicalSize = const Size(1024, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomePage(
+          state: state,
+          onRequestClose: () async => closeRequests++,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    state.addFiles([write('queued.pdf', 16).path]);
+    await tester.pumpAndSettle();
+    expect(state.docs, hasLength(1));
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(state.docs, isEmpty, reason: 'first press clears the queue');
+    expect(closeRequests, 0, reason: 'and does not close the app');
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(closeRequests, 1, reason: 'with nothing queued, it closes');
+  });
+
   testWidgets('window is a drop target and shows empty state', (tester) async {
     await pump(tester);
     expect(find.byType(DropTarget), findsOneWidget);

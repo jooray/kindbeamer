@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../state/app_state.dart';
 import '../state/documents.dart';
@@ -10,9 +14,13 @@ import 'settings_dialog.dart';
 import 'theme.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.state});
+  const HomePage({super.key, required this.state, this.onRequestClose});
 
   final AppState state;
+
+  /// How Cancel closes the app, injectable so a test need not shut down the
+  /// test harness to check that it was asked to.
+  final Future<void> Function()? onRequestClose;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -51,6 +59,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
     if (lifecycleState == AppLifecycleState.resumed) {
       widget.state.refreshFromPlatform();
+    }
+  }
+
+  /// Cancel empties the queue, and closes the app when there is nothing left to
+  /// empty — the same two steps the official client offers.
+  Future<void> _cancel() async {
+    if (state.docs.isNotEmpty) {
+      state.clearDocs();
+      return;
+    }
+    await (widget.onRequestClose ?? _closeApp)();
+  }
+
+  Future<void> _closeApp() async {
+    if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+      await windowManager.close();
+    } else {
+      await SystemNavigator.pop();
     }
   }
 
@@ -464,7 +490,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             'Cancel',
             Colors.white,
             Colors.black87,
-            state.phase == SendPhase.sending ? null : () => state.clearDocs(),
+            state.phase == SendPhase.sending ? null : _cancel,
           ),
           const SizedBox(width: 10),
           _pillButton(
