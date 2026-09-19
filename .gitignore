@@ -56,3 +56,6 @@ AGENTS.md
 keystore.properties
 signing.properties
 android/local.properties
+
+# Signer credentials for zsp (SIGN_WITH=bunker://...)
+.env
