@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The label's own paper and ink (lib/src/ui/theme.dart: Ink0). -->
+    <color name="launch_background">#F2F1EC</color>
+</resources>
