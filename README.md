@@ -51,7 +51,7 @@ Take the tarball for your architecture from the
 Asahi or an ARM box.
 
 ```bash
-tar -xzf KindBeamer-1.0.0-linux-x64.tar.gz
+tar -xzf KindBeamer-1.0.1-linux-x64.tar.gz
 ./bundle/kindbeamer
 ```
 

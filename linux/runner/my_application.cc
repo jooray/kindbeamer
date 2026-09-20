@@ -14,6 +14,44 @@ struct _MyApplication {
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 
+// Flutter's Linux embedder draws through a GdkGLContext, and when GDK cannot
+// hand it one (a VM or remote session with no GL driver, or one that only
+// speaks GLES) the view is left without a compositor and never paints. The
+// engine still starts and window_manager still shows the window, so the
+// symptom is an empty black window rather than an error. The embedder keeps a
+// software renderer for that case, chosen from FLUTTER_LINUX_RENDERER when the
+// engine is constructed, so probe for a usable context first and switch if
+// there is none. Realizing the window here is safe: the titlebar is already
+// set, and the view realizes it a few lines further down anyway.
+static gboolean use_software_renderer(GtkWindow* window) {
+  // An explicit choice wins.
+  const gchar* renderer = g_getenv("FLUTTER_LINUX_RENDERER");
+  if (renderer != nullptr) {
+    return g_strcmp0(renderer, "software") == 0;
+  }
+
+  gtk_widget_realize(GTK_WIDGET(window));
+  GdkWindow* gdk_window = gtk_widget_get_window(GTK_WIDGET(window));
+  if (gdk_window == nullptr) {
+    return FALSE;
+  }
+
+  g_autoptr(GError) error = nullptr;
+  g_autoptr(GdkGLContext) context =
+      gdk_window_create_gl_context(gdk_window, &error);
+  if (context != nullptr && gdk_gl_context_realize(context, &error)) {
+    return FALSE;
+  }
+
+  g_message(
+      "No OpenGL context available (%s), falling back to software rendering. "
+      "On a driver that offers GLES but not desktop OpenGL, GDK_GL=gles is "
+      "worth a try; FLUTTER_LINUX_RENDERER=opengl forces the GPU path back.",
+      error != nullptr ? error->message : "no reason given");
+  g_setenv("FLUTTER_LINUX_RENDERER", "software", TRUE);
+  return TRUE;
+}
+
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
   gtk_widget_show(gtk_widget_get_toplevel(GTK_WIDGET(view)));
@@ -54,7 +92,17 @@ static void my_application_activate(GApplication* application) {
 
   gtk_window_set_default_size(window, 1280, 720);
 
+  gboolean software_renderer = use_software_renderer(window);
+
   g_autoptr(FlDartProject) project = fl_dart_project_new();
+  // The software renderer rasterizes with Skia, which cannot draw the text
+  // Impeller records (FML_CHECK in dl_sk_dispatcher.cc kills the process on the
+  // first glyph), so the fallback has to turn Impeller off too. It goes here
+  // rather than in FLUTTER_ENGINE_SWITCHES because the engine only reads those
+  // in debug and profile builds.
+  if (software_renderer) {
+    fl_dart_project_set_enable_impeller(project, FALSE);
+  }
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 
