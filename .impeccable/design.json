@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-20T22:09:15Z",
+  "title": "Design System: KindBeamer",
+  "extensions": {
+    "colorMeta": {
+      "deep-slate": {
+        "role": "neutral",
+        "displayName": "Deep Slate",
+        "canonical": "#1F2630",
+        "oklch": "oklch(26.6% 0.021 257.3)",
+        "tonalRamp": ["#060B14", "#1F262F", "#3B434D", "#5A626D", "#7B838E", "#9EA6B0", "#C2CAD4", "#E8EFFA"]
+      },
+      "panel-ink": {
+        "role": "neutral",
+        "displayName": "Panel Ink",
+        "canonical": "#1A202A",
+        "oklch": "oklch(24.2% 0.021 260.6)",
+        "tonalRamp": ["#070B14", "#1F252F", "#3C424D", "#5B626D", "#7C838E", "#9FA5B0", "#C3CAD4", "#E8EFFA"]
+      },
+      "field-ink": {
+        "role": "neutral",
+        "displayName": "Field Ink",
+        "canonical": "#131922",
+        "oklch": "oklch(21.2% 0.020 258.3)",
+        "tonalRamp": ["#060B13", "#1F252F", "#3C424C", "#5B626C", "#7C838D", "#9FA6B0", "#C3CAD4", "#E8EFF9"]
+      },
+      "header-slate": {
+        "role": "neutral",
+        "displayName": "Header Slate",
+        "canonical": "#2B3442",
+        "oklch": "oklch(32.3% 0.028 259.1)",
+        "tonalRamp": ["#050B16", "#1D2532", "#394351", "#586270", "#798392", "#9CA6B5", "#C0CAD8", "#E6EFFE"]
+      },
+      "header-shade": {
+        "role": "neutral",
+        "displayName": "Header Shade",
+        "canonical": "#222A36",
+        "oklch": "oklch(28.3% 0.025 258.3)",
+        "tonalRamp": ["#060B15", "#1E2531", "#3A434F", "#59626F", "#7A8390", "#9DA6B3", "#C1CAD7", "#E7EFFC"]
+      },
+      "status-slate": {
+        "role": "neutral",
+        "displayName": "Status Slate",
+        "canonical": "#232B37",
+        "oklch": "oklch(28.7% 0.025 258.4)",
+        "tonalRamp": ["#060B15", "#1E2531", "#3A434F", "#59626F", "#7A8390", "#9DA6B3", "#C1CAD7", "#E7EFFC"]
+      },
+      "footer-ink": {
+        "role": "neutral",
+        "displayName": "Footer Ink",
+        "canonical": "#1B222C",
+        "oklch": "oklch(25.0% 0.022 257.3)",
+        "tonalRamp": ["#060B14", "#1E2630", "#3B434D", "#5A626D", "#7B838E", "#9EA6B1", "#C2CAD5", "#E8EFFA"]
+      },
+      "slate-border": {
+        "role": "neutral",
+        "displayName": "Slate Border",
+        "canonical": "#3B4657",
+        "oklch": "oklch(39.1% 0.032 259.0)",
+        "tonalRamp": ["#040B18", "#1C2534", "#384353", "#576273", "#788395", "#9AA6B7", "#BFCADB", "#E5EFFF"]
+      },
+      "slate-border-light": {
+        "role": "neutral",
+        "displayName": "Slate Border Light",
+        "canonical": "#5C6B84",
+        "oklch": "oklch(52.5% 0.044 260.6)",
+        "tonalRamp": ["#030B1B", "#1A2538", "#354258", "#53627A", "#74839C", "#97A6BF", "#BBCAE3", "#E6EFFF"]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#E8EDF4",
+        "oklch": "oklch(94.4% 0.011 256.7)",
+        "tonalRamp": ["#090B0E", "#222529", "#3F4247", "#5E6166", "#7F8388", "#A1A5AB", "#C5C9D0", "#EAEFF6"]
+      },
+      "muted-slate": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#A7B4C4",
+        "oklch": "oklch(76.5% 0.027 253.6)",
+        "tonalRamp": ["#050C14", "#1D2630", "#39434E", "#58626F", "#788492", "#9AA6B6", "#BECBDB", "#E4F0FF"]
+      },
+      "faint-slate": {
+        "role": "neutral",
+        "displayName": "Faint Slate",
+        "canonical": "#6E7E92",
+        "oklch": "oklch(58.7% 0.036 254.1)",
+        "tonalRamp": ["#030B18", "#1A2634", "#364354", "#546375", "#748498", "#97A7BB", "#BBCBDF", "#E4F0FF"]
+      },
+      "pure-white": {
+        "role": "neutral",
+        "displayName": "Pure White",
+        "canonical": "#FFFFFF",
+        "oklch": "oklch(100% 0.000 0)",
+        "tonalRamp": ["#0B0B0B", "#252525", "#424242", "#616161", "#828282", "#A5A5A5", "#C9C9C9", "#EEEEEE"]
+      },
+      "signal-teal": {
+        "role": "primary",
+        "displayName": "Signal Teal",
+        "canonical": "#38C7B4",
+        "oklch": "oklch(75.1% 0.121 182.0)",
+        "tonalRamp": ["#000F0C", "#002C27", "#004D45", "#007165", "#009787", "#2CBDAB", "#61E2CF", "#B9FFF2"]
+      },
+      "signal-teal-deep": {
+        "role": "primary",
+        "displayName": "Deep Signal Teal",
+        "canonical": "#1FA392",
+        "oklch": "oklch(64.5% 0.110 181.5)",
+        "tonalRamp": ["#000F0C", "#002C27", "#004E44", "#007165", "#069787", "#47BBA9", "#75DFCD", "#B9FFF2"]
+      },
+      "link-blue": {
+        "role": "secondary",
+        "displayName": "Link Blue",
+        "canonical": "#7FB5FF",
+        "oklch": "oklch(76.5% 0.121 256.5)",
+        "tonalRamp": ["#000A21", "#002351", "#174178", "#35629E", "#5384C6", "#73A7EF", "#A7CCFF", "#E4F0FF"]
+      },
+      "row-selected": {
+        "role": "neutral",
+        "displayName": "Row Selected",
+        "canonical": "#333333",
+        "oklch": "oklch(32.1% 0.000 89.9)",
+        "tonalRamp": ["#0B0B0B", "#252525", "#424242", "#616161", "#828282", "#A5A5A5", "#C9C9C9", "#EEEEEE"]
+      },
+      "disabled-fill": {
+        "role": "neutral",
+        "displayName": "Disabled Fill",
+        "canonical": "#B9C2CC",
+        "oklch": "oklch(81.0% 0.017 250.9)",
+        "tonalRamp": ["#070C11", "#20262C", "#3C434A", "#5B626A", "#7B838C", "#9EA6AF", "#C1CAD4", "#E7F0F9"]
+      },
+      "disabled-text": {
+        "role": "neutral",
+        "displayName": "Disabled Text",
+        "canonical": "#5A6472",
+        "oklch": "oklch(50.0% 0.026 256.8)",
+        "tonalRamp": ["#060B15", "#1E2631", "#3A434F", "#586270", "#798391", "#9CA6B4", "#C0CAD8", "#E6EFFD"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display (Wordmark)",
+        "purpose": "The wordmark only: \"kind\" at 600 in Signal Teal, \"beamer\" at 300 in Paper White."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings \"Your document\" and \"Delivery options\", in Muted Slate."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Dialog titles; 17px in the sign-in dialog."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Metadata field text, document and device names, row labels, archive label."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Footer links, status-strip text, \"Add files…\", dialog captions."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Send and Cancel pill labels — the heaviest text in the app."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "File sizes, helper copy, the credential-backend note in Settings."
+      }
+    },
+    "breakpoints": [
+      { "name": "compact", "value": "600px" },
+      { "name": "window-min", "value": "620px" },
+      { "name": "window-default", "value": "880px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Send Button",
+      "kind": "button",
+      "refersTo": "button-send",
+      "description": "The app's primary action: a deep teal pill, bottom-right of the action bar.",
+      "html": "<button class=\"ds-btn-send\" type=\"button\">Send</button>",
+      "css": ".ds-btn-send { background: #1FA392; color: #FFFFFF; font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-send:hover { background: #069787; } .ds-btn-send:active { background: #007165; } .ds-btn-send:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Send Button (Disabled)",
+      "kind": "button",
+      "refersTo": "button-send-disabled",
+      "description": "Send at rest, before a document and a device are both chosen.",
+      "html": "<button class=\"ds-btn-send-disabled\" type=\"button\" disabled>Send</button>",
+      "css": ".ds-btn-send-disabled { background: #B9C2CC; color: #5A6472; font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: default; }"
+    },
+    {
+      "name": "Cancel Button",
+      "kind": "button",
+      "refersTo": "button-cancel",
+      "description": "The quiet twin: a white pill that empties the queue, then closes the app.",
+      "html": "<button class=\"ds-btn-cancel\" type=\"button\">Cancel</button>",
+      "css": ".ds-btn-cancel { background: #FFFFFF; color: rgba(0, 0, 0, 0.87); font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-cancel:hover { background: #E8EDF4; } .ds-btn-cancel:active { background: #C2CAD4; } .ds-btn-cancel:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "The header's file-adding action; also the shape language for dialog actions.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\">Add files…</button>",
+      "css": ".ds-btn-outline { background: transparent; color: #E8EDF4; font: 400 13px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 16px; border: 1px solid #5C6B84; border-radius: 999px; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease; } .ds-btn-outline:hover { background: rgba(92, 107, 132, 0.18); } .ds-btn-outline:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Filled Button",
+      "kind": "button",
+      "refersTo": "button-filled",
+      "description": "Material's filled button on the sign-in and paste-continue paths; foreground follows the scheme (black today).",
+      "html": "<button class=\"ds-btn-filled\" type=\"button\">Sign in</button>",
+      "css": ".ds-btn-filled { background: #1FA392; color: rgba(0, 0, 0, 0.87); font: 500 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; height: 40px; padding: 0 24px; border: 0; border-radius: 999px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-filled:hover { background: #069787; } .ds-btn-filled:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Title and author wells; disabled until a document is selected, focus turns the border teal.",
+      "html": "<input class=\"ds-input\" type=\"text\" value=\"The Emish Garden [SK]\" aria-label=\"Document Title\" placeholder=\"&lt;Document Title&gt;\">",
+      "css": ".ds-input { background: #131922; color: #E8EDF4; font: 400 13.5px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 8px 12px; border: 1px solid #3B4657; border-radius: 4px; width: 100%; box-sizing: border-box; transition: border-color 0.15s ease; } .ds-input::placeholder { color: #6E7E92; } .ds-input:hover { border-color: #5C6B84; } .ds-input:focus { outline: none; border-color: #38C7B4; } .ds-input:disabled { color: rgba(232, 237, 244, 0.38); cursor: default; }"
+    },
+    {
+      "name": "Checkbox Row",
+      "kind": "input",
+      "refersTo": "checkbox",
+      "description": "Device picker and archive option: dense row, 18px box, whole row tappable.",
+      "html": "<label class=\"ds-check\"><input type=\"checkbox\" checked><span class=\"ds-check-box\"><svg viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.5 12.5l5 5L19.5 7\"/></svg></span><span class=\"ds-check-label\">Daylight</span></label>",
+      "css": ".ds-check { display: inline-flex; align-items: center; gap: 10px; color: #E8EDF4; font: 400 13.5px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; cursor: pointer; } .ds-check input { position: absolute; opacity: 0; width: 0; height: 0; } .ds-check-box { width: 18px; height: 18px; box-sizing: border-box; border: 2px solid #5C6B84; border-radius: 3px; background: #131922; display: inline-flex; align-items: center; justify-content: center; } .ds-check-box svg { display: none; } .ds-check input:checked + .ds-check-box { background: #1FA392; border-color: #1FA392; } .ds-check input:checked + .ds-check-box svg { display: block; } .ds-check input:focus-visible + .ds-check-box { outline: 2px solid #38C7B4; outline-offset: 2px; } .ds-check input:disabled + .ds-check-box { border-color: #3B4657; } .ds-check input:disabled ~ .ds-check-label { color: #6E7E92; }"
+    },
+    {
+      "name": "Document Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The queue: flat panel, one tonal step darker than the canvas, selected row a flat #333333.",
+      "html": "<div class=\"ds-panel\"><div class=\"ds-panel-row ds-panel-row-selected\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"#A7B4C4\" stroke-width=\"1.6\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><path d=\"M9 8h6M9 12h6M9 16h3\"/></svg><span class=\"ds-panel-name\">the_emish_garden_SK_print.pdf</span><span class=\"ds-panel-size\">460.82 KB</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"#6E7E92\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></div><div class=\"ds-panel-row\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"#A7B4C4\" stroke-width=\"1.6\"><path d=\"M4 5.5A2.5 2.5 0 0 1 6.5 3H15l5 5v13H6.5A2.5 2.5 0 0 1 4 18.5z\"/><path d=\"M15 3v5h5\"/></svg><span class=\"ds-panel-name\">notes.epub</span><span class=\"ds-panel-size\">84 KB</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"#6E7E92\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></div></div>",
+      "css": ".ds-panel { background: #1A202A; border: 1px solid #3B4657; border-radius: 4px; padding: 4px 0; } .ds-panel-row { display: flex; align-items: center; gap: 10px; padding: 5px 10px; color: #A7B4C4; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; } .ds-panel-row-selected { background: #333333; color: #E8EDF4; } .ds-panel-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-panel-size { color: #6E7E92; font-size: 12px; } .ds-panel-row svg:last-child { flex: none; cursor: pointer; }"
+    },
+    {
+      "name": "Status Strip",
+      "kind": "custom",
+      "refersTo": "status-strip",
+      "description": "The current send fact, in a sentence: Status Slate band with a 3px teal left edge.",
+      "html": "<div class=\"ds-status\">Your document will be sent in PDF format.</div>",
+      "css": ".ds-status { background: #232B37; border-top: 1px solid #151B23; border-left: 3px solid #38C7B4; padding: 8px 14px; color: #E8EDF4; font: 400 13px/1.4 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; text-align: center; }"
+    },
+    {
+      "name": "Header with Wordmark",
+      "kind": "nav",
+      "refersTo": "header",
+      "description": "The gradient band: wordmark left, Add files… right, closed by a 1px hairline.",
+      "html": "<header class=\"ds-header\"><span class=\"ds-wordmark\"><span class=\"ds-wordmark-kind\">kind</span><span class=\"ds-wordmark-beamer\">beamer</span></span><button class=\"ds-btn-outline\" type=\"button\">Add files…</button></header>",
+      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 18px; background: linear-gradient(180deg, #2B3442 0%, #222A36 100%); border-bottom: 1px solid #1C1C1C; } .ds-wordmark { font: 600 26px/1.1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; } .ds-wordmark-kind { color: #38C7B4; font-weight: 600; } .ds-wordmark-beamer { color: #E8EDF4; font-weight: 300; } .ds-header .ds-btn-outline { background: transparent; color: #E8EDF4; font: 400 13px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 16px; border: 1px solid #5C6B84; border-radius: 999px; cursor: pointer; transition: background 0.15s ease; } .ds-header .ds-btn-outline:hover { background: rgba(92, 107, 132, 0.18); } .ds-header .ds-btn-outline:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Dispatch",
+    "overview": "A dispatch desk at night: documents arrive from wherever they already are, get addressed, and are sent on. Nothing about the app is loud — the darker the room, the better it reads. The palette is one narrow slate family stepped from canvas to well, lit by a single signal teal that means *this is live*.\n\nThe calm is borrowed from the device the app serves. E-ink serenity: low glare, soft contrast, reading-first; the window should feel like paper's opposite number, not a control room. Workmanlike and blunt is the other half of the attitude — dense 13–14px rows, short labels, square-ish slabs, no ornament carrying meaning it does not need to. The one expressive act is the wordmark, and even that is only a colour split.\n\nThe confirmed anti-reference is Amazon's own client: no charcoal-and-orange, no marketing gloss, no imitation of official chrome. This app is openly the unofficial tool.",
+    "keyCharacteristics": [
+      "One dark slate world with narrow tonal steps between surfaces.",
+      "Exactly one expressive colour, Signal Teal, reserved for state and the primary action.",
+      "Borders and tonal steps do all the separating; nothing floats, nothing casts a shadow.",
+      "The platform's UI font at fixed sizes; the wordmark is the only branded type.",
+      "Utility density: short labels, full-width single column, status stated in sentences."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Signal Teal appears only where something is live or selected: focus, checked, sending, the wordmark's \"kind\", the strip's edge. It is never a background for anything larger than a checkbox or an action pill.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Accent Ceiling",
+        "body": "Link Blue exists to mark text links and nothing else. A third accent hue is an implementation mistake, not a design decision.",
+        "section": "colors"
+      },
+      {
+        "name": "The System-Voice Rule",
+        "body": "The platform UI font at fixed sizes is the rule and the wordmark is the only exception. No bundled typeface, no display font, no all-caps labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Shadow Rule",
+        "body": "No drop shadows, glows, blurs or glassmorphism. A surface that needs to separate gets a 1px border or one tonal step, and nothing else.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Slab-or-Pill Rule",
+        "body": "If it holds content it is a slab with a 3–6px corner; if it is an action it is a pill. Nothing between: no 8–16px \"card\" radius, no square action buttons.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do put state changes in Signal Teal only: field focus, checked, sending, the wordmark's \"kind\", the status strip's left edge.",
+      "Do separate surfaces with a 1px border or exactly one tonal step (Slate Border #3B4657 on Panel Ink #1A202A over Deep Slate #1F2630).",
+      "Do keep section headings in Muted Slate at 20px/400 with 0.3px letter-spacing, not Paper White.",
+      "Do keep the four bands in order: header, scrolling body, status strip, action bar — the same order on desktop and phone.",
+      "Do state the current send fact in the strip, in a full sentence, at 13px Paper White."
+    ],
+    "donts": [
+      "Don't add shadows, glows, blurs or glassmorphism (The No-Shadow Rule).",
+      "Don't let teal cover more than a checkbox or an action pill; the Send button is the ceiling.",
+      "Don't introduce a third accent hue; Link Blue is the whole budget for text links.",
+      "Don't bundle a font or add a display face; the system UI font is the rule.",
+      "Don't use 8–16px card radii or fully square actions (The Slab-or-Pill Rule).",
+      "Don't adopt the official client's charcoal-and-orange or any Amazon-adjacent brand colour."
+    ]
+  }
+}

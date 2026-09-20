@@ -59,3 +59,11 @@ android/local.properties
 
 # Signer credentials for zsp (SIGN_WITH=bunker://...)
 .env
+
+# Impeccable working artefacts: screenshots and build state are rebuilt, not kept
+.impeccable/review/
+.impeccable/build/
+.impeccable/mocks/
+
+# Local agent configuration
+.claude/

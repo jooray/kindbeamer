@@ -16,6 +16,10 @@ import 'documents.dart';
 
 enum SendPhase { idle, sending, done, error }
 
+/// Paper, night, or whatever the desk is doing. Persisted with the rest of the
+/// label's defaults.
+enum Appearance { auto, paper, night }
+
 class AppState extends ChangeNotifier {
   AppState({
     required this.supportDir,
@@ -45,6 +49,16 @@ class AppState extends ChangeNotifier {
   SendPhase phase = SendPhase.idle;
   String statusMessage = '';
   String? notice;
+
+  /// How far the whole queue has gone, 0..1 — what the postmark's rim and the
+  /// rule above the franking row are drawn from.
+  double progress = 0;
+
+  /// Whether a delivered send takes the window with it. On by default: the
+  /// common case is Open With, send, get back to what you were reading.
+  bool closeOnSuccess = true;
+
+  Appearance appearance = Appearance.auto;
 
   /// This installation's device identity. Generated once and kept, so signing
   /// in again replaces this machine's entry in the account's device list rather
@@ -83,6 +97,11 @@ class AppState extends ChangeNotifier {
             .cast<String>()
             .toSet();
         archive = m['archive'] as bool? ?? true;
+        closeOnSuccess = m['close_on_success'] as bool? ?? true;
+        appearance = Appearance.values.firstWhere(
+          (a) => a.name == (m['appearance'] as String? ?? ''),
+          orElse: () => Appearance.auto,
+        );
         final stored = m['device_serial'] as String? ?? '';
         if (DeviceId.isValidSerial(stored)) {
           deviceId = DeviceId.forSerial(stored);
@@ -100,6 +119,8 @@ class AppState extends ChangeNotifier {
         json.encode({
           'selected': selectedSerials.toList(),
           'archive': archive,
+          'close_on_success': closeOnSuccess,
+          'appearance': appearance.name,
           'device_serial': deviceId.serial,
         }),
       );
@@ -130,6 +151,7 @@ class AppState extends ChangeNotifier {
     if (phase != SendPhase.sending) {
       phase = SendPhase.idle;
       statusMessage = '';
+      progress = 0;
     }
     notifyListeners();
     unawaited(_convertPending());
@@ -180,6 +202,27 @@ class AppState extends ChangeNotifier {
 
   void setArchive(bool v) {
     archive = v;
+    _savePrefs();
+    notifyListeners();
+  }
+
+  void setCloseOnSuccess(bool v) {
+    closeOnSuccess = v;
+    _savePrefs();
+    notifyListeners();
+  }
+
+  void setAppearance(Appearance v) {
+    appearance = v;
+    _savePrefs();
+    notifyListeners();
+  }
+
+  /// One key ticks or clears the whole field; the printed count says which.
+  void setAllDevices(bool on) {
+    selectedSerials = on
+        ? devices.map((d) => d.deviceSerialNumber).toSet()
+        : <String>{};
     _savePrefs();
     notifyListeners();
   }
@@ -266,16 +309,22 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  static String _plural(int n, String noun) =>
+      n == 1 ? '1 $noun' : '$n ${noun}s';
+
   Future<bool> send() async {
     final c = _client;
     if (!canSend || c == null) return false;
     phase = SendPhase.sending;
+    progress = 0;
     notifyListeners();
     final targets = selectedSerials.toList();
+    final count = docs.length;
     var ok = true;
     for (var i = 0; i < docs.length; i++) {
       final doc = docs[i];
-      statusMessage = 'Sending ${doc.name} (${i + 1}/${docs.length})…';
+      statusMessage = 'Sending ${doc.name} (${i + 1} of $count)';
+      progress = i / count;
       notifyListeners();
       var lastPct = -1;
       try {
@@ -291,8 +340,8 @@ class AppState extends ChangeNotifier {
             final pct = (sent * 100 / total).clamp(0, 100).round();
             if (pct == lastPct) return;
             lastPct = pct;
-            statusMessage =
-                'Sending ${doc.name} (${i + 1}/${docs.length}) — $pct%';
+            progress = (i + pct / 100) / count;
+            statusMessage = 'Sending ${doc.name} (${i + 1} of $count) — $pct%';
             notifyListeners();
           },
         );
@@ -305,11 +354,14 @@ class AppState extends ChangeNotifier {
       }
     }
     phase = SendPhase.done;
-    statusMessage = ok ? 'Sent ${docs.length} document(s).' : statusMessage;
+    progress = 1;
     final sent = docs.length;
     docs.clear();
     selectedIndex = -1;
-    statusMessage = 'Sent $sent document(s) to ${targets.length} device(s).';
+    statusMessage = ok
+        ? '${_plural(sent, 'document')} delivered to '
+              '${_plural(targets.length, 'device')}.'
+        : statusMessage;
     notifyListeners();
     return true;
   }
