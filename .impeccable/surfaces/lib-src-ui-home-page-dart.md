@@ -45,11 +45,13 @@ FIRST VIEWPORT: Barred edge, then a printed header — KINDBEAMER wordmark left,
 ADD ⌘O and SETTINGS right. Section A CONTENTS: ruled box, one typewritten row
 per document with format and size right-aligned. Section B DESCRIPTION: TITLE and
 AUTHOR on the same ruled baselines, pre-filled. Section C DELIVER TO: numbered
-lanes in two columns, digit 1-9,0 printed beside each tick box, count at the
-right. Section D ENDORSEMENT: archive tick. The franking row closes the label: a
-hairline progress rule, the postmark disc at the left, the state sentence beside
-it, CLEAR ESC and SEND ↵ at the right. SEND is the only inverted block on the
-page.
+lanes in two columns, digit 1-9,0 printed beside each tick box, count and an
+ALL/NONE control at the right, and the library copy as the last row of the same
+box under a hairline — three lettered sections, not four, so a three-document
+label still fits one screen. The franking row closes the label: a hairline
+progress rule, the postmark disc at the left, the state sentence beside it,
+CLEAR ESC and SEND ENTER at the right. SEND is the only inverted block on the
+page, and a delivery strikes two more rules across the label beside it.
 
 FORM: the airmail / customs-declaration label, candidate 6 of 7 on the grounded
 list; seed key 02a899d0, assigned index 6, scope direction, mode operate.

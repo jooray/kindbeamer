@@ -11,9 +11,11 @@ architecture, the wire protocol and the platform integration.
 
 Goals:
 
-- Faithful replacement for the official desktop app's core flow:
-  pick documents → pick devices → send over Wi-Fi → optional library archive.
-- Native feel on every platform, dark UI modeled on the official app.
+- Replacement for the official desktop app's core flow:
+  pick documents → pick devices → send over Wi-Fi → optional library archive,
+  shortened to a window that opens already addressed and sends on Enter.
+- Native feel on every platform; a monochrome e-paper window that inverts at
+  night, keyboard-first on the desktop.
 - Act as a share/open recipient everywhere the OS allows it.
 - No server component; credentials stay on the device.
 
@@ -42,16 +44,19 @@ lib/
     platform/
       intake.dart               Android share intents, macOS Services channel
     ui/
-      theme.dart                colors / dark theme
-      home_page.dart            main window (header, doc list, devices, footer, drop)
+      theme.dart                ink palette (paper/night), type, metrics
+      label_parts.dart          barred edge, legend, well, tick, postmark, buttons
+      home_page.dart            the label (contents, description, delivery, franking)
       login_dialog.dart         embedded webview login + paste-URL fallback
-      settings_dialog.dart      account / sign out / refresh
+      settings_dialog.dart      account / after a delivery / appearance / links
 ```
 
 State management is a single `ChangeNotifier` (`AppState`) consumed through
-`ListenableBuilder`; no external state package. UI is Material 3 with a custom
-dark palette — the official app's layout, deliberately not its colours: slate
-blue-grey surfaces with a teal accent instead of charcoal and Kindle orange.
+`ListenableBuilder`; no external state package. UI is Material 3 carrying a
+monochrome e-paper palette with no accent hue at all: state is fill, stroke,
+tick and inversion, which is what lets the same window read as paper by day and
+as an inverted e-reader at night. Two bundled OFL faces: Libre Franklin for
+what the form prints, Courier Prime for what is filled into it.
 
 ## 3. Authentication
 
@@ -282,25 +287,43 @@ accepts, and sending is blocked only while it runs.
   reachable. The pre-rename key `stk_next_client` is still read so an existing
   session survives the upgrade.
 - `settings.json` in the app-support dir: last selected device serials, the
-  archive checkbox and this installation's device serial (the pid is derived
-  from it, so it is not stored).
+  library-copy tick, `close_on_success`, `appearance`, and this installation's
+  device serial (the pid is derived from it, so it is not stored).
 - Nothing else leaves the device; uploads go directly to Amazon endpoints.
 
 ## 9. UI
 
-Single window, 880×700 (minimum 620×520), dark:
+Single window, 720×645 (minimum 460×430), drawn as a dispatch label between two
+barred airmail edges. Paper (#F2F1EC on #16171A ink) or night (a true
+inversion); `Appearance` follows the system unless Settings pins one.
 
-- header: wordmark (`kind` teal + `beamer` light), *Add files…*
-- "Your document": queued file list (select/remove), title + author fields for
-  the selected item
-- "Delivery options": checkbox list of owned devices; sign-in prompt when logged out
-- archive checkbox in an outlined box; selected document size
-- status strip: "Your document will be sent in <FORMAT> format." /
-  "No valid document is selected to send." / `Sending <name> (1/3) — 42%`
-- footer: Settings | Need Help? | Manage your Kindle links, Cancel + Send pills
-  (Send enabled only when signed in, queue non-empty, ≥1 device selected)
-- drag overlay: translucent veil, upload glyph, "Drop files here / to send to
-  your Kindle" in teal
+- header: wordmark (`kind` bold + `beamer` light, the split carried by weight
+  rather than colour), the disclaimer line, *Add* and *Settings*
+- **A CONTENTS**: the queued files, one typewritten row each with format and
+  size in a fixed right-hand column; a converter's note prints under the box
+- **B DESCRIPTION**: `TITLE` and `AUTHOR` on ruled lines, pre-filled from the
+  file name; they edit the marked document
+- **C DELIVER TO**: owned devices as numbered lanes in two columns (one column
+  below 520px), `n OF m` and an ALL/NONE control on the legend line, and the
+  library copy as the last row of the same box; a sign-in prompt replaces the
+  lanes when logged out, skeleton lanes while they load
+- franking row: a progress rule, the postmark (idle / ready / the rim inking
+  round while sending / struck solid on delivery / doubled in ink when held),
+  the state sentence with a facts line under it, `CLEAR`/`CLOSE` and `SEND`
+  (enabled only when signed in, queue non-empty, ≥1 device selected)
+- drop and `?` overlays: the window turns over between its own barred edges —
+  inverted in paper, plain in night, so a dark room is never flashed
+- keys: `Enter` send (or sign in), `Esc` clear then close, `1`-`9`/`0` tick a
+  lane, `A` all/none, `E` library copy, `Backspace` drop the marked document,
+  mod+`O` add, mod+`,` settings, `?` the key list. Digits reaching a focused
+  text field are left to it.
+- after a delivery the window closes itself (`close_on_success`, default on);
+  a failure always keeps it, with the reason and `RETRY`
+- touch builds print no key caps, use 46dp rows, and say "tap" where the
+  desktop says "press"
+
+`tool/demo_main.dart` renders any of these states against a stand-in account
+for screenshots; it never touches a real session.
 
 ## 10. Testing
 
@@ -315,8 +338,15 @@ Single window, 880×700 (minimum 620×520), dark:
   shape of generated serials and pids.
 - `platform_capabilities_test.dart`: the per-platform network declarations and
   file-type registrations that only fail in a release build.
-- `home_page_test.dart`: window is a `DropTarget`; dropped PDF+EPUB populate the
-  queue and drive the format banner; metadata editing; send gating; removal.
+- `home_page_test.dart`: the label's sections and drop target; dropped PDF+EPUB
+  populate the queue and drive the franking line; the conversion footnote;
+  metadata editing; send gating and the sign-in prompt; the number, `A` and `E`
+  keys; a digit typed into a field staying in the field; a whole delivery
+  through a stand-in client, ending in a struck postmark and a window that
+  closes itself; a failed send keeping the queue and offering `RETRY`; the key
+  sheet; `CLEAR` then `CLOSE`.
+- `support/fake_client.dart`: the stand-in `StkClient` those tests send through
+  — it signs nothing and reaches no network.
 
 CI (`.github/workflows/ci.yml`) runs `dart format --set-exit-if-changed`,
 `flutter analyze` and `flutter test`, then builds macOS, Linux and Android and

@@ -33,7 +33,7 @@ Future<void> main(List<String> args) async {
     // The label is all there is, so the window is sized to it rather than to a
     // workspace: enough for the form, and no empty desk around it.
     const options = WindowOptions(
-      size: Size(720, 645),
+      size: Size(720, 585),
       minimumSize: Size(460, 430),
       title: 'KindBeamer',
       titleBarStyle: TitleBarStyle.normal,

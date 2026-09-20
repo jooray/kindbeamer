@@ -107,7 +107,7 @@ Future<void> main(List<String> args) async {
   if (desktop) {
     await windowManager.ensureInitialized();
     final options = WindowOptions(
-      size: size ?? const Size(720, 645),
+      size: size ?? const Size(720, 585),
       minimumSize: const Size(460, 430),
       title: 'KindBeamer',
       titleBarStyle: TitleBarStyle.normal,

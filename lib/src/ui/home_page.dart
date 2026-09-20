@@ -933,50 +933,67 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       onPressed: state.canSend ? _send : null,
     );
 
+    final delivered = state.phase == SendPhase.done;
     return Column(
       children: [
-        ProgressRule(
-          value: state.progress,
-          active: sending || state.phase == SendPhase.done,
-        ),
-        Container(
-          color: c.ground,
-          padding: const EdgeInsets.fromLTRB(
-            Metrics.gutter,
-            12,
-            Metrics.gutter,
-            14,
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Narrow enough that the sentence would be squeezed to nothing:
-              // the actions take their own line, at full width.
-              if (constraints.maxWidth < 520) {
-                return Column(
+        ProgressRule(value: state.progress, active: sending || delivered),
+        Stack(
+          children: [
+            // A franking cancels what it stamps: on delivery the rule above
+            // this row is joined by two more, struck across the whole label.
+            if (delivered)
+              Positioned(
+                top: 4,
+                left: 0,
+                right: 0,
+                child: Column(
                   children: [
-                    status,
-                    const SizedBox(height: 13),
-                    Row(
-                      children: [
-                        Expanded(child: clear),
-                        const SizedBox(width: 9),
-                        Expanded(child: send),
-                      ],
-                    ),
+                    Container(height: 2, color: c.ink),
+                    const SizedBox(height: 3),
+                    Container(height: 2, color: c.ink),
                   ],
-                );
-              }
-              return Row(
-                children: [
-                  Expanded(child: status),
-                  const SizedBox(width: 14),
-                  clear,
-                  const SizedBox(width: 9),
-                  send,
-                ],
-              );
-            },
-          ),
+                ),
+              ),
+            Container(
+              color: Colors.transparent,
+              padding: const EdgeInsets.fromLTRB(
+                Metrics.gutter,
+                16,
+                Metrics.gutter,
+                14,
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // Narrow enough that the sentence would be squeezed to nothing:
+                  // the actions take their own line, at full width.
+                  if (constraints.maxWidth < 520) {
+                    return Column(
+                      children: [
+                        status,
+                        const SizedBox(height: 13),
+                        Row(
+                          children: [
+                            Expanded(child: clear),
+                            const SizedBox(width: 9),
+                            Expanded(child: send),
+                          ],
+                        ),
+                      ],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(child: status),
+                      const SizedBox(width: 14),
+                      clear,
+                      const SizedBox(width: 9),
+                      send,
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -1037,59 +1054,60 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget _keySheet(Ink0 c) {
     final invert = Theme.of(context).brightness == Brightness.light;
     final fg = invert ? c.ground : c.ink;
-    const rows = [
-      ('ENTER', 'Send · sign in when signed out'),
+    final rows = [
+      ('ENTER', 'Send \u00B7 sign in when signed out'),
       ('ESC', 'Clear the queue, then close'),
-      ('1 … 9, 0', 'Tick the device on that line'),
+      ('1 \u2026 9, 0', 'Tick the device on that line'),
       ('A', 'All devices, or none'),
-      ('E', 'Keep a library copy'),
+      ('E', 'Keep a copy in your Kindle Library'),
       ('BACKSPACE', 'Drop the marked document'),
+      ('${modKey}O', 'Add files'),
+      ('$modKey,', 'Settings'),
+      ('?', 'This card'),
     ];
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('KEYS', style: press(size: 15, color: fg, tracking: 5)),
-        const SizedBox(height: 16),
-        for (final (key, what) in rows)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 9),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 108,
-                  child: Text(
-                    key,
-                    style: press(size: 10, color: fg, weight: FontWeight.w700),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 460),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('KEYS', style: press(size: 15, color: fg, tracking: 6)),
+          const SizedBox(height: 10),
+          Container(height: 1, color: fg),
+          const SizedBox(height: 14),
+          for (final (key, what) in rows)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 112,
+                    child: Text(
+                      key,
+                      style: press(
+                        size: 10.5,
+                        color: fg,
+                        weight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                ),
-                Text(what, style: typed(size: 12.5, color: fg)),
-              ],
+                  Expanded(
+                    child: Text(what, style: typed(size: 13, color: fg)),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 6),
+          Text(
+            'PRESS ANY KEY',
+            style: press(
+              size: 9,
+              color: fg.withValues(alpha: 0.6),
+              tracking: 2,
             ),
           ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 9),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 108,
-                child: Text(
-                  '${modKey}O  /  $modKey,',
-                  style: press(size: 10, color: fg, weight: FontWeight.w700),
-                ),
-              ),
-              Text('Add files · Settings', style: typed(size: 12.5, color: fg)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          'PRESS ANY KEY',
-          style: press(size: 9, color: fg.withValues(alpha: 0.6), tracking: 2),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -1164,8 +1182,8 @@ class _IconTapState extends State<_IconTap> {
           behavior: HitTestBehavior.opaque,
           onTap: widget.onTap,
           child: SizedBox(
-            width: 26,
-            height: 26,
+            width: touchLayout ? 48 : 26,
+            height: touchLayout ? 48 : 26,
             child: Center(child: widget.builder(_hover)),
           ),
         ),

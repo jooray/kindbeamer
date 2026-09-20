@@ -11,7 +11,7 @@ bool get touchLayout => Platform.isAndroid || Platform.isIOS;
 
 /// Desktop rows are set to the label's printed rhythm; a touch screen needs a
 /// 48dp target, so the same rhythm is simply printed larger there.
-double get laneHeight => touchLayout ? 46 : Metrics.row;
+double get laneHeight => touchLayout ? 48 : Metrics.row;
 
 /// The barred edge of an airmail label, in one ink. It is what makes the
 /// window read as a piece of addressed post before a single word is read.
@@ -202,6 +202,44 @@ class _TickPainter extends CustomPainter {
   @override
   bool shouldRepaint(_TickPainter old) =>
       old.on != on || old.ink != ink || old.stroke != stroke;
+}
+
+/// The remove mark: two strokes on the tick's hairline, so the label keeps one
+/// drawn vocabulary and never borrows a glyph from a font.
+class CrossMark extends StatelessWidget {
+  const CrossMark({super.key, required this.strong, this.size = 12});
+
+  final bool strong;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = Ink0.of(context);
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(painter: _CrossPainter(strong ? c.ink : c.mark)),
+    );
+  }
+}
+
+class _CrossPainter extends CustomPainter {
+  _CrossPainter(this.ink);
+
+  final Color ink;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = ink
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.square;
+    canvas.drawLine(Offset.zero, Offset(size.width, size.height), p);
+    canvas.drawLine(Offset(size.width, 0), Offset(0, size.height), p);
+  }
+
+  @override
+  bool shouldRepaint(_CrossPainter old) => old.ink != ink;
 }
 
 enum Frank { idle, ready, sending, delivered, held }

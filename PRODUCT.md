@@ -62,8 +62,9 @@ is effectively the only option.
   credentials live in the OS keychain/encrypted storage, falling back to a
   mode-600 file where no keychain is reachable, with Settings naming which was
   used.
-- Desktop window is ~880×700 (minimum 620×520) and the same UI is fitted to
-  phones via `SafeArea`; there is no separate mobile design.
+- Desktop window is 720×585 (minimum 460×430); the same label is fitted to
+  phones via `SafeArea`, dropping to one device column, 48dp rows and no printed
+  key caps below 520px. There is no separate mobile design.
 - Non-goals today: USB/MTP sideloading, Kindle Library management, iOS and
   Windows packaging. Roadmap: migrating to the `/import/kindle-doc/send-to-kindle`
   endpoint, localization, a notarized macOS build and signed release APK in CI.
@@ -73,21 +74,32 @@ is effectively the only option.
 
 ## Brand Commitments
 
-- Name **KindBeamer**; the lowercase `kindbeamer` wordmark (teal "kind", light
-  "beamer") is the app's identity, and the master icon art is
-  `assets/icon/icon-1024.png` with derived platform icon sets.
+- Name **KindBeamer**; the lowercase `kindbeamer` wordmark is the app's
+  identity, and it is always split mid-word — bold "kind" against light
+  "beamer". The split was carried by colour (teal against pale) until the
+  e-paper redesign of September 2026 pinned a monochrome world; it is carried
+  by weight now, and the split itself is the commitment, not the hue. The
+  master icon art is `assets/icon/icon-1024.png`, drawn by
+  `tools/make_icons.py` as the postmark struck on a sheet of e-paper, with
+  derived platform icon sets.
 - An openly unofficial project: the disclaimer ("not affiliated with, endorsed
   by, or sponsored by Amazon") stays visible wherever the app is presented, and
   copy never implies official status.
 - Voice is plain, honest, first-person-free prose; no marketing inflation, and
   limitations and failure modes are stated rather than hidden.
-- The dark UI is deliberately *not* the official client's charcoal-and-orange;
-  it has its own slate-and-teal palette inherited from the current theme.
+- The UI is deliberately *not* the official client's charcoal-and-orange. Since
+  September 2026 it has no accent hue at all: one ink on one paper, inverted for
+  night, with every state carried by fill, stroke, tick or inversion. The
+  slate-and-teal palette it replaced is history, not a commitment.
 
 ## Evidence on Hand
 
-- `docs/screenshot-macos.png` — a real macOS window with a queued PDF, title and
-  author filled in, device checkboxes ticked and the Send button.
+- `docs/screenshot-macos.png` — the real macOS window, paper and night side by
+  side, with a queued PDF, title and author filled in, three of seven devices
+  ticked and the postmark beside Send.
+- `.impeccable/review/` — captures of every state the label has (empty, signed
+  out, ready, queue, sending, delivered, held, drop, keys, settings) in both
+  themes, plus an Android phone capture from the emulator.
 - `SPECIFICATION.md` — architecture, wire protocol, format table, testing and
   build notes; the place to record protocol knowledge.
 - `README.md` — install paths, feature list, share-recipient matrix.
