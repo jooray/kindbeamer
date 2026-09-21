@@ -225,8 +225,9 @@ these projects are ours.
   Amazon's Send to Kindle service. KindBeamer's protocol code is a clean-room
   Dart port of the approach it takes.
 - [sendKindle](https://github.com/kparal/sendKindle) is the original
-  command-line tool for mailing documents to a Kindle. Unmaintained since 2019,
-  and its author asks anyone who wants it revived to fork it.
+  command-line tool for mailing documents to a Kindle. Its last code change was
+  in 2019 and the repository is now archived, so it takes no issues or pull
+  requests. Its author asks anyone who wants it revived to fork it.
 - [kindle-send](https://github.com/nikhil1raghav/kindle-send) sends web pages
   and documents from the terminal. It turns a URL into an EPUB first, which
   makes it a good fit for scripted page archiving.
