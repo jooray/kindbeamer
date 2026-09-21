@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KindBeamer: send documents to your Kindle</title>
+<meta name="description" content="An open-source Send to Kindle client for macOS, Linux and Android. Open a document with it, press Enter, and it lands on the Kindles you picked.">
+<meta property="og:title" content="KindBeamer">
+<meta property="og:description" content="Open a document with it, press Enter, and it lands on the Kindles you picked. macOS, Linux and Android.">
+<meta property="og:image" content="https://jooray.github.io/kindbeamer/screenshot-macos.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="icon.png">
+
+<style>
+@font-face {
+  font-family: 'LibreFranklin';
+  src: url('fonts/LibreFranklin-wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'CourierPrime';
+  src: url('fonts/CourierPrime-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'CourierPrime';
+  src: url('fonts/CourierPrime-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* One ink on one paper, the way the app draws itself. Night is a true
+   inversion: nothing is tinted on the way across. */
+:root {
+  --ground: #F2F1EC;
+  --well: #E9E8E2;
+  --ink: #16171A;
+  --ink-mid: #52545A;
+  --ink-faint: #646669;
+  --mark: #7D7F84;
+  --rule: #C2C1BB;
+  --rule-faint: #D8D7D1;
+  --on-ink: #F2F1EC;
+  --press: 'LibreFranklin', system-ui, sans-serif;
+  --typed: 'CourierPrime', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #101113;
+    --well: #191A1D;
+    --ink: #E9E8E3;
+    --ink-mid: #9B9DA2;
+    --ink-faint: #85878C;
+    --mark: #6C6E73;
+    --rule: #3B3D41;
+    --rule-faint: #2A2C2F;
+    --on-ink: #101113;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--typed);
+  font-size: 15px;
+  line-height: 1.6;
+}
+::selection { background: var(--ink); color: var(--on-ink); }
+
+/* The barred airmail edge, the same period and slant the window paints. */
+.barred {
+  height: 9px;
+  background-image: repeating-linear-gradient(
+    115deg,
+    var(--ink) 0 14px,
+    transparent 14px 26px
+  );
+}
+.barred.foot { background-image: repeating-linear-gradient(
+    65deg,
+    var(--ink) 0 14px,
+    transparent 14px 26px
+  ); }
+
+.label {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 22px 64px;
+}
+
+header { padding: 34px 0 20px; border-bottom: 1px solid var(--rule); }
+.wordmark {
+  font-family: var(--press);
+  font-size: 40px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin: 0;
+}
+.wordmark b { font-weight: 700; color: var(--ink); }
+.wordmark span { font-weight: 300; color: var(--ink-mid); }
+.standfirst {
+  margin: 14px 0 0;
+  font-size: 16px;
+  color: var(--ink);
+  max-width: 34em;
+}
+
+section { padding: 30px 0 0; }
+.legend {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--press);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--ink-mid);
+  margin: 0 0 12px;
+}
+.legend b { color: var(--ink); font-weight: 700; }
+p { margin: 0 0 14px; max-width: 38em; }
+a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { background: var(--ink); color: var(--on-ink); text-decoration: none; }
+
+figure { margin: 0; }
+figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+}
+figcaption {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  max-width: 38em;
+}
+
+table { border-collapse: collapse; width: 100%; max-width: 560px; }
+td { padding: 7px 0; border-bottom: 1px solid var(--rule-faint); vertical-align: top; }
+td.key {
+  font-family: var(--press);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  padding-right: 22px;
+  width: 8.5em;
+}
+td.what { font-size: 14px; color: var(--ink-mid); }
+
+.grab { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 16px; }
+.grab a {
+  font-family: var(--press);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  padding: 11px 18px;
+  border: 1px solid var(--ink);
+  text-decoration: none;
+  color: var(--ink);
+}
+.grab a.solid { background: var(--ink); color: var(--on-ink); }
+.grab a:hover { background: var(--ink); color: var(--on-ink); }
+.grab a.solid:hover { box-shadow: inset 0 0 0 3px var(--ground), inset 0 0 0 4px var(--on-ink); }
+.note { font-size: 13px; color: var(--ink-faint); }
+
+.franking { display: flex; gap: 20px; align-items: flex-start; }
+.franking svg { flex: none; margin-top: 4px; }
+.franking .ring { fill: none; stroke: var(--mark); stroke-width: 1.4; }
+.franking .ring.inner { stroke-width: 1; }
+.franking text { font-family: var(--typed); fill: var(--mark); }
+
+.btw {
+  margin-top: 48px;
+  border-top: 1px solid var(--rule);
+  padding-top: 26px;
+}
+.btw .trailer {
+  position: relative;
+  padding-top: 56.25%;
+  margin: 18px 0 0;
+  border: 1px solid var(--rule);
+  background: var(--well);
+}
+.btw .trailer iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+footer {
+  margin-top: 44px;
+  border-top: 1px solid var(--rule);
+  padding-top: 18px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+footer p { max-width: 42em; margin-bottom: 8px; }
+
+@media (max-width: 520px) {
+  .wordmark { font-size: 32px; }
+  .franking { gap: 14px; }
+  .franking svg { display: none; }
+  td.key { width: 7em; padding-right: 14px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+<div class="barred"></div>
+<div class="label">
+
+<header>
+  <h1 class="wordmark"><b>kind</b><span>beamer</span></h1>
+  <p class="standfirst">Send your documents to your Kindle from your own machine.</p>
+</header>
+
+<section>
+  <p class="legend"><b>A</b> WHAT IT IS</p>
+  <p>KindBeamer is an open-source client for Amazon's Send to Kindle service. Open a
+  PDF or an EPUB with it, press Enter, and it turns up on the Kindles you picked.</p>
+  <p>It runs on macOS, Linux and Android. Nothing passes through a server of mine,
+  because there isn't one.</p>
+</section>
+
+<section>
+  <p class="legend"><b>B</b> WHAT IT LOOKS LIKE</p>
+  <figure>
+    <img src="screenshot-macos.png" alt="The KindBeamer window: a dispatch label with a queued PDF in section A, its title and author in section B, seven Kindle devices in two numbered columns in section C with three ticked, and a postmark beside the Send button.">
+    <figcaption>The window opens already addressed: the document you gave it, a title
+    taken from the file name, the devices you ticked last time. Usually there is
+    nothing left to do but press Enter. It inverts at night.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <p class="legend"><b>C</b> KEYS</p>
+  <p>Built for people who would rather not reach for the mouse. It behaves itself in
+  a tiling window manager, and the keys are printed on the window, so there is
+  nothing to memorise.</p>
+  <table>
+    <tr><td class="key">ENTER</td><td class="what">Send</td></tr>
+    <tr><td class="key">ESC</td><td class="what">Clear the queue; again to close the window</td></tr>
+    <tr><td class="key">1 … 9, 0</td><td class="what">Tick the device on that line</td></tr>
+    <tr><td class="key">A</td><td class="what">All devices, or none</td></tr>
+    <tr><td class="key">E</td><td class="what">Keep a copy in your Kindle library</td></tr>
+    <tr><td class="key">?</td><td class="what">The card that lists all of this</td></tr>
+  </table>
+  <p class="note" style="margin-top:14px">A delivered send closes the window by
+  itself. A failed one stays, and says why.</p>
+</section>
+
+<section>
+  <p class="legend"><b>D</b> GET IT</p>
+  <div class="franking">
+    <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="ring" cx="32" cy="32" r="30"/>
+      <circle class="ring inner" cx="32" cy="32" r="25"/>
+      <text x="32" y="30" text-anchor="middle" font-size="9" font-weight="700">FREE</text>
+      <line x1="10" y1="34" x2="54" y2="34" stroke="currentColor" stroke-width="0.8" style="stroke:var(--mark)"/>
+      <text x="32" y="45" text-anchor="middle" font-size="7.5">MIT</text>
+    </svg>
+    <div>
+      <div class="grab">
+        <a class="solid" href="https://github.com/jooray/kindbeamer/releases/latest">ALL DOWNLOADS</a>
+        <a href="https://zapstore.dev/apps/dev.stkn.kindbeamer">ANDROID · ZAPSTORE</a>
+        <a href="https://github.com/jooray/kindbeamer">SOURCE</a>
+      </div>
+      <p class="note">macOS ships as a .dmg, Linux as a tarball for x86-64 and arm64,
+      Android as an APK, or from Zapstore, which keeps it updated. Linux is the one
+      that needed doing: Amazon never wrote a desktop client for it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="btw">
+  <p class="legend"><b>BTW</b></p>
+  <p>The book in that screenshot is a real one, and mine.
+  <a href="https://tamersofentropy.net/">Tamers of Entropy</a> is a lunarpunk novel
+  about identity, parallel spaces, AI, space and expanding consciousness.
+  Paperback, ebook and audiobook, in English, Slovak and Czech.</p>
+  <div class="trailer">
+    <iframe src="https://www.youtube-nocookie.com/embed/APLe95FRUhg" title="Tamers of Entropy trailer" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</section>
+
+<footer>
+  <p>KindBeamer is not affiliated with, endorsed by, or sponsored by Amazon. It
+  speaks to an undocumented service, which Amazon may change or block whenever
+  they like.</p>
+  <p>MIT licensed. Built by <a href="https://juraj.bednar.io/">Juraj Bednár</a>.
+  The protocol was worked out first by
+  <a href="https://github.com/maxdjohnson/stkclient">stkclient</a>.</p>
+</footer>
+
+</div>
+<div class="barred foot"></div>
+</body>
+</html>
