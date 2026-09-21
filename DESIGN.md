@@ -226,6 +226,8 @@ The ink itself is the primary: **Press Ink** (`{colors.paper-ink}` on paper, `{c
 
 The label is a single column centred at a maximum width of 900px, with a 22px gutter, inside a window of 720×585 (minimum 460×430). Structure from the top: barred edge (7px), printed header (13px/12px vertical padding), a strong hairline, the scrolling field stack (14px top and bottom), the optional notice band, the franking row, barred edge flipped. The overlays live between the two barred edges, so the postal border never leaves the window.
 
+The queue is the only section whose length the user controls, so it is the only one capped: past three rows (3 × 26px desktop, 3 × 48dp touch) it scrolls inside its own well on a 3px square-ended thumb and the rest of the label stays where it was. When the whole field stack runs past the window, a ground-coloured chip prints CONTINUES BELOW in press caption type (8.5px, 1.5px tracking, ink-faint) at the bottom right of the scroll area, 22px in from the gutter — the sheet saying where it carries on rather than a fading edge.
+
 Sections are lettered and separated by 13px, with 7px between a legend and the box it names. Rows are the rhythm: every document row, device lane and skeleton lane is exactly 26px tall on desktop (the library row is 26+6px, being the last row under a hairline inside the same box), so a count is read by eye rather than measured. Measurements sit in a fixed right-hand column — the size column is a hard 82px, right-aligned, in Courier — and never reflow as names change.
 
 **Responsive behaviour** turns on one breakpoint at 520px and one platform flag:
@@ -247,7 +249,7 @@ This system has no elevation. There are no shadows, no gradients, no blurs, no s
 
 Every corner is square. Radius is 0 everywhere — buttons, wells, tick boxes, dialogs, scrollbar thumbs, the text cursor — and the direction contract's "no corner above 2px" landed as a flat zero in the build. Borders do the work radius would: a hairline (1px) at rest, 1.2px for an emphasised well, a dialog edge or an inked button, and 1.6px for hover or keyboard focus. There is no second colour to spend on a state, so a state is a heavier strike of the same rule.
 
-The recurring silhouettes are the barred edge (a 7px band of ink parallelograms on a 26px period, slanted 1.15× the band height, flipped along the bottom), the square tick, the ruled well, the underlined field, and the postmark disc — the only circle in the system.
+The recurring silhouettes are the barred edge (a 7px band of ink parallelograms on a 26px period, slanted 1.15× the band height, flipped along the bottom), the square tick, the two-stroke cross, the ruled well, the underlined field, and the postmark disc — the only circle in the system.
 
 ## Components
 
@@ -267,6 +269,12 @@ The only selection control; there are no switches, pills or radio buttons anywhe
 - **On:** the square filled solid in ink with a 1.9px knocked-out check (square caps).
 - **State is binary and instant** — no tint, no slide, no transition.
 
+### Cross Mark
+
+The remove mark: two strokes drawn on the tick's hairline, so the label keeps one drawn vocabulary and never borrows a glyph from a font.
+- **Geometry:** two 1.2px square-capped lines corner to corner of a square box — 10px in a queue row, 11px in the notice band.
+- **States:** mark grey at rest, full ink on hover; the hit target around it is 26px square on desktop and 48dp on touch.
+
 ### Wells and Fields
 
 - **Well:** well-coloured ground with a 1px rule border, square, 5px vertical padding; the box the keyboard is pointed at takes a 1.2px ink border instead.
@@ -278,7 +286,8 @@ The only selection control; there are no switches, pills or radio buttons anywhe
 - Fixed height (26px desktop / 48dp touch), full-width hit target, hover inks the row ground to the faint rule.
 - A document row prints a 6px solid ink square as its carriage mark when selected and sets its name in Courier 700 ink; unselected names are ink-mid 400.
 - A device lane prints its key digit (1–9 then 0) at the far left in Courier 11px — ink 700 when ticked, faint 400 when not — then the tick box, then the name. Past the tenth device a lane has a tick and no digit.
-- Format tags sit in press caption; sizes in a fixed 82px right-aligned Courier column.
+- Format tags sit in press caption; sizes in a fixed 82px right-aligned Courier column, and the row ends with the drawn cross mark.
+- The queue box holds three rows at full height; beyond that it scrolls within the well rather than pushing the label down.
 
 ### Postmark (signature component)
 

@@ -47,8 +47,10 @@ per document with format and size right-aligned. Section B DESCRIPTION: TITLE an
 AUTHOR on the same ruled baselines, pre-filled. Section C DELIVER TO: numbered
 lanes in two columns, digit 1-9,0 printed beside each tick box, count and an
 ALL/NONE control at the right, and the library copy as the last row of the same
-box under a hairline — three lettered sections, not four, so a three-document
-label still fits one screen. The franking row closes the label: a hairline
+box under a hairline — three lettered sections, not four. The window opens at
+the height a one-document label measures; the queue caps at three rows and
+scrolls in its own box past that, and when the body still runs long the page
+prints CONTINUES BELOW at its foot rather than letting a row end in mid-air. The franking row closes the label: a hairline
 progress rule, the postmark disc at the left, the state sentence beside it,
 CLEAR ESC and SEND ENTER at the right. SEND is the only inverted block on the
 page, and a delivery strikes two more rules across the label beside it.

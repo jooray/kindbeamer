@@ -8,120 +8,312 @@
         "role": "neutral",
         "displayName": "Warm Paper",
         "canonical": "#F2F1EC",
-        "tonalRamp": ["#17171A", "#2E2E2C", "#494845", "#66655F", "#87867F", "#A9A8A1", "#CDCCC5", "#F2F1EC"]
+        "tonalRamp": [
+          "#17171A",
+          "#2E2E2C",
+          "#494845",
+          "#66655F",
+          "#87867F",
+          "#A9A8A1",
+          "#CDCCC5",
+          "#F2F1EC"
+        ]
       },
       "paper-well": {
         "role": "neutral",
         "displayName": "Paper Well",
         "canonical": "#E9E8E2",
-        "tonalRamp": ["#161614", "#2C2C29", "#454440", "#605F5A", "#7F7E78", "#A09F98", "#C4C3BC", "#E9E8E2"]
+        "tonalRamp": [
+          "#161614",
+          "#2C2C29",
+          "#454440",
+          "#605F5A",
+          "#7F7E78",
+          "#A09F98",
+          "#C4C3BC",
+          "#E9E8E2"
+        ]
       },
       "paper-ink": {
         "role": "primary",
         "displayName": "Press Ink",
         "canonical": "#16171A",
-        "tonalRamp": ["#0A0B0C", "#16171A", "#2B2D31", "#43454A", "#5D5F64", "#7A7C81", "#9A9CA1", "#BDBFC3"]
+        "tonalRamp": [
+          "#0A0B0C",
+          "#16171A",
+          "#2B2D31",
+          "#43454A",
+          "#5D5F64",
+          "#7A7C81",
+          "#9A9CA1",
+          "#BDBFC3"
+        ]
       },
       "paper-ink-mid": {
         "role": "neutral",
         "displayName": "Ink Mid",
         "canonical": "#52545A",
-        "tonalRamp": ["#0C0D0F", "#1E1F22", "#333438", "#52545A", "#6E7076", "#8C8E94", "#ABADB2", "#CBCDD1"]
+        "tonalRamp": [
+          "#0C0D0F",
+          "#1E1F22",
+          "#333438",
+          "#52545A",
+          "#6E7076",
+          "#8C8E94",
+          "#ABADB2",
+          "#CBCDD1"
+        ]
       },
       "paper-ink-faint": {
         "role": "neutral",
         "displayName": "Ink Faint",
         "canonical": "#646669",
-        "tonalRamp": ["#0E0F10", "#212223", "#383939", "#4E4F51", "#646669", "#888A8D", "#ACAEB1", "#D0D2D5"]
+        "tonalRamp": [
+          "#0E0F10",
+          "#212223",
+          "#383939",
+          "#4E4F51",
+          "#646669",
+          "#888A8D",
+          "#ACAEB1",
+          "#D0D2D5"
+        ]
       },
       "paper-mark": {
         "role": "neutral",
         "displayName": "Mark Grey",
         "canonical": "#7D7F84",
-        "tonalRamp": ["#111213", "#242526", "#3B3C3E", "#535457", "#6A6C70", "#7D7F84", "#A5A7AB", "#CDCFD3"]
+        "tonalRamp": [
+          "#111213",
+          "#242526",
+          "#3B3C3E",
+          "#535457",
+          "#6A6C70",
+          "#7D7F84",
+          "#A5A7AB",
+          "#CDCFD3"
+        ]
       },
       "paper-rule": {
         "role": "neutral",
         "displayName": "Field Rule",
         "canonical": "#C2C1BB",
-        "tonalRamp": ["#141413", "#2A2A28", "#414140", "#5A5A57", "#757471", "#90908C", "#ACABA7", "#C2C1BB"]
+        "tonalRamp": [
+          "#141413",
+          "#2A2A28",
+          "#414140",
+          "#5A5A57",
+          "#757471",
+          "#90908C",
+          "#ACABA7",
+          "#C2C1BB"
+        ]
       },
       "paper-rule-faint": {
         "role": "neutral",
         "displayName": "Inner Rule",
         "canonical": "#D8D7D1",
-        "tonalRamp": ["#151514", "#2B2B29", "#434341", "#5C5C59", "#777672", "#93928E", "#B5B4AF", "#D8D7D1"]
+        "tonalRamp": [
+          "#151514",
+          "#2B2B29",
+          "#434341",
+          "#5C5C59",
+          "#777672",
+          "#93928E",
+          "#B5B4AF",
+          "#D8D7D1"
+        ]
       },
       "night-ground": {
         "role": "neutral",
         "displayName": "Night Ground",
         "canonical": "#101113",
-        "tonalRamp": ["#101113", "#1E1F22", "#303134", "#454649", "#5C5D61", "#76777B", "#9FA0A4", "#D4D5D8"]
+        "tonalRamp": [
+          "#101113",
+          "#1E1F22",
+          "#303134",
+          "#454649",
+          "#5C5D61",
+          "#76777B",
+          "#9FA0A4",
+          "#D4D5D8"
+        ]
       },
       "night-well": {
         "role": "neutral",
         "displayName": "Night Well",
         "canonical": "#191A1D",
-        "tonalRamp": ["#0B0C0D", "#191A1D", "#2B2C30", "#414246", "#57585C", "#717276", "#9B9C9F", "#D0D1D4"]
+        "tonalRamp": [
+          "#0B0C0D",
+          "#191A1D",
+          "#2B2C30",
+          "#414246",
+          "#57585C",
+          "#717276",
+          "#9B9C9F",
+          "#D0D1D4"
+        ]
       },
       "night-ink": {
         "role": "primary",
         "displayName": "Night Press Ink",
         "canonical": "#E9E8E3",
-        "tonalRamp": ["#161615", "#2C2C2A", "#454441", "#5F5E5B", "#7E7D79", "#A09F9A", "#C5C4BF", "#E9E8E3"]
+        "tonalRamp": [
+          "#161615",
+          "#2C2C2A",
+          "#454441",
+          "#5F5E5B",
+          "#7E7D79",
+          "#A09F9A",
+          "#C5C4BF",
+          "#E9E8E3"
+        ]
       },
       "night-ink-mid": {
         "role": "neutral",
         "displayName": "Night Ink Mid",
         "canonical": "#9B9DA2",
-        "tonalRamp": ["#131415", "#262728", "#3D3E40", "#555659", "#6E7074", "#878A8E", "#9B9DA2", "#C6C8CC"]
+        "tonalRamp": [
+          "#131415",
+          "#262728",
+          "#3D3E40",
+          "#555659",
+          "#6E7074",
+          "#878A8E",
+          "#9B9DA2",
+          "#C6C8CC"
+        ]
       },
       "night-ink-faint": {
         "role": "neutral",
         "displayName": "Night Ink Faint",
         "canonical": "#85878C",
-        "tonalRamp": ["#121314", "#242526", "#3A3B3D", "#515255", "#6A6B6F", "#85878C", "#A9ABB0", "#CFD1D5"]
+        "tonalRamp": [
+          "#121314",
+          "#242526",
+          "#3A3B3D",
+          "#515255",
+          "#6A6B6F",
+          "#85878C",
+          "#A9ABB0",
+          "#CFD1D5"
+        ]
       },
       "night-mark": {
         "role": "neutral",
         "displayName": "Night Mark",
         "canonical": "#6C6E73",
-        "tonalRamp": ["#0F1011", "#212223", "#37383A", "#4E4F53", "#6C6E73", "#8A8C90", "#AEB0B4", "#D2D4D8"]
+        "tonalRamp": [
+          "#0F1011",
+          "#212223",
+          "#37383A",
+          "#4E4F53",
+          "#6C6E73",
+          "#8A8C90",
+          "#AEB0B4",
+          "#D2D4D8"
+        ]
       },
       "night-rule": {
         "role": "neutral",
         "displayName": "Night Field Rule",
         "canonical": "#3B3D41",
-        "tonalRamp": ["#0C0D0E", "#1B1C1E", "#2B2C2F", "#3B3D41", "#565860", "#787A80", "#9FA1A6", "#C9CBCF"]
+        "tonalRamp": [
+          "#0C0D0E",
+          "#1B1C1E",
+          "#2B2C2F",
+          "#3B3D41",
+          "#565860",
+          "#787A80",
+          "#9FA1A6",
+          "#C9CBCF"
+        ]
       },
       "night-rule-faint": {
         "role": "neutral",
         "displayName": "Night Inner Rule",
         "canonical": "#2A2C2F",
-        "tonalRamp": ["#0A0B0C", "#181A1B", "#2A2C2F", "#3C3E42", "#545659", "#727478", "#9A9CA0", "#C6C8CB"]
+        "tonalRamp": [
+          "#0A0B0C",
+          "#181A1B",
+          "#2A2C2F",
+          "#3C3E42",
+          "#545659",
+          "#727478",
+          "#9A9CA0",
+          "#C6C8CB"
+        ]
       }
     },
     "typographyMeta": {
-      "wordmark": { "displayName": "Wordmark", "purpose": "kindbeamer, split mid-word by weight: 700 ink against 300 ink-mid. Never split by colour." },
-      "display": { "displayName": "Overlay Display", "purpose": "Overlay headlines only — AFFIX DOCUMENT (26px/6 tracking), KEYS (15px/6 tracking)." },
-      "legend": { "displayName": "Legend", "purpose": "Section legends (A CONTENTS) and button labels; the section letter goes to wght 700." },
-      "label": { "displayName": "Field Label", "purpose": "TITLE / AUTHOR, dialog group headings, dense button labels." },
-      "caption": { "displayName": "Caption", "purpose": "Disclaimer line, format tags, franking note, printed key hints." },
-      "body": { "displayName": "Typed Body", "purpose": "Everything filled into the form: document names, device names, field values." },
-      "status": { "displayName": "State Sentence", "purpose": "The one sentence beside the postmark that names what is happening." },
-      "measure": { "displayName": "Measure", "purpose": "Sizes, tallies and lane digits, right-aligned in a fixed column that never reflows." }
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "kindbeamer, split mid-word by weight: 700 ink against 300 ink-mid. Never split by colour."
+      },
+      "display": {
+        "displayName": "Overlay Display",
+        "purpose": "Overlay headlines only — AFFIX DOCUMENT (26px/6 tracking), KEYS (15px/6 tracking)."
+      },
+      "legend": {
+        "displayName": "Legend",
+        "purpose": "Section legends (A CONTENTS) and button labels; the section letter goes to wght 700."
+      },
+      "label": {
+        "displayName": "Field Label",
+        "purpose": "TITLE / AUTHOR, dialog group headings, dense button labels."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Disclaimer line, format tags, franking note, printed key hints."
+      },
+      "body": {
+        "displayName": "Typed Body",
+        "purpose": "Everything filled into the form: document names, device names, field values."
+      },
+      "status": {
+        "displayName": "State Sentence",
+        "purpose": "The one sentence beside the postmark that names what is happening."
+      },
+      "measure": {
+        "displayName": "Measure",
+        "purpose": "Sizes, tallies and lane digits, right-aligned in a fixed column that never reflows."
+      }
     },
     "shadows": [],
     "motion": [
-      { "name": "postmark-press", "value": "190ms cubic-bezier(0.215, 0.61, 0.355, 1) scale 1.22 → 1", "purpose": "The stamp lands. Fires when the frank state becomes sending, delivered or held. The system's only easing." },
-      { "name": "progress-sweep", "value": "linear, driven by bytes sent", "purpose": "The postmark rim arc and the 2px progress rule above the franking row; not time-based." },
-      { "name": "no-ripple", "value": "NoSplash.splashFactory; highlightColor transparent", "purpose": "Material ink splashes are switched off globally; press feedback is a border strike." }
+      {
+        "name": "postmark-press",
+        "value": "190ms cubic-bezier(0.215, 0.61, 0.355, 1) scale 1.22 → 1",
+        "purpose": "The stamp lands. Fires when the frank state becomes sending, delivered or held. The system's only easing."
+      },
+      {
+        "name": "progress-sweep",
+        "value": "linear, driven by bytes sent",
+        "purpose": "The postmark rim arc and the 2px progress rule above the franking row; not time-based."
+      },
+      {
+        "name": "no-ripple",
+        "value": "NoSplash.splashFactory; highlightColor transparent",
+        "purpose": "Material ink splashes are switched off globally; press feedback is a border strike."
+      }
     ],
     "breakpoints": [
-      { "name": "narrow", "value": "520px" },
-      { "name": "label-max", "value": "900px" },
-      { "name": "window-min", "value": "460x430px" },
-      { "name": "window-default", "value": "720x585px" }
+      {
+        "name": "narrow",
+        "value": "520px"
+      },
+      {
+        "name": "label-max",
+        "value": "900px"
+      },
+      {
+        "name": "window-min",
+        "value": "460x430px"
+      },
+      {
+        "name": "window-default",
+        "value": "720x585px"
+      }
     ]
   },
   "components": [
@@ -148,6 +340,14 @@
       "description": "The system's only selection control: a 15px square, hairline when off, solid ink with a knocked-out check when on. No switches, no pills.",
       "html": "<span class=\"ds-tick\"></span><span class=\"ds-tick ds-tick-on\"><svg viewBox=\"0 0 15 15\" width=\"15\" height=\"15\"><path d=\"M3.6 7.8 L6.45 10.65 L11.7 4.35\" fill=\"none\" stroke=\"#F2F1EC\" stroke-width=\"1.9\" stroke-linecap=\"square\"/></svg></span>",
       "css": ".ds-tick { display: inline-block; width: 15px; height: 15px; border: 1.2px solid #7D7F84; border-radius: 0; background: transparent; vertical-align: middle; margin-right: 10px; } .ds-tick-on { border: none; background: #16171A; line-height: 0; }"
+    },
+    {
+      "name": "Cross Mark",
+      "kind": "custom",
+      "refersTo": "none",
+      "description": "The remove mark on a queue row (10px) and in the notice band (11px): two drawn strokes on the tick's hairline, mark grey at rest and full ink on hover, so the label never borrows a glyph from a font.",
+      "html": "<button class=\"ds-cross\" aria-label=\"Remove\"><svg viewBox=\"0 0 10 10\" width=\"10\" height=\"10\"><path d=\"M0 0 L10 10 M10 0 L0 10\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-linecap=\"square\"/></svg></button>",
+      "css": ".ds-cross { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; background: transparent; border: none; border-radius: 0; color: #7D7F84; cursor: pointer; } .ds-cross:hover, .ds-cross:focus-visible { color: #16171A; outline: none; }"
     },
     {
       "name": "Ruled Field",
@@ -196,6 +396,14 @@
       "description": "Settings and sign-in: the back of the label. Ground-coloured, max 480px, square, 1.2px ink border, with its own barred edge top and bottom so it reads as the same stock.",
       "html": "<div class=\"ds-slip\"><div class=\"ds-barred\"></div><div class=\"ds-slip-body\"><div class=\"ds-slip-head\">SETTINGS</div><div class=\"ds-slip-group\">APPEARANCE</div></div><div class=\"ds-barred ds-barred-flip\"></div></div>",
       "css": ".ds-slip { max-width: 480px; background: #F2F1EC; border: 1.2px solid #16171A; border-radius: 0; } .ds-slip-body { padding: 18px 20px 20px; } .ds-slip-head { font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 700; font-size: 13px; letter-spacing: 4px; color: #16171A; margin-bottom: 20px; } .ds-slip-group { font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 600; font-size: 9.5px; letter-spacing: 1.6px; color: #52545A; padding-bottom: 5px; border-bottom: 1px solid #C2C1BB; }"
+    },
+    {
+      "name": "Continues Below Chip",
+      "kind": "custom",
+      "refersTo": "none",
+      "description": "Printed at the bottom right of the field stack when the body runs past the window: a ground-coloured chip in press caption type, the sheet saying where it carries on instead of a fading edge.",
+      "html": "<div class=\"ds-continues\">CONTINUES BELOW</div>",
+      "css": ".ds-continues { display: inline-block; background: #F2F1EC; color: #646669; padding: 3px 2px 2px 8px; border-radius: 0; font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 600; font-size: 8.5px; letter-spacing: 1.5px; text-transform: uppercase; }"
     }
   ],
   "narrative": {
@@ -210,13 +418,41 @@
       "One inverted block per page, and it is SEND."
     ],
     "rules": [
-      { "name": "The No-Hue Rule", "body": "There is no accent colour and none may be added. A state is expressed by fill, stroke weight, tick or inversion — never by a hue. Audit test: a screenshot printed on a mono laser printer must lose nothing.", "section": "colors" },
-      { "name": "The True Inversion Rule", "body": "Night maps role for role onto the paper set. Ink becomes ground, ground becomes ink; no channel is tinted, warmed or cooled on the way across, and no component branches on theme beyond picking its Ink0.", "section": "colors" },
-      { "name": "The Three-Steps-of-Text Rule", "body": "Text has exactly three weights of presence — ink, ink-mid, ink-faint — and drawn outlines get a fourth, mark. A fifth step is not available; if something needs to recede further, it should not be on the label.", "section": "colors" },
-      { "name": "The Two-Voices Rule", "body": "Press type states what the form printed; typed type states what was filled into it. A value the user supplied or a machine measured is never set in the press face, and a legend, button or key cap is never set in Courier.", "section": "typography" },
-      { "name": "The Printed Key Cap Rule", "body": "Wherever a key does the same thing as a control, the key is printed on the control in press caption type at 62% ink (ENTER on SEND, ESC on CLEAR, A on ALL, E on the library row, ⌘O / CTRL+O on ADD). On touch builds the caps are dropped entirely — never faked, never drawn as a key-shaped box.", "section": "typography" },
-      { "name": "The Flat Sheet Rule", "body": "Nothing on the label floats. If an element needs to separate from its neighbour, it gets a hairline, a well, or a heavier strike of its own border — never a shadow.", "section": "elevation" },
-      { "name": "The One Inverted Block Rule", "body": "SEND is the only inverted block on the page. Inversion is how the label marks its single irreversible act; a second inverted block would make the act ambiguous. The settings appearance buttons reuse the solid treatment to mark the one active choice, and nothing else may.", "section": "elevation" }
+      {
+        "name": "The No-Hue Rule",
+        "body": "There is no accent colour and none may be added. A state is expressed by fill, stroke weight, tick or inversion — never by a hue. Audit test: a screenshot printed on a mono laser printer must lose nothing.",
+        "section": "colors"
+      },
+      {
+        "name": "The True Inversion Rule",
+        "body": "Night maps role for role onto the paper set. Ink becomes ground, ground becomes ink; no channel is tinted, warmed or cooled on the way across, and no component branches on theme beyond picking its Ink0.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three-Steps-of-Text Rule",
+        "body": "Text has exactly three weights of presence — ink, ink-mid, ink-faint — and drawn outlines get a fourth, mark. A fifth step is not available; if something needs to recede further, it should not be on the label.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Voices Rule",
+        "body": "Press type states what the form printed; typed type states what was filled into it. A value the user supplied or a machine measured is never set in the press face, and a legend, button or key cap is never set in Courier.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Key Cap Rule",
+        "body": "Wherever a key does the same thing as a control, the key is printed on the control in press caption type at 62% ink (ENTER on SEND, ESC on CLEAR, A on ALL, E on the library row, ⌘O / CTRL+O on ADD). On touch builds the caps are dropped entirely — never faked, never drawn as a key-shaped box.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Sheet Rule",
+        "body": "Nothing on the label floats. If an element needs to separate from its neighbour, it gets a hairline, a well, or a heavier strike of its own border — never a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Inverted Block Rule",
+        "body": "SEND is the only inverted block on the page. Inversion is how the label marks its single irreversible act; a second inverted block would make the act ambiguous. The settings appearance buttons reuse the solid treatment to mark the one active choice, and nothing else may.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do express every state with fill, stroke weight, tick or inversion. There is no hue in this system and nothing may introduce one.",

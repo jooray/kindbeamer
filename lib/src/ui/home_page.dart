@@ -55,6 +55,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// print that it continues rather than letting a row end in mid-air.
   bool _moreBelow = false;
   final ScrollController _queueScroll = ScrollController();
+  final ScrollController _bodyScroll = ScrollController();
 
   SendPhase _lastPhase = SendPhase.idle;
   Timer? _closeTimer;
@@ -99,6 +100,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _title.dispose();
     _author.dispose();
     _queueScroll.dispose();
+    _bodyScroll.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -138,18 +140,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (mounted) setState(() {});
   }
 
+  void _setOverflow(bool more) {
+    if (more == _moreBelow) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && more != _moreBelow) setState(() => _moreBelow = more);
+    });
+  }
+
   bool _noteOverflow(Notification n) {
-    final more = n is ScrollMetricsNotification
-        ? n.metrics.extentAfter > 1
-        : n is ScrollUpdateNotification
-        ? n.metrics.extentAfter > 1
-        : _moreBelow;
-    if (more != _moreBelow) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && more != _moreBelow) setState(() => _moreBelow = more);
-      });
-    }
+    if (n is ScrollMetricsNotification) _setOverflow(n.metrics.extentAfter > 1);
+    if (n is ScrollUpdateNotification) _setOverflow(n.metrics.extentAfter > 1);
     return false;
+  }
+
+  /// A page that is already too long on its first layout never sends a metrics
+  /// notification, so the marker is read straight off the position each frame.
+  void _readOverflow() {
+    if (!mounted || !_bodyScroll.hasClients) return;
+    _setOverflow(_bodyScroll.position.extentAfter > 1);
   }
 
   void _syncControllers() {
@@ -282,7 +290,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return ListenableBuilder(
       listenable: state,
       builder: (context, _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _syncControllers());
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _syncControllers();
+          _readOverflow();
+        });
         return Scaffold(
           backgroundColor: c.ground,
           body: SafeArea(
@@ -333,28 +344,35 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             Expanded(
               child: Stack(
                 children: [
-                  NotificationListener<ScrollMetricsNotification>(
-                    onNotification: _noteOverflow,
-                    child: NotificationListener<ScrollUpdateNotification>(
+                  // When the page runs long the viewport gives up a strip at
+                  // its foot, so the note that it continues is printed on clean
+                  // ground instead of over the row it was cut at.
+                  Padding(
+                    padding: EdgeInsets.only(bottom: _moreBelow ? 17 : 0),
+                    child: NotificationListener<ScrollMetricsNotification>(
                       onNotification: _noteOverflow,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(
-                          Metrics.gutter,
-                          14,
-                          Metrics.gutter,
-                          14,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Legend(letter: 'A', name: 'CONTENTS'),
-                            _contents(c),
-                            const SizedBox(height: Metrics.sectionGap),
-                            const Legend(letter: 'B', name: 'DESCRIPTION'),
-                            _description(c),
-                            const SizedBox(height: Metrics.sectionGap),
-                            _deliverTo(c),
-                          ],
+                      child: NotificationListener<ScrollUpdateNotification>(
+                        onNotification: _noteOverflow,
+                        child: SingleChildScrollView(
+                          controller: _bodyScroll,
+                          padding: const EdgeInsets.fromLTRB(
+                            Metrics.gutter,
+                            14,
+                            Metrics.gutter,
+                            14,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Legend(letter: 'A', name: 'CONTENTS'),
+                              _contents(c),
+                              const SizedBox(height: Metrics.sectionGap),
+                              const Legend(letter: 'B', name: 'DESCRIPTION'),
+                              _description(c),
+                              const SizedBox(height: Metrics.sectionGap),
+                              _deliverTo(c),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -364,7 +382,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       right: Metrics.gutter,
                       bottom: 0,
                       child: Container(
-                        color: c.ground,
                         padding: const EdgeInsets.fromLTRB(8, 3, 2, 2),
                         child: Text(
                           'CONTINUES BELOW',
