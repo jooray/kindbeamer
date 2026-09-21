@@ -51,7 +51,7 @@ OwnedDevice device(String name, String serial) => OwnedDevice(
 /// Stands in for the real client so a UI test can drive a whole send without a
 /// network, an account, or a signature.
 class FakeStkClient extends StkClient {
-  FakeStkClient({this.devices = const [], this.failWith})
+  FakeStkClient({this.devices = const [], this.failWith, this.listFailure})
     : super(fakeDeviceInfo());
 
   final List<OwnedDevice> devices;
@@ -59,10 +59,20 @@ class FakeStkClient extends StkClient {
   /// When set, every `sendFile` throws it.
   final Object? failWith;
 
+  /// When set, the first `getOwnedDevices` throws it — a stale registration or
+  /// a service that is not answering.
+  Object? listFailure;
+
   final List<String> sent = [];
+  int listCalls = 0;
 
   @override
-  Future<List<OwnedDevice>> getOwnedDevices() async => devices;
+  Future<List<OwnedDevice>> getOwnedDevices() async {
+    listCalls++;
+    final failure = listFailure;
+    if (failure != null) throw failure;
+    return devices;
+  }
 
   @override
   Future<String> sendFile(

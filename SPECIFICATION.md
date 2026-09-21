@@ -298,15 +298,18 @@ barred airmail edges. Paper (#F2F1EC on #16171A ink) or night (a true
 inversion); `Appearance` follows the system unless Settings pins one.
 
 - header: wordmark (`kind` bold + `beamer` light, the split carried by weight
-  rather than colour), the disclaimer line, *Add* and *Settings*
+  rather than colour), *Add* and *Settings*
 - **A CONTENTS**: the queued files, one typewritten row each with format and
   size in a fixed right-hand column; a converter's note prints under the box
 - **B DESCRIPTION**: `TITLE` and `AUTHOR` on ruled lines, pre-filled from the
   file name; they edit the marked document
 - **C DELIVER TO**: owned devices as numbered lanes in two columns (one column
   below 520px), `n OF m` and an ALL/NONE control on the legend line, and the
-  library copy as the last row of the same box; a sign-in prompt replaces the
-  lanes when logged out, skeleton lanes while they load
+  library copy as the last row of the same box. The lanes are replaced by a
+  sign-in prompt when logged out, skeleton lanes while they load, "no devices on
+  this account" when the list comes back empty, and a `Trouble` well when it
+  fails — what happened, what to do, `DETAILS` folding the raw answer away, and
+  the one action that recovers it
 - franking row: a progress rule, the postmark (idle / ready / the rim inking
   round while sending / struck solid on delivery / doubled in ink when held),
   the state sentence with a facts line under it, `CLEAR`/`CLOSE` and `SEND`
@@ -319,6 +322,24 @@ inversion); `Appearance` follows the system unless Settings pins one.
   text field are left to it.
 - after a delivery the window closes itself (`close_on_success`, default on);
   a failure always keeps it, with the reason and `RETRY`
+
+### Failure
+
+`Trouble` (`state/app_state.dart`) is what reaches the window instead of an
+exception: a sentence in the app's own words, the recovery, the raw text, and
+whether the recovery is a fresh pairing. `ApiError.isRegistrationRejected` (401,
+403, or `DeviceInfoToken` in the body) is what separates the two kinds:
+
+- **Registration rejected** — the credentials on this machine are dead and
+  nothing retries past that, so the label opens the sign-in flow itself (once
+  per failure, whether it surfaced from the device list at startup or from a
+  send) and explains behind it. Enter and the franking block pair rather than
+  retry; the device serial is kept, so signing in re-registers the same device
+  rather than adding another.
+- **Service or network** — `TRY AGAIN`, and Enter does the same.
+
+A failed send puts its sentence in the franking row and its raw answer in the
+band above it, dismissible; the device list keeps both inside section C.
 - touch builds print no key caps, use 46dp rows, and say "tap" where the
   desktop says "press"
 

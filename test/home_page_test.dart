@@ -5,6 +5,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kindbeamer/src/amazon/models.dart';
 import 'package:kindbeamer/src/convert/markdown.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
 import 'package:kindbeamer/src/state/documents.dart';
@@ -320,6 +321,100 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(find.text('KEYS'), findsNothing);
+  });
+
+  /// The screen the user actually met: a session Amazon has stopped accepting,
+  /// which used to leave three grey skeleton bars and a raw 403 on the label.
+  Future<({int pairs, FakeStkClient client})> failingList(
+    WidgetTester tester,
+    Object failure,
+  ) async {
+    final client = FakeStkClient(
+      devices: [device('Juraj\'s Paperwhite', 'S0')],
+      listFailure: failure,
+    );
+    state = AppState(
+      supportDir: tmp,
+      store: CredentialsStore(tmp),
+      client: client,
+    );
+    await tester.runAsync(() async {
+      await state.loadPrefs();
+      await state.refreshDevices();
+    });
+    return (pairs: 0, client: client);
+  }
+
+  testWidgets('a rejected registration pairs again without being asked', (
+    tester,
+  ) async {
+    final setup = await failingList(
+      tester,
+      ApiError(
+        'HTTP 403 for /GetListOfOwnedDevices',
+        '{"Message":"Failed to validate DeviceInfoToken."}',
+        403,
+      ),
+    );
+    var pairs = 0;
+    tester.view.physicalSize = const Size(1024, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomePage(state: state, onPair: () async => pairs++),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(pairs, 1, reason: 'the only way on is a fresh pairing');
+    expect(
+      find.textContaining('no longer accepts this installation'),
+      findsOneWidget,
+    );
+    expect(find.text('SIGN IN AGAIN'), findsOneWidget);
+    expect(
+      find.textContaining('Failed to validate DeviceInfoToken'),
+      findsNothing,
+      reason: 'the raw answer waits behind DETAILS',
+    );
+
+    await tester.tap(find.text('DETAILS'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Failed to validate DeviceInfoToken'),
+      findsOneWidget,
+    );
+    expect(setup.client.listCalls, 1);
+  });
+
+  testWidgets('a service failure offers another attempt, not a pairing', (
+    tester,
+  ) async {
+    final setup = await failingList(
+      tester,
+      const SocketException('Connection refused'),
+    );
+    var pairs = 0;
+    tester.view.physicalSize = const Size(1024, 1400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HomePage(state: state, onPair: () async => pairs++),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(pairs, 0);
+    expect(find.text('TRY AGAIN'), findsOneWidget);
+    expect(find.textContaining('Could not reach Amazon'), findsOneWidget);
+
+    setup.client.listFailure = null;
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(setup.client.listCalls, 2, reason: 'enter tries the list again');
+    expect(find.text('Juraj\'s Paperwhite'), findsOneWidget);
   });
 
   testWidgets('removing a document empties the label', (tester) async {

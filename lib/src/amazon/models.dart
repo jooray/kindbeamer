@@ -111,10 +111,23 @@ class SendToKindleResponse {
 }
 
 class ApiError implements Exception {
-  ApiError(this.message, [this.body]);
+  ApiError(this.message, [this.body, this.status]);
 
   final String message;
   final String? body;
+
+  /// The HTTP status where there was one. The UI reads it to tell a dead
+  /// registration (401/403 — sign in again) from a service or network failure
+  /// (try again), which are different problems with different recoveries.
+  final int? status;
+
+  /// Amazon answers a retired device registration with 401 or 403, and says so
+  /// in the body; either is enough to know the credentials on this machine are
+  /// no longer accepted.
+  bool get isRegistrationRejected =>
+      status == 401 ||
+      status == 403 ||
+      (body ?? '').contains('DeviceInfoToken');
 
   @override
   String toString() =>

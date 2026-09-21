@@ -69,7 +69,11 @@ Future<String> tokenExchange(
     body: body,
   );
   if (res.statusCode != 200) {
-    throw ApiError('token exchange failed: HTTP ${res.statusCode}', res.body);
+    throw ApiError(
+      'token exchange failed: HTTP ${res.statusCode}',
+      res.body,
+      res.statusCode,
+    );
   }
   final token = (json.decode(res.body) as Map<String, dynamic>)['access_token'];
   if (token is! String || token.isEmpty) {
@@ -176,6 +180,7 @@ Future<DeviceInfo> registerDeviceWithToken(
     throw ApiError(
       'device registration failed: HTTP ${res.statusCode}',
       res.body,
+      res.statusCode,
     );
   }
   final XmlDocument doc;
@@ -221,7 +226,11 @@ Future<Map<String, dynamic>> _request(
     body: data,
   );
   if (res.statusCode != 200) {
-    throw ApiError('HTTP ${res.statusCode} for $path', res.body);
+    throw ApiError(
+      'HTTP ${res.statusCode} for $path',
+      res.body,
+      res.statusCode,
+    );
   }
   return json.decode(res.body) as Map<String, dynamic>;
 }
@@ -265,7 +274,11 @@ Future<void> uploadFile(
     final res = await client.send(request);
     final resBody = await res.stream.bytesToString();
     if (res.statusCode != 200) {
-      throw ApiError('upload failed: HTTP ${res.statusCode}', resBody);
+      throw ApiError(
+        'upload failed: HTTP ${res.statusCode}',
+        resBody,
+        res.statusCode,
+      );
     }
   } finally {
     client.close();
@@ -309,6 +322,10 @@ Future<void> logout(AdpSigner signer) async {
     },
   );
   if (res.statusCode != 200) {
-    throw ApiError('logout failed: HTTP ${res.statusCode}', res.body);
+    throw ApiError(
+      'logout failed: HTTP ${res.statusCode}',
+      res.body,
+      res.statusCode,
+    );
   }
 }

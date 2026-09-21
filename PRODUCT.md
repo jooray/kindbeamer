@@ -83,8 +83,10 @@ is effectively the only option.
   `tools/make_icons.py` as the postmark struck on a sheet of e-paper, with
   derived platform icon sets.
 - An openly unofficial project: the disclaimer ("not affiliated with, endorsed
-  by, or sponsored by Amazon") stays visible wherever the app is presented, and
-  copy never implies official status.
+  by, or sponsored by Amazon") is stated wherever the app is presented — the
+  README, the Zapstore listing, and Settings inside the app — and copy never
+  implies official status. It sat under the wordmark until September 2026; the
+  main window carries the app, not the disclaimer, and Settings carries it.
 - Voice is plain, honest, first-person-free prose; no marketing inflation, and
   limitations and failure modes are stated rather than hidden.
 - The UI is deliberately *not* the official client's charcoal-and-orange. Since

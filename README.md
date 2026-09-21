@@ -70,7 +70,12 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 - Monochrome e-paper, inverted at night and following the system by default.
   Nothing in the app is carried by colour, so it reads the same on any screen.
 - A delivered send closes the window, unless Settings says otherwise; a failed
-  one keeps it, with the reason on the label.
+  one keeps it, with the reason on the label — in the app's own words, with the
+  raw answer from Amazon folded away behind **Details**.
+- When Amazon stops accepting this installation's registration, which it does
+  when a session goes stale, the app opens the sign-in flow itself instead of
+  leaving an error on screen. Signing in re-registers the same device, so your
+  Kindles and the documents already on them are untouched.
 - Keyboard-first: **Enter** sends, **Esc** clears then closes, **1-9** and
   **0** tick the device on that line, **A** takes all or none, **E** keeps the
   library copy, **?** prints the key list.

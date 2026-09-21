@@ -20,6 +20,62 @@ enum SendPhase { idle, sending, done, error }
 /// label's defaults.
 enum Appearance { auto, paper, night }
 
+/// A failure the label has to explain, in three parts: what happened in the
+/// app's own words, what to do about it, and the raw text a bug report needs.
+/// Nothing that reaches the window is a stack trace unless the reader asks.
+class Trouble {
+  const Trouble({
+    required this.sentence,
+    required this.recovery,
+    required this.detail,
+    required this.needsSignIn,
+  });
+
+  final String sentence;
+  final String recovery;
+  final String detail;
+
+  /// Amazon has stopped accepting this installation's registration, so the
+  /// recovery is a fresh sign-in rather than another attempt.
+  final bool needsSignIn;
+
+  static bool _rejected(Object error) =>
+      error is ApiError && error.isRegistrationRejected;
+
+  factory Trouble.listing(Object error) => _rejected(error)
+      ? Trouble(
+          sentence:
+              'Amazon no longer accepts this installation\'s registration.',
+          recovery:
+              'Sign in again to register this computer afresh. Your devices '
+              'and the documents already on them are untouched.',
+          detail: '$error',
+          needsSignIn: true,
+        )
+      : Trouble(
+          sentence: 'Could not reach Amazon to list your devices.',
+          recovery: 'Check the connection, then try again.',
+          detail: '$error',
+          needsSignIn: false,
+        );
+
+  factory Trouble.sending(Object error) => _rejected(error)
+      ? Trouble(
+          sentence:
+              'Amazon refused the send: this installation is no longer '
+              'registered.',
+          recovery: 'Sign in again, then send. Nothing was delivered.',
+          detail: '$error',
+          needsSignIn: true,
+        )
+      : Trouble(
+          sentence: 'The send did not go through.',
+          recovery: 'Check the connection, then try again.',
+          detail: '$error',
+          needsSignIn: false,
+        );
+}
+
 class AppState extends ChangeNotifier {
   AppState({
     required this.supportDir,
@@ -40,6 +96,12 @@ class AppState extends ChangeNotifier {
   StkClient? _client;
 
   List<OwnedDevice> devices = [];
+
+  /// The device list is fetched, not instant: the label draws lanes, a wait or
+  /// a failure from these two rather than leaving an empty box to guess at.
+  bool devicesLoading = false;
+  Trouble? deviceTrouble;
+  Trouble? sendTrouble;
   Set<String> selectedSerials = {};
   bool archive = true;
 
@@ -152,6 +214,7 @@ class AppState extends ChangeNotifier {
       phase = SendPhase.idle;
       statusMessage = '';
       progress = 0;
+      sendTrouble = null;
     }
     notifyListeners();
     unawaited(_convertPending());
@@ -197,6 +260,7 @@ class AppState extends ChangeNotifier {
     selectedIndex = -1;
     phase = SendPhase.idle;
     statusMessage = '';
+    sendTrouble = null;
     notifyListeners();
   }
 
@@ -280,6 +344,9 @@ class AppState extends ChangeNotifier {
   Future<void> refreshDevices() async {
     final c = _client;
     if (c == null) return;
+    devicesLoading = true;
+    deviceTrouble = null;
+    notifyListeners();
     try {
       devices = await c.getOwnedDevices();
       final known = devices.map((d) => d.deviceSerialNumber).toSet();
@@ -290,9 +357,11 @@ class AppState extends ChangeNotifier {
       }
       statusMessage = '';
     } catch (e) {
-      notice = 'Could not load devices: $e';
+      deviceTrouble = Trouble.listing(e);
+    } finally {
+      devicesLoading = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Future<void> signOut() async {
@@ -317,10 +386,10 @@ class AppState extends ChangeNotifier {
     if (!canSend || c == null) return false;
     phase = SendPhase.sending;
     progress = 0;
+    sendTrouble = null;
     notifyListeners();
     final targets = selectedSerials.toList();
     final count = docs.length;
-    var ok = true;
     for (var i = 0; i < docs.length; i++) {
       final doc = docs[i];
       statusMessage = 'Sending ${doc.name} (${i + 1} of $count)';
@@ -346,9 +415,9 @@ class AppState extends ChangeNotifier {
           },
         );
       } catch (e) {
-        ok = false;
         phase = SendPhase.error;
-        statusMessage = 'Failed: $e';
+        sendTrouble = Trouble.sending(e);
+        statusMessage = sendTrouble!.sentence;
         notifyListeners();
         return false;
       }
@@ -358,10 +427,9 @@ class AppState extends ChangeNotifier {
     final sent = docs.length;
     docs.clear();
     selectedIndex = -1;
-    statusMessage = ok
-        ? '${_plural(sent, 'document')} delivered to '
-              '${_plural(targets.length, 'device')}.'
-        : statusMessage;
+    statusMessage =
+        '${_plural(sent, 'document')} delivered to '
+        '${_plural(targets.length, 'device')}.';
     notifyListeners();
     return true;
   }

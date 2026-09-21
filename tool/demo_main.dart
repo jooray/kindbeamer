@@ -7,12 +7,13 @@
 //     <scene> [night]
 //
 // Scenes: empty · signedout · ready · queue · sending · delivered · error ·
-//         drop · keys · settings
+//         drop · keys · settings · rejected · offline
 import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:kindbeamer/src/amazon/models.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
 import 'package:kindbeamer/src/state/credentials_store.dart';
 import 'package:kindbeamer/src/ui/home_page.dart';
@@ -52,6 +53,17 @@ Future<void> main(List<String> args) async {
     client: scene == 'signedout'
         ? null
         : FakeStkClient(
+            listFailure: scene == 'rejected'
+                ? ApiError(
+                    'HTTP 403 for /GetListOfOwnedDevices',
+                    '{"Message":"Failed to validate DeviceInfoToken."}',
+                    403,
+                  )
+                : scene == 'offline'
+                ? const SocketException(
+                    'Failed host lookup: stkservice.amazon.com',
+                  )
+                : null,
             devices: [
               device('Juraj’s Paperwhite', 'S0'),
               device('Kindle Scribe', 'S1'),
@@ -98,7 +110,10 @@ Future<void> main(List<String> args) async {
     state.phase = SendPhase.error;
     state.statusMessage =
         'Failed: SocketException: Connection reset by peer (uploading)';
-  } else if (scene != 'empty' && scene != 'keys') {
+  } else if (scene != 'empty' &&
+      scene != 'keys' &&
+      scene != 'rejected' &&
+      scene != 'offline') {
     state.addFiles([doc('the-selfish-gene.pdf', 4310).path]);
   }
 
@@ -134,6 +149,9 @@ Future<void> main(List<String> args) async {
         home: HomePage(
           state: state,
           onRequestClose: () async {},
+          // The capture wants the label behind the pairing flow, not the
+          // webview the real app opens here.
+          onPair: () async {},
           openOverlay: const {'drop', 'keys', 'settings'}.contains(scene)
               ? scene
               : null,

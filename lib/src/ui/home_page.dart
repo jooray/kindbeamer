@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
     required this.state,
     this.onRequestClose,
     this.openOverlay,
+    this.onPair,
   });
 
   final AppState state;
@@ -31,6 +32,10 @@ class HomePage extends StatefulWidget {
   /// Opens one of the states a screenshot cannot reach by itself — `drop`,
   /// `keys` or `settings`. Set only by the harness in `tool/demo_main.dart`.
   final String? openOverlay;
+
+  /// How the label pairs with Amazon again, injectable so a test need not
+  /// stand up a webview to check that it was asked to.
+  final Future<void> Function()? onPair;
 
   /// How the app closes itself — after a delivery, or on an Escape with an
   /// empty queue. Injectable so a test need not shut down the test harness.
@@ -54,6 +59,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   /// True while the label runs past the bottom of the window, so the page can
   /// print that it continues rather than letting a row end in mid-air.
   bool _moreBelow = false;
+
+  /// The trouble whose sign-in was already offered, so a dialog the reader
+  /// closed is not reopened under them on the next notification.
+  Trouble? _pairedFor;
+  bool _pairing = false;
+  bool _deviceDetail = false;
+  bool _sendDetail = false;
   final ScrollController _queueScroll = ScrollController();
   final ScrollController _bodyScroll = ScrollController();
 
@@ -75,6 +87,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // into, so the page has to rebuild when focus moves.
     _titleFocus.addListener(_onFocusChanged);
     _authorFocus.addListener(_onFocusChanged);
+    // A session restored before the first frame has already failed by the time
+    // this page exists, so the check cannot wait for a notification.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybePair());
     switch (widget.openOverlay) {
       case 'drop':
         _dragging = true;
@@ -127,6 +142,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         }
       });
     }
+    if (state.phase == SendPhase.error && _lastPhase != SendPhase.error) {
+      _sendDetail = true;
+    }
+    if (state.phase != SendPhase.error && _sendDetail) _sendDetail = false;
     if (state.notice != null) {
       _noticeTimer?.cancel();
       _noticeTimer = Timer(const Duration(seconds: 8), () {
@@ -134,6 +153,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     }
     _lastPhase = state.phase;
+    _maybePair();
+  }
+
+  /// A registration Amazon has stopped accepting cannot be retried, argued
+  /// with, or worked around: the only way on is to pair this installation
+  /// again, so the label opens that rather than waiting to be asked.
+  void _maybePair() {
+    final trouble = state.deviceTrouble ?? state.sendTrouble;
+    if (trouble == null || !trouble.needsSignIn) {
+      _pairedFor = null;
+      return;
+    }
+    if (identical(_pairedFor, trouble) || _pairing) return;
+    _pairedFor = trouble;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _pairing) return;
+      _pairing = true;
+      await _pair();
+      _pairing = false;
+    });
+  }
+
+  Future<void> _pair() async {
+    if (widget.onPair != null) return widget.onPair!();
+    if (mounted) await showLoginDialog(context, state);
   }
 
   void _onFocusChanged() {
@@ -200,11 +244,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _send() {
+    // A rejected registration is the one failure Enter must not retry: the
+    // send would be refused again, so it pairs instead.
+    final blocked = state.sendTrouble ?? state.deviceTrouble;
+    if (blocked != null && blocked.needsSignIn) {
+      _pair();
+      return;
+    }
     if (state.canSend) {
       state.send();
       return;
     }
-    if (!state.signedIn) showLoginDialog(context, state);
+    if (!state.signedIn) {
+      _pair();
+      return;
+    }
+    if (state.deviceTrouble != null) state.refreshDevices();
   }
 
   void _toggleLane(int index) {
@@ -405,7 +460,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ),
             ),
-            if (state.notice != null) _noticeBand(c),
+            if (state.notice != null)
+              _noticeBand(c, state.notice!, state.clearNotice)
+            else if (_sendDetail && state.sendTrouble != null)
+              _noticeBand(
+                c,
+                state.sendTrouble!.detail,
+                () => setState(() => _sendDetail = false),
+              ),
             _franking(c),
           ],
         ),
@@ -459,11 +521,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'UNOFFICIAL SEND-TO-KINDLE CLIENT',
-                  style: press(size: 8.5, color: c.inkFaint, tracking: 1.5),
                 ),
               ],
             ),
@@ -715,8 +772,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             children: [
               if (!state.signedIn)
                 _signedOut(c)
-              else if (total == 0)
+              else if (state.deviceTrouble != null)
+                _troubleWell(c, state.deviceTrouble!)
+              else if (state.devicesLoading)
                 _lanesLoading(c)
+              else if (total == 0)
+                _noDevices(c)
               else
                 _lanes(c),
               if (state.signedIn) ...[const Rule(strong: true), _archive(c)],
@@ -740,12 +801,103 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
           const SizedBox(width: 14),
-          PressButton(
-            label: 'SIGN IN',
-            cap: 'ENTER',
-            onPressed: () => showLoginDialog(context, state),
+          PressButton(label: 'SIGN IN', cap: 'ENTER', onPressed: _pair),
+        ],
+      ),
+    );
+  }
+
+  /// What a failure looks like on a printed form: what happened, what to do,
+  /// the action, and the raw text folded away until it is asked for.
+  Widget _troubleWell(Ink0 c, Trouble trouble) {
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            trouble.sentence,
+            style: typed(size: 12.5, color: c.ink, height: 1.45),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            trouble.recovery,
+            style: typed(size: 11.5, color: c.inkMid, height: 1.5),
+          ),
+          if (_deviceDetail) ...[
+            const SizedBox(height: 10),
+            _detail(c, trouble.detail),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              PressButton(
+                label: _deviceDetail ? 'HIDE DETAILS' : 'DETAILS',
+                dense: true,
+                onPressed: () => setState(() => _deviceDetail = !_deviceDetail),
+              ),
+              const Spacer(),
+              PressButton(
+                label: trouble.needsSignIn ? 'SIGN IN AGAIN' : 'TRY AGAIN',
+                cap: 'ENTER',
+                onPressed: trouble.needsSignIn
+                    ? _pair
+                    : () => state.refreshDevices(),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _noDevices(Ink0 c) {
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'No Kindle devices on this account.',
+            style: typed(size: 12.5, color: c.ink, height: 1.45),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Register a Kindle, or install a Kindle app and sign in on it, '
+            'then look again.',
+            style: typed(size: 11.5, color: c.inkMid, height: 1.5),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Spacer(),
+              PressButton(
+                label: 'LOOK AGAIN',
+                cap: 'ENTER',
+                onPressed: () => state.refreshDevices(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The raw text, kept selectable: it is what a bug report is made of.
+  Widget _detail(Ink0 c, String text) {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 92),
+      decoration: BoxDecoration(
+        border: Border.all(color: c.rule),
+        color: c.ground,
+      ),
+      padding: const EdgeInsets.all(10),
+      width: double.infinity,
+      child: SingleChildScrollView(
+        child: SelectableText(
+          text,
+          style: typed(size: 11, color: c.inkMid, height: 1.5),
+        ),
       ),
     );
   }
@@ -873,7 +1025,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _noticeBand(Ink0 c) {
+  Widget _noticeBand(Ink0 c, String text, VoidCallback onClose) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -885,13 +1037,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         children: [
           Expanded(
             child: Text(
-              state.notice!,
+              text,
               style: typed(size: 12, color: c.ink, height: 1.4),
             ),
           ),
           _IconTap(
             tooltip: 'Dismiss',
-            onTap: state.clearNotice,
+            onTap: onClose,
             builder: (hover) => CrossMark(strong: hover, size: 11),
           ),
         ],
@@ -912,13 +1064,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           note: state.closeOnSuccess ? 'CLOSING THIS WINDOW' : '',
         );
       case SendPhase.error:
+        final failure = state.sendTrouble;
+        final again = failure?.needsSignIn ?? false;
         return (
           mark: Frank.held,
-          line: state.statusMessage,
-          note: touchLayout ? 'TAP RETRY' : 'PRESS ENTER TO TRY AGAIN',
+          line: failure?.sentence ?? state.statusMessage,
+          note: again
+              ? (touchLayout ? 'TAP SIGN IN' : 'PRESS ENTER TO SIGN IN AGAIN')
+              : (touchLayout ? 'TAP RETRY' : 'PRESS ENTER TO TRY AGAIN'),
         );
       case SendPhase.idle:
         break;
+    }
+    // An account the service has stopped accepting outranks an empty queue: it
+    // is the thing the reader has to act on, and Enter acts on it.
+    final trouble = state.deviceTrouble;
+    if (trouble != null) {
+      return (
+        mark: Frank.idle,
+        // Section C carries the explanation; the franking row carries what it
+        // means for the send, which is that there is nowhere to send to.
+        line: trouble.needsSignIn
+            ? 'Pairing needed.'
+            : 'No devices to send to.',
+        note: trouble.needsSignIn
+            ? (touchLayout
+                  ? 'TAP SIGN IN AGAIN'
+                  : 'PRESS ENTER TO SIGN IN AGAIN')
+            : (touchLayout ? 'TAP TRY AGAIN' : 'PRESS ENTER TO TRY AGAIN'),
+      );
+    }
+    if (state.devicesLoading) {
+      return (mark: Frank.idle, line: 'Looking up your devices…', note: '');
     }
     if (doc == null) {
       return (mark: Frank.idle, line: 'Nothing to send yet.', note: '');
@@ -998,11 +1175,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       cap: 'ESC',
       onPressed: sending ? null : _cancel,
     );
+    // Whatever the label is waiting for is what this block does, and Enter
+    // does the same thing: send, try the send again, or pair again.
+    final pair = state.sendTrouble?.needsSignIn ?? false;
     final send = PressButton(
       label: sending
           ? 'SENDING'
           : failed
-          ? 'RETRY'
+          ? (pair ? 'SIGN IN' : 'RETRY')
           : 'SEND',
       cap: state.canSend ? 'ENTER' : null,
       solid: true,
@@ -1131,7 +1311,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final invert = Theme.of(context).brightness == Brightness.light;
     final fg = invert ? c.ground : c.ink;
     final rows = [
-      ('ENTER', 'Send \u00B7 sign in when signed out'),
+      ('ENTER', 'Send \u00B7 or whatever the label is waiting for'),
       ('ESC', 'Clear the queue, then close'),
       ('1 \u2026 9, 0', 'Tick the device on that line'),
       ('A', 'All devices, or none'),
