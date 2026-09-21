@@ -49,6 +49,7 @@ class _LoginDialogState extends State<LoginDialog> {
   final TextEditingController _paste = TextEditingController();
   bool _busy = false;
   bool _showPaste = false;
+  late bool _useWebview = _webviewSupported;
   String? _error;
 
   @override
@@ -124,272 +125,354 @@ class _LoginDialogState extends State<LoginDialog> {
         vertical: compact ? 10 : 22,
       ),
       child: ConstrainedBox(
-        // The slip has to fit the window it opens in: a 585-tall window with a
-        // 600-tall dialog pushes the webview past the window's own bounds, and
-        // the part that hangs over stops taking clicks entirely.
         constraints: BoxConstraints(
           maxWidth: 640,
           maxHeight: compact
               ? media.size.height
               : math.min(600, media.size.height - 44),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const BarredEdge(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 12, 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'SIGN IN TO AMAZON',
-                      style: press(
-                        size: 12,
-                        color: c.ink,
-                        weight: FontWeight.w700,
-                        tracking: 3,
-                      ),
-                    ),
-                  ),
-                  if (_busy)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: Text(
-                        'WORKING',
-                        style: press(size: 9, color: c.inkMid, tracking: 1.6),
-                      ),
-                    ),
-                  PressButton(
-                    label: 'CLOSE',
-                    dense: true,
-                    onPressed: _busy ? null : () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-            if (_error != null)
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: c.ink, width: 1.2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const BarredEdge(),
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: c.ink, width: 1.2),
-                    color: c.well,
+                padding: const EdgeInsets.fromLTRB(18, 14, 12, 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'SIGN IN TO AMAZON',
+                        style: press(
+                          size: 12,
+                          color: c.ink,
+                          weight: FontWeight.w700,
+                          tracking: 3,
+                        ),
+                      ),
+                    ),
+                    if (_busy)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Text(
+                          'WORKING',
+                          style: press(size: 9, color: c.inkMid, tracking: 1.6),
+                        ),
+                      ),
+                    PressButton(
+                      label: 'CLOSE',
+                      dense: true,
+                      onPressed: _busy
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: c.ink, width: 1.2),
+                      color: c.well,
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 96),
+                          child: SingleChildScrollView(
+                            child: SelectableText(
+                              _error!,
+                              style: typed(
+                                size: 12,
+                                color: c.ink,
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        PressButton(
+                          label: 'START OVER',
+                          dense: true,
+                          onPressed: _busy ? null : _startOver,
+                        ),
+                      ],
+                    ),
                   ),
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 96),
-                        child: SingleChildScrollView(
-                          child: SelectableText(
-                            _error!,
-                            style: typed(size: 12, color: c.ink, height: 1.45),
+                ),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 18),
+                  decoration: BoxDecoration(border: Border.all(color: c.rule)),
+                  child: _useWebview
+                      ? Stack(
+                          children: [
+                            InAppWebView(
+                              initialUrlRequest: URLRequest(
+                                url: WebUri(_signinUrl),
+                              ),
+                              initialSettings: InAppWebViewSettings(
+                                // The landing page bounces to `sendtokindle://…`;
+                                // without this the navigation is swallowed.
+                                useShouldOverrideUrlLoading: true,
+                                javaScriptCanOpenWindowsAutomatically: false,
+                                supportZoom: false,
+                                userAgent: _userAgent,
+                              ),
+                              onWebViewCreated: (controller) =>
+                                  _controller = controller,
+                              shouldOverrideUrlLoading:
+                                  (controller, action) async {
+                                    final u = action.request.url?.toString();
+                                    if (u != null && _isRedirect(u)) {
+                                      _complete(u);
+                                      return NavigationActionPolicy.CANCEL;
+                                    }
+                                    return NavigationActionPolicy.ALLOW;
+                                  },
+                              onLoadStart: (controller, url) =>
+                                  _checkUrl(url?.toString()),
+                              onLoadStop: (controller, url) async {
+                                _checkUrl(url?.toString());
+                                if (_busy) return;
+                                // The code can sit in a URL the navigation
+                                // callbacks never reported (server-side redirect).
+                                final href = await controller
+                                    .evaluateJavascript(
+                                      source: 'window.location.href',
+                                    );
+                                if (href is String) _checkUrl(href);
+                                if (_busy) return;
+                                await _scanHistory(controller);
+                              },
+                              onUpdateVisitedHistory: (controller, url, _) =>
+                                  _checkUrl(url?.toString()),
+                              onReceivedError: (controller, request, error) {
+                                final u = request.url.toString();
+                                if (_isRedirect(u)) {
+                                  _complete(u);
+                                }
+                              },
+                            ),
+                            if (_busy)
+                              Container(
+                                color: c.ground.withValues(alpha: 0.92),
+                                child: Center(
+                                  child: Text(
+                                    'COMPLETING SIGN-IN',
+                                    style: press(
+                                      size: 11,
+                                      color: c.ink,
+                                      tracking: 3,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        )
+                      : _browserPanel(c),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_useWebview)
+                      Row(
+                        children: [
+                          // The embedded browser is not always able to take the
+                          // keyboard, so the way out through the real one is on
+                          // screen rather than something to find out about.
+                          PressButton(
+                            label: 'OPEN IN BROWSER',
+                            dense: true,
+                            onPressed: () {
+                              setState(() => _showPaste = true);
+                              launchUrl(
+                                Uri.parse(_signinUrl),
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          PressButton(
+                            label: _showPaste
+                                ? 'HIDE REDIRECT URL'
+                                : 'PASTE REDIRECT URL INSTEAD',
+                            dense: true,
+                            onPressed: () =>
+                                setState(() => _showPaste = !_showPaste),
+                          ),
+                        ],
+                      ),
+                    if (_showPaste && _useWebview)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(
+                          'Finish signing in over there, then paste the address '
+                          'the browser ends on — it starts sendtokindle:// or '
+                          'amazon.com/sendtokindle/maplanding.',
+                          style: typed(
+                            size: 11.5,
+                            color: c.inkMid,
+                            height: 1.5,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      PressButton(
-                        label: 'START OVER',
-                        dense: true,
-                        onPressed: _busy ? null : _startOver,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 18),
-                decoration: BoxDecoration(border: Border.all(color: c.rule)),
-                child: _webviewSupported
-                    ? Stack(
-                        children: [
-                          InAppWebView(
-                            initialUrlRequest: URLRequest(
-                              url: WebUri(_signinUrl),
-                            ),
-                            initialSettings: InAppWebViewSettings(
-                              // The landing page bounces to `sendtokindle://…`;
-                              // without this the navigation is swallowed.
-                              useShouldOverrideUrlLoading: true,
-                              javaScriptCanOpenWindowsAutomatically: false,
-                              supportZoom: false,
-                              userAgent: _userAgent,
-                            ),
-                            onWebViewCreated: (controller) =>
-                                _controller = controller,
-                            shouldOverrideUrlLoading:
-                                (controller, action) async {
-                                  final u = action.request.url?.toString();
-                                  if (u != null && _isRedirect(u)) {
-                                    _complete(u);
-                                    return NavigationActionPolicy.CANCEL;
-                                  }
-                                  return NavigationActionPolicy.ALLOW;
-                                },
-                            onLoadStart: (controller, url) =>
-                                _checkUrl(url?.toString()),
-                            onLoadStop: (controller, url) async {
-                              _checkUrl(url?.toString());
-                              if (_busy) return;
-                              // The code can sit in a URL the navigation
-                              // callbacks never reported (server-side redirect).
-                              final href = await controller.evaluateJavascript(
-                                source: 'window.location.href',
-                              );
-                              if (href is String) _checkUrl(href);
-                              if (_busy) return;
-                              await _scanHistory(controller);
-                            },
-                            onUpdateVisitedHistory: (controller, url, _) =>
-                                _checkUrl(url?.toString()),
-                            onReceivedError: (controller, request, error) {
-                              final u = request.url.toString();
-                              if (_isRedirect(u)) {
-                                _complete(u);
-                              }
-                            },
-                          ),
-                          if (_busy)
-                            Container(
-                              color: c.ground.withValues(alpha: 0.92),
-                              child: Center(
-                                child: Text(
-                                  'COMPLETING SIGN-IN',
-                                  style: press(
-                                    size: 11,
-                                    color: c.ink,
-                                    tracking: 3,
+                    if (_showPaste && _useWebview)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(color: c.rule),
+                                  ),
+                                ),
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: TextField(
+                                  controller: _paste,
+                                  cursorWidth: 1.4,
+                                  cursorRadius: Radius.zero,
+                                  style: typed(size: 12, color: c.ink),
+                                  decoration: InputDecoration.collapsed(
+                                    hintText:
+                                        'https://www.amazon.com/sendtokindle/'
+                                        'maplanding?…',
+                                    hintStyle: typed(
+                                      size: 12,
+                                      color: c.inkFaint,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                        ],
-                      )
-                    : _browserFallback(c),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // The embedded browser is not always able to take the
-                      // keyboard, so the way out through the real one is on
-                      // screen rather than something to find out about.
-                      PressButton(
-                        label: 'OPEN IN BROWSER',
-                        dense: true,
-                        onPressed: () {
-                          setState(() => _showPaste = true);
-                          launchUrl(
-                            Uri.parse(_signinUrl),
-                            mode: LaunchMode.externalApplication,
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      PressButton(
-                        label: _showPaste
-                            ? 'HIDE REDIRECT URL'
-                            : 'PASTE REDIRECT URL INSTEAD',
-                        dense: true,
-                        onPressed: () =>
-                            setState(() => _showPaste = !_showPaste),
-                      ),
-                    ],
-                  ),
-                  if (_showPaste)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        'Finish signing in over there, then paste the address '
-                        'the browser ends on — it starts sendtokindle:// or '
-                        'amazon.com/sendtokindle/maplanding.',
-                        style: typed(size: 11.5, color: c.inkMid, height: 1.5),
-                      ),
-                    ),
-                  if (_showPaste)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(color: c.rule),
-                                ),
-                              ),
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: TextField(
-                                controller: _paste,
-                                cursorWidth: 1.4,
-                                cursorRadius: Radius.zero,
-                                style: typed(size: 12, color: c.ink),
-                                decoration: InputDecoration.collapsed(
-                                  hintText:
-                                      'https://www.amazon.com/sendtokindle/'
-                                      'maplanding?…',
-                                  hintStyle: typed(size: 12, color: c.inkFaint),
-                                ),
-                              ),
+                            const SizedBox(width: 10),
+                            PressButton(
+                              label: 'CONTINUE',
+                              solid: true,
+                              onPressed: _busy
+                                  ? null
+                                  : () {
+                                      if (_paste.text.trim().isNotEmpty) {
+                                        _complete(_paste.text.trim());
+                                      }
+                                    },
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          PressButton(
-                            label: 'CONTINUE',
-                            solid: true,
-                            onPressed: _busy
-                                ? null
-                                : () {
-                                    if (_paste.text.trim().isNotEmpty) {
-                                      _complete(_paste.text.trim());
-                                    }
-                                  },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const BarredEdge(flip: true),
-          ],
+              const BarredEdge(flip: true),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _browserFallback(Ink0 c) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'No embedded browser on this platform. Open the sign-in page in '
-              'your browser, finish signing in, then paste the final redirect '
-              'URL from the address bar below.',
-              textAlign: TextAlign.center,
-              style: typed(size: 13, color: c.inkMid, height: 1.5),
+  /// The sign-in without a webview in it: the page opens in the browser the
+  /// reader already trusts, and comes back as the address it lands on.
+  Widget _browserPanel(Ink0 c) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '1.  Open the Amazon sign-in page in your browser.',
+            style: typed(size: 13, color: c.ink, height: 1.5),
+          ),
+          const SizedBox(height: 10),
+          PressButton(
+            label: 'OPEN SIGN-IN PAGE',
+            cap: 'ENTER',
+            solid: true,
+            onPressed: () => launchUrl(
+              Uri.parse(_signinUrl),
+              mode: LaunchMode.externalApplication,
             ),
-            const SizedBox(height: 18),
-            PressButton(
-              label: 'OPEN SIGN-IN PAGE',
-              solid: true,
-              onPressed: () => launchUrl(
-                Uri.parse(_signinUrl),
-                mode: LaunchMode.externalApplication,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            '2.  Sign in there. The page ends on an address starting '
+            'sendtokindle:// or amazon.com/sendtokindle/maplanding — your '
+            'browser may refuse to open it, which is fine. Copy it from the '
+            'address bar.',
+            style: typed(size: 13, color: c.ink, height: 1.5),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            '3.  Paste it here.',
+            style: typed(size: 13, color: c.ink, height: 1.5),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: c.rule)),
+                  ),
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: TextField(
+                    controller: _paste,
+                    autofocus: true,
+                    cursorWidth: 1.4,
+                    cursorRadius: Radius.zero,
+                    onSubmitted: (v) {
+                      if (v.trim().isNotEmpty) _complete(v.trim());
+                    },
+                    style: typed(size: 12, color: c.ink),
+                    decoration: InputDecoration.collapsed(
+                      hintText:
+                          'https://www.amazon.com/sendtokindle/maplanding?…',
+                      hintStyle: typed(size: 12, color: c.inkFaint),
+                    ),
+                  ),
+                ),
               ),
+              const SizedBox(width: 10),
+              PressButton(
+                label: 'CONTINUE',
+                solid: true,
+                onPressed: _busy
+                    ? null
+                    : () {
+                        if (_paste.text.trim().isNotEmpty) {
+                          _complete(_paste.text.trim());
+                        }
+                      },
+              ),
+            ],
+          ),
+          if (_webviewSupported) ...[
+            const SizedBox(height: 22),
+            Text(
+              'The embedded browser is available, but on some machines it '
+              'draws the Amazon page and then takes no clicks.',
+              style: typed(size: 11.5, color: c.inkFaint, height: 1.5),
+            ),
+            const SizedBox(height: 8),
+            PressButton(
+              label: 'TRY THE EMBEDDED BROWSER',
+              dense: true,
+              onPressed: () => setState(() => _useWebview = true),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

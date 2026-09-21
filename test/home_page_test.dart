@@ -367,9 +367,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The pairing waits for the window to settle before it raises a webview.
-    expect(pairs, 0);
-    await tester.pump(const Duration(seconds: 1));
     expect(pairs, 1, reason: 'the only way on is a fresh pairing');
     expect(
       find.textContaining('no longer accepts this installation'),
@@ -408,7 +405,6 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 1));
 
     expect(pairs, 0);
     expect(find.text('TRY AGAIN'), findsOneWidget);

@@ -173,13 +173,13 @@ ThemeData einkTheme(Brightness brightness) {
       trackColor: const WidgetStatePropertyAll(Colors.transparent),
     ),
     textTheme: TextTheme(bodyMedium: typed(color: c.ink)),
-    dialogTheme: DialogThemeData(
-      backgroundColor: c.ground,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: c.ink, width: 1.2),
-        borderRadius: BorderRadius.zero,
-      ),
-    ),
+    // A dialog gets its 1.2px ink border from a DecoratedBox inside it, never
+    // from `shape` here. A shape on the dialog theme makes Flutter render the
+    // dialog's Material as a RenderPhysicalShape, whose hitTest rejects
+    // everything outside its clip path — and on macOS that takes the sign-in
+    // webview's pointer events with it, leaving an Amazon login page that
+    // draws perfectly and cannot be clicked at all. Bisected against the
+    // pre-redesign build, which differs from this one in exactly that line.
+    dialogTheme: DialogThemeData(backgroundColor: c.ground, elevation: 0),
   );
 }
