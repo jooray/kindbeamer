@@ -91,22 +91,22 @@ Future<void> main(List<String> args) async {
     state.addFiles([doc('river-of-gods.epub', 2410).path]);
   } else if (scene == 'queue') {
     state.addFiles([
-      doc('the-selfish-gene.pdf', 4310).path,
+      doc('tamers-of-entropy-en.pdf', 4310).path,
       doc('river-of-gods.epub', 2410).path,
       doc('field-notes-2026.md', 38).path,
     ]);
   } else if (scene == 'sending') {
-    state.addFiles([doc('the-selfish-gene.pdf', 4310).path]);
+    state.addFiles([doc('tamers-of-entropy-en.pdf', 4310).path]);
     state.phase = SendPhase.sending;
     state.progress = 0.62;
-    state.statusMessage = 'Sending the-selfish-gene.pdf (1 of 1) — 62%';
+    state.statusMessage = 'Sending tamers-of-entropy-en.pdf (1 of 1) — 62%';
   } else if (scene == 'delivered') {
     state.phase = SendPhase.done;
     state.progress = 1;
     state.statusMessage = '1 document delivered to 3 devices.';
     state.closeOnSuccess = false;
   } else if (scene == 'error') {
-    state.addFiles([doc('the-selfish-gene.pdf', 4310).path]);
+    state.addFiles([doc('tamers-of-entropy-en.pdf', 4310).path]);
     state.phase = SendPhase.error;
     state.statusMessage =
         'Failed: SocketException: Connection reset by peer (uploading)';
@@ -114,7 +114,13 @@ Future<void> main(List<String> args) async {
       scene != 'keys' &&
       scene != 'rejected' &&
       scene != 'offline') {
-    state.addFiles([doc('the-selfish-gene.pdf', 4310).path]);
+    state.addFiles([doc('tamers-of-entropy-en.pdf', 4310).path]);
+  }
+  // A real book to stand in the label rather than a placeholder: the author's
+  // own, which is also what the website's closing note points at.
+  if (state.docs.isNotEmpty) {
+    state.docs.first.title = 'Tamers of Entropy [EN]';
+    state.docs.first.author = 'Juraj & Lisa';
   }
 
   // window_manager is desktop-only; on a phone the app owns the whole screen.
