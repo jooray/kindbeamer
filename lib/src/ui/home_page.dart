@@ -378,6 +378,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ),
                   ),
                   if (_moreBelow)
+                    // The page is cut at a printed fold, not sliced through a
+                    // row: the rule is where it folds, the note is under it.
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 17,
+                      child: Container(height: 1, color: c.rule),
+                    ),
+                  if (_moreBelow)
                     Positioned(
                       right: Metrics.gutter,
                       bottom: 0,
