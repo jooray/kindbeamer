@@ -11,7 +11,7 @@ It talks to the same Send to Kindle cloud service the official app uses, so your
 documents arrive over Wi-Fi on the devices you pick, and in your Kindle Library
 if you want them there.
 
-<img src="docs/screenshot-macos.png" alt="KindBeamer on macOS: a PDF queued with its title and author, four Kindle devices ticked, and the Send button" width="620">
+<img src="docs/screenshot-macos.png" alt="KindBeamer on macOS: a dispatch label with a queued PDF, its title and author, seven Kindle devices in two numbered columns with three ticked, and a postmark beside the Send button" width="720">
 
 > **Disclaimer:** this project is not affiliated with, endorsed by, or sponsored
 > by Amazon. Use at your own risk; Amazon may change or block the undocumented
@@ -63,14 +63,28 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 
 ## Features
 
-- Dark UI with the official app's layout (document title and author, per-device
-  checkboxes, "Archive document in your Kindle Library", format banner) in its
-  own slate and teal palette.
+- One window, laid out as a dispatch label: contents, description, the devices
+  to deliver to, and a franking row that states the facts and sends. It opens
+  already addressed — the file you dropped, a title from its name, the devices
+  you ticked last time — so the usual visit is Enter.
+- Monochrome e-paper, inverted at night and following the system by default.
+  Nothing in the app is carried by colour, so it reads the same on any screen.
+- A delivered send closes the window, unless Settings says otherwise; a failed
+  one keeps it, with the reason on the label — in the app's own words, with the
+  raw answer from Amazon folded away behind **Details**.
+- When Amazon stops accepting this installation's registration, which it does
+  when a session goes stale, the app opens the sign-in flow itself instead of
+  leaving an error on screen. Signing in re-registers the same device, so your
+  Kindles and the documents already on them are untouched.
+- Keyboard-first: **Enter** sends, **Esc** clears then closes, **1-9** and
+  **0** tick the device on that line, **A** takes all or none, **E** keeps the
+  library copy, **?** prints the key list.
 - Drop files anywhere on the window, pick them with a file dialog, or receive
   them from the OS share mechanisms listed below.
 - Multi-document queue: drop a PDF and an EPUB at once, edit the metadata of
   each, send them in one go, with upload progress per document.
-- Device picker listing every registered Kindle device and app on your account.
+- Every registered Kindle device and app on your account, in two numbered
+  columns so a long list needs no scrolling.
 - Sign-in with your Amazon account over OAuth (PKCE) in an embedded browser
   window. The long-lived device credentials then go into the OS keychain or
   encrypted storage, and no password is ever stored.
@@ -92,15 +106,32 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 
 ## Usage
 
-1. Launch the app and press **Sign in**, then complete the Amazon login in the
-   window that opens. (Linux has no embedded browser, so there the app opens
-   your system browser and lets you paste the redirect URL instead.)
-2. Drop one or more documents onto the window, or use **Add files…**, the share
-   sheet, the Services menu.
-3. Adjust the title and author of the selected document, tick the target
-   devices, and choose whether to archive in your Kindle Library.
-4. Press **Send**. The documents are uploaded to Amazon and delivered to the
-   devices you ticked over Wi-Fi.
+1. Launch the app and press **Sign in** (or just **Enter**), then complete the
+   Amazon login in the window that opens. (Linux has no embedded browser, so
+   there the app opens your system browser and lets you paste the redirect URL
+   instead.)
+2. Open a document with KindBeamer — *Open With*, the share sheet, the Services
+   menu, a drop onto the window, **Add files…**, or a path on the command line.
+3. Press **Enter**. The label already carries the title, the devices you used
+   last time and the library copy; change any of them first if you want to.
+4. The postmark inks round as the upload goes, strikes solid on delivery, and
+   the window leaves. Only a failure stays on screen, and it names the cause.
+
+### Keys
+
+| Key | What it does |
+|---|---|
+| `Enter` | Send — or sign in, when signed out |
+| `Esc` | Clear the queue; with nothing queued, close the window |
+| `1`…`9`, `0` | Tick the device on that line |
+| `A` | All devices, or none |
+| `E` | Keep a copy in your Kindle Library |
+| `Backspace` | Drop the marked document |
+| `⌘O` / `Ctrl+O` | Add files |
+| `⌘,` / `Ctrl+,` | Settings |
+| `?` | The list above, on the window |
+
+Digits typed into the title or author field stay in the field.
 
 Signing in registers that installation as a device on your Amazon account, shown
 as "KindBeamer (your computer's name)" or "KindBeamer (Android)". Each

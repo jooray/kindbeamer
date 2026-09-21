@@ -30,6 +30,8 @@ Future<void> main(List<String> args) async {
 
   if (isDesktop) {
     await windowManager.ensureInitialized();
+    // The label is all there is, so the window is sized to it rather than to a
+    // workspace: enough for the form, and no empty desk around it.
     const options = WindowOptions(
       size: Size(880, 700),
       minimumSize: Size(620, 520),
@@ -52,11 +54,20 @@ class KindBeamerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'KindBeamer',
-      debugShowCheckedModeBanner: false,
-      theme: stkTheme(),
-      home: HomePage(state: state),
+    return ListenableBuilder(
+      listenable: state,
+      builder: (context, _) => MaterialApp(
+        title: 'KindBeamer',
+        debugShowCheckedModeBanner: false,
+        theme: einkTheme(Brightness.light),
+        darkTheme: einkTheme(Brightness.dark),
+        themeMode: switch (state.appearance) {
+          Appearance.auto => ThemeMode.system,
+          Appearance.paper => ThemeMode.light,
+          Appearance.night => ThemeMode.dark,
+        },
+        home: HomePage(state: state),
+      ),
     );
   }
 }
