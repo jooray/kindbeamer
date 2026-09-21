@@ -1,312 +1,242 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-20T22:09:15Z",
+  "generatedAt": "2026-09-21T00:00:00Z",
   "title": "Design System: KindBeamer",
   "extensions": {
     "colorMeta": {
-      "deep-slate": {
+      "paper-ground": {
         "role": "neutral",
-        "displayName": "Deep Slate",
-        "canonical": "#1F2630",
-        "oklch": "oklch(26.6% 0.021 257.3)",
-        "tonalRamp": ["#060B14", "#1F262F", "#3B434D", "#5A626D", "#7B838E", "#9EA6B0", "#C2CAD4", "#E8EFFA"]
+        "displayName": "Warm Paper",
+        "canonical": "#F2F1EC",
+        "tonalRamp": ["#17171A", "#2E2E2C", "#494845", "#66655F", "#87867F", "#A9A8A1", "#CDCCC5", "#F2F1EC"]
       },
-      "panel-ink": {
+      "paper-well": {
         "role": "neutral",
-        "displayName": "Panel Ink",
-        "canonical": "#1A202A",
-        "oklch": "oklch(24.2% 0.021 260.6)",
-        "tonalRamp": ["#070B14", "#1F252F", "#3C424D", "#5B626D", "#7C838E", "#9FA5B0", "#C3CAD4", "#E8EFFA"]
+        "displayName": "Paper Well",
+        "canonical": "#E9E8E2",
+        "tonalRamp": ["#161614", "#2C2C29", "#454440", "#605F5A", "#7F7E78", "#A09F98", "#C4C3BC", "#E9E8E2"]
       },
-      "field-ink": {
-        "role": "neutral",
-        "displayName": "Field Ink",
-        "canonical": "#131922",
-        "oklch": "oklch(21.2% 0.020 258.3)",
-        "tonalRamp": ["#060B13", "#1F252F", "#3C424C", "#5B626C", "#7C838D", "#9FA6B0", "#C3CAD4", "#E8EFF9"]
-      },
-      "header-slate": {
-        "role": "neutral",
-        "displayName": "Header Slate",
-        "canonical": "#2B3442",
-        "oklch": "oklch(32.3% 0.028 259.1)",
-        "tonalRamp": ["#050B16", "#1D2532", "#394351", "#586270", "#798392", "#9CA6B5", "#C0CAD8", "#E6EFFE"]
-      },
-      "header-shade": {
-        "role": "neutral",
-        "displayName": "Header Shade",
-        "canonical": "#222A36",
-        "oklch": "oklch(28.3% 0.025 258.3)",
-        "tonalRamp": ["#060B15", "#1E2531", "#3A434F", "#59626F", "#7A8390", "#9DA6B3", "#C1CAD7", "#E7EFFC"]
-      },
-      "status-slate": {
-        "role": "neutral",
-        "displayName": "Status Slate",
-        "canonical": "#232B37",
-        "oklch": "oklch(28.7% 0.025 258.4)",
-        "tonalRamp": ["#060B15", "#1E2531", "#3A434F", "#59626F", "#7A8390", "#9DA6B3", "#C1CAD7", "#E7EFFC"]
-      },
-      "footer-ink": {
-        "role": "neutral",
-        "displayName": "Footer Ink",
-        "canonical": "#1B222C",
-        "oklch": "oklch(25.0% 0.022 257.3)",
-        "tonalRamp": ["#060B14", "#1E2630", "#3B434D", "#5A626D", "#7B838E", "#9EA6B1", "#C2CAD5", "#E8EFFA"]
-      },
-      "slate-border": {
-        "role": "neutral",
-        "displayName": "Slate Border",
-        "canonical": "#3B4657",
-        "oklch": "oklch(39.1% 0.032 259.0)",
-        "tonalRamp": ["#040B18", "#1C2534", "#384353", "#576273", "#788395", "#9AA6B7", "#BFCADB", "#E5EFFF"]
-      },
-      "slate-border-light": {
-        "role": "neutral",
-        "displayName": "Slate Border Light",
-        "canonical": "#5C6B84",
-        "oklch": "oklch(52.5% 0.044 260.6)",
-        "tonalRamp": ["#030B1B", "#1A2538", "#354258", "#53627A", "#74839C", "#97A6BF", "#BBCAE3", "#E6EFFF"]
-      },
-      "paper-white": {
-        "role": "neutral",
-        "displayName": "Paper White",
-        "canonical": "#E8EDF4",
-        "oklch": "oklch(94.4% 0.011 256.7)",
-        "tonalRamp": ["#090B0E", "#222529", "#3F4247", "#5E6166", "#7F8388", "#A1A5AB", "#C5C9D0", "#EAEFF6"]
-      },
-      "muted-slate": {
-        "role": "neutral",
-        "displayName": "Muted Slate",
-        "canonical": "#A7B4C4",
-        "oklch": "oklch(76.5% 0.027 253.6)",
-        "tonalRamp": ["#050C14", "#1D2630", "#39434E", "#58626F", "#788492", "#9AA6B6", "#BECBDB", "#E4F0FF"]
-      },
-      "faint-slate": {
-        "role": "neutral",
-        "displayName": "Faint Slate",
-        "canonical": "#6E7E92",
-        "oklch": "oklch(58.7% 0.036 254.1)",
-        "tonalRamp": ["#030B18", "#1A2634", "#364354", "#546375", "#748498", "#97A7BB", "#BBCBDF", "#E4F0FF"]
-      },
-      "pure-white": {
-        "role": "neutral",
-        "displayName": "Pure White",
-        "canonical": "#FFFFFF",
-        "oklch": "oklch(100% 0.000 0)",
-        "tonalRamp": ["#0B0B0B", "#252525", "#424242", "#616161", "#828282", "#A5A5A5", "#C9C9C9", "#EEEEEE"]
-      },
-      "signal-teal": {
+      "paper-ink": {
         "role": "primary",
-        "displayName": "Signal Teal",
-        "canonical": "#38C7B4",
-        "oklch": "oklch(75.1% 0.121 182.0)",
-        "tonalRamp": ["#000F0C", "#002C27", "#004D45", "#007165", "#009787", "#2CBDAB", "#61E2CF", "#B9FFF2"]
+        "displayName": "Press Ink",
+        "canonical": "#16171A",
+        "tonalRamp": ["#0A0B0C", "#16171A", "#2B2D31", "#43454A", "#5D5F64", "#7A7C81", "#9A9CA1", "#BDBFC3"]
       },
-      "signal-teal-deep": {
+      "paper-ink-mid": {
+        "role": "neutral",
+        "displayName": "Ink Mid",
+        "canonical": "#52545A",
+        "tonalRamp": ["#0C0D0F", "#1E1F22", "#333438", "#52545A", "#6E7076", "#8C8E94", "#ABADB2", "#CBCDD1"]
+      },
+      "paper-ink-faint": {
+        "role": "neutral",
+        "displayName": "Ink Faint",
+        "canonical": "#646669",
+        "tonalRamp": ["#0E0F10", "#212223", "#383939", "#4E4F51", "#646669", "#888A8D", "#ACAEB1", "#D0D2D5"]
+      },
+      "paper-mark": {
+        "role": "neutral",
+        "displayName": "Mark Grey",
+        "canonical": "#7D7F84",
+        "tonalRamp": ["#111213", "#242526", "#3B3C3E", "#535457", "#6A6C70", "#7D7F84", "#A5A7AB", "#CDCFD3"]
+      },
+      "paper-rule": {
+        "role": "neutral",
+        "displayName": "Field Rule",
+        "canonical": "#C2C1BB",
+        "tonalRamp": ["#141413", "#2A2A28", "#414140", "#5A5A57", "#757471", "#90908C", "#ACABA7", "#C2C1BB"]
+      },
+      "paper-rule-faint": {
+        "role": "neutral",
+        "displayName": "Inner Rule",
+        "canonical": "#D8D7D1",
+        "tonalRamp": ["#151514", "#2B2B29", "#434341", "#5C5C59", "#777672", "#93928E", "#B5B4AF", "#D8D7D1"]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#101113",
+        "tonalRamp": ["#101113", "#1E1F22", "#303134", "#454649", "#5C5D61", "#76777B", "#9FA0A4", "#D4D5D8"]
+      },
+      "night-well": {
+        "role": "neutral",
+        "displayName": "Night Well",
+        "canonical": "#191A1D",
+        "tonalRamp": ["#0B0C0D", "#191A1D", "#2B2C30", "#414246", "#57585C", "#717276", "#9B9C9F", "#D0D1D4"]
+      },
+      "night-ink": {
         "role": "primary",
-        "displayName": "Deep Signal Teal",
-        "canonical": "#1FA392",
-        "oklch": "oklch(64.5% 0.110 181.5)",
-        "tonalRamp": ["#000F0C", "#002C27", "#004E44", "#007165", "#069787", "#47BBA9", "#75DFCD", "#B9FFF2"]
+        "displayName": "Night Press Ink",
+        "canonical": "#E9E8E3",
+        "tonalRamp": ["#161615", "#2C2C2A", "#454441", "#5F5E5B", "#7E7D79", "#A09F9A", "#C5C4BF", "#E9E8E3"]
       },
-      "link-blue": {
-        "role": "secondary",
-        "displayName": "Link Blue",
-        "canonical": "#7FB5FF",
-        "oklch": "oklch(76.5% 0.121 256.5)",
-        "tonalRamp": ["#000A21", "#002351", "#174178", "#35629E", "#5384C6", "#73A7EF", "#A7CCFF", "#E4F0FF"]
-      },
-      "row-selected": {
+      "night-ink-mid": {
         "role": "neutral",
-        "displayName": "Row Selected",
-        "canonical": "#333333",
-        "oklch": "oklch(32.1% 0.000 89.9)",
-        "tonalRamp": ["#0B0B0B", "#252525", "#424242", "#616161", "#828282", "#A5A5A5", "#C9C9C9", "#EEEEEE"]
+        "displayName": "Night Ink Mid",
+        "canonical": "#9B9DA2",
+        "tonalRamp": ["#131415", "#262728", "#3D3E40", "#555659", "#6E7074", "#878A8E", "#9B9DA2", "#C6C8CC"]
       },
-      "disabled-fill": {
+      "night-ink-faint": {
         "role": "neutral",
-        "displayName": "Disabled Fill",
-        "canonical": "#B9C2CC",
-        "oklch": "oklch(81.0% 0.017 250.9)",
-        "tonalRamp": ["#070C11", "#20262C", "#3C434A", "#5B626A", "#7B838C", "#9EA6AF", "#C1CAD4", "#E7F0F9"]
+        "displayName": "Night Ink Faint",
+        "canonical": "#85878C",
+        "tonalRamp": ["#121314", "#242526", "#3A3B3D", "#515255", "#6A6B6F", "#85878C", "#A9ABB0", "#CFD1D5"]
       },
-      "disabled-text": {
+      "night-mark": {
         "role": "neutral",
-        "displayName": "Disabled Text",
-        "canonical": "#5A6472",
-        "oklch": "oklch(50.0% 0.026 256.8)",
-        "tonalRamp": ["#060B15", "#1E2631", "#3A434F", "#586270", "#798391", "#9CA6B4", "#C0CAD8", "#E6EFFD"]
+        "displayName": "Night Mark",
+        "canonical": "#6C6E73",
+        "tonalRamp": ["#0F1011", "#212223", "#37383A", "#4E4F53", "#6C6E73", "#8A8C90", "#AEB0B4", "#D2D4D8"]
+      },
+      "night-rule": {
+        "role": "neutral",
+        "displayName": "Night Field Rule",
+        "canonical": "#3B3D41",
+        "tonalRamp": ["#0C0D0E", "#1B1C1E", "#2B2C2F", "#3B3D41", "#565860", "#787A80", "#9FA1A6", "#C9CBCF"]
+      },
+      "night-rule-faint": {
+        "role": "neutral",
+        "displayName": "Night Inner Rule",
+        "canonical": "#2A2C2F",
+        "tonalRamp": ["#0A0B0C", "#181A1B", "#2A2C2F", "#3C3E42", "#545659", "#727478", "#9A9CA0", "#C6C8CB"]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display (Wordmark)",
-        "purpose": "The wordmark only: \"kind\" at 600 in Signal Teal, \"beamer\" at 300 in Paper White."
-      },
-      "headline": {
-        "displayName": "Headline",
-        "purpose": "Section headings \"Your document\" and \"Delivery options\", in Muted Slate."
-      },
-      "title": {
-        "displayName": "Title",
-        "purpose": "Dialog titles; 17px in the sign-in dialog."
-      },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Metadata field text, document and device names, row labels, archive label."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Footer links, status-strip text, \"Add files…\", dialog captions."
-      },
-      "action": {
-        "displayName": "Action",
-        "purpose": "Send and Cancel pill labels — the heaviest text in the app."
-      },
-      "caption": {
-        "displayName": "Caption",
-        "purpose": "File sizes, helper copy, the credential-backend note in Settings."
-      }
+      "wordmark": { "displayName": "Wordmark", "purpose": "kindbeamer, split mid-word by weight: 700 ink against 300 ink-mid. Never split by colour." },
+      "display": { "displayName": "Overlay Display", "purpose": "Overlay headlines only — AFFIX DOCUMENT (26px/6 tracking), KEYS (15px/6 tracking)." },
+      "legend": { "displayName": "Legend", "purpose": "Section legends (A CONTENTS) and button labels; the section letter goes to wght 700." },
+      "label": { "displayName": "Field Label", "purpose": "TITLE / AUTHOR, dialog group headings, dense button labels." },
+      "caption": { "displayName": "Caption", "purpose": "Disclaimer line, format tags, franking note, printed key hints." },
+      "body": { "displayName": "Typed Body", "purpose": "Everything filled into the form: document names, device names, field values." },
+      "status": { "displayName": "State Sentence", "purpose": "The one sentence beside the postmark that names what is happening." },
+      "measure": { "displayName": "Measure", "purpose": "Sizes, tallies and lane digits, right-aligned in a fixed column that never reflows." }
     },
+    "shadows": [],
+    "motion": [
+      { "name": "postmark-press", "value": "190ms cubic-bezier(0.215, 0.61, 0.355, 1) scale 1.22 → 1", "purpose": "The stamp lands. Fires when the frank state becomes sending, delivered or held. The system's only easing." },
+      { "name": "progress-sweep", "value": "linear, driven by bytes sent", "purpose": "The postmark rim arc and the 2px progress rule above the franking row; not time-based." },
+      { "name": "no-ripple", "value": "NoSplash.splashFactory; highlightColor transparent", "purpose": "Material ink splashes are switched off globally; press feedback is a border strike." }
+    ],
     "breakpoints": [
-      { "name": "compact", "value": "600px" },
-      { "name": "window-min", "value": "620px" },
-      { "name": "window-default", "value": "880px" }
+      { "name": "narrow", "value": "520px" },
+      { "name": "label-max", "value": "900px" },
+      { "name": "window-min", "value": "460x430px" },
+      { "name": "window-default", "value": "720x585px" }
     ]
   },
   "components": [
     {
-      "name": "Send Button",
+      "name": "Press Button (outline)",
       "kind": "button",
-      "refersTo": "button-send",
-      "description": "The app's primary action: a deep teal pill, bottom-right of the action bar.",
-      "html": "<button class=\"ds-btn-send\" type=\"button\">Send</button>",
-      "css": ".ds-btn-send { background: #1FA392; color: #FFFFFF; font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-send:hover { background: #069787; } .ds-btn-send:active { background: #007165; } .ds-btn-send:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+      "refersTo": "button-press",
+      "description": "The default printed action: a rectangle of ink rule with a tracked uppercase label and, on desktop, its key printed beside it.",
+      "html": "<button class=\"ds-btn-press\">CLEAR <span class=\"ds-cap\">ESC</span></button>",
+      "css": ".ds-btn-press { display: inline-flex; align-items: center; gap: 9px; height: 34px; padding: 0 16px; background: transparent; color: #16171A; border: 1px solid #16171A; border-radius: 0; font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 700; font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; cursor: pointer; } .ds-btn-press .ds-cap { font-size: 9px; font-variation-settings: 'wght' 500; opacity: 0.62; } .ds-btn-press:hover { background: #E9E8E2; border-width: 1.6px; } .ds-btn-press:focus-visible { outline: none; border-width: 1.6px; } .ds-btn-press:disabled { color: #646669; border-color: #C2C1BB; cursor: default; }"
     },
     {
-      "name": "Send Button (Disabled)",
+      "name": "Press Button (solid)",
       "kind": "button",
-      "refersTo": "button-send-disabled",
-      "description": "Send at rest, before a document and a device are both chosen.",
-      "html": "<button class=\"ds-btn-send-disabled\" type=\"button\" disabled>Send</button>",
-      "css": ".ds-btn-send-disabled { background: #B9C2CC; color: #5A6472; font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: default; }"
+      "refersTo": "button-press-solid",
+      "description": "SEND. The only inverted block on the page; hover knocks a rule out just inside the edge, the way a hand stamp shows its shoulder.",
+      "html": "<button class=\"ds-btn-solid\">SEND <span class=\"ds-cap\">ENTER</span></button>",
+      "css": ".ds-btn-solid { position: relative; display: inline-flex; align-items: center; gap: 9px; height: 34px; padding: 0 16px; background: #16171A; color: #F2F1EC; border: 1.2px solid #16171A; border-radius: 0; font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 700; font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; cursor: pointer; } .ds-btn-solid .ds-cap { font-size: 9px; font-variation-settings: 'wght' 500; opacity: 0.62; } .ds-btn-solid::after { content: ''; position: absolute; inset: 3px; border: 1px solid #F2F1EC; opacity: 0; } .ds-btn-solid:hover::after, .ds-btn-solid:focus-visible::after { opacity: 1; } .ds-btn-solid:focus-visible { outline: none; }"
     },
     {
-      "name": "Cancel Button",
-      "kind": "button",
-      "refersTo": "button-cancel",
-      "description": "The quiet twin: a white pill that empties the queue, then closes the app.",
-      "html": "<button class=\"ds-btn-cancel\" type=\"button\">Cancel</button>",
-      "css": ".ds-btn-cancel { background: #FFFFFF; color: rgba(0, 0, 0, 0.87); font: 600 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 22px; border: 0; border-radius: 22px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-cancel:hover { background: #E8EDF4; } .ds-btn-cancel:active { background: #C2CAD4; } .ds-btn-cancel:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
-    },
-    {
-      "name": "Outline Button",
-      "kind": "button",
-      "refersTo": "button-outline",
-      "description": "The header's file-adding action; also the shape language for dialog actions.",
-      "html": "<button class=\"ds-btn-outline\" type=\"button\">Add files…</button>",
-      "css": ".ds-btn-outline { background: transparent; color: #E8EDF4; font: 400 13px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 16px; border: 1px solid #5C6B84; border-radius: 999px; cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease; } .ds-btn-outline:hover { background: rgba(92, 107, 132, 0.18); } .ds-btn-outline:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
-    },
-    {
-      "name": "Filled Button",
-      "kind": "button",
-      "refersTo": "button-filled",
-      "description": "Material's filled button on the sign-in and paste-continue paths; foreground follows the scheme (black today).",
-      "html": "<button class=\"ds-btn-filled\" type=\"button\">Sign in</button>",
-      "css": ".ds-btn-filled { background: #1FA392; color: rgba(0, 0, 0, 0.87); font: 500 14px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; height: 40px; padding: 0 24px; border: 0; border-radius: 999px; cursor: pointer; transition: background 0.15s ease; } .ds-btn-filled:hover { background: #069787; } .ds-btn-filled:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
-    },
-    {
-      "name": "Text Field",
-      "kind": "input",
-      "refersTo": "field",
-      "description": "Title and author wells; disabled until a document is selected, focus turns the border teal.",
-      "html": "<input class=\"ds-input\" type=\"text\" value=\"The Emish Garden [SK]\" aria-label=\"Document Title\" placeholder=\"&lt;Document Title&gt;\">",
-      "css": ".ds-input { background: #131922; color: #E8EDF4; font: 400 13.5px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 8px 12px; border: 1px solid #3B4657; border-radius: 4px; width: 100%; box-sizing: border-box; transition: border-color 0.15s ease; } .ds-input::placeholder { color: #6E7E92; } .ds-input:hover { border-color: #5C6B84; } .ds-input:focus { outline: none; border-color: #38C7B4; } .ds-input:disabled { color: rgba(232, 237, 244, 0.38); cursor: default; }"
-    },
-    {
-      "name": "Checkbox Row",
-      "kind": "input",
-      "refersTo": "checkbox",
-      "description": "Device picker and archive option: dense row, 18px box, whole row tappable.",
-      "html": "<label class=\"ds-check\"><input type=\"checkbox\" checked><span class=\"ds-check-box\"><svg viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"3.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4.5 12.5l5 5L19.5 7\"/></svg></span><span class=\"ds-check-label\">Daylight</span></label>",
-      "css": ".ds-check { display: inline-flex; align-items: center; gap: 10px; color: #E8EDF4; font: 400 13.5px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; cursor: pointer; } .ds-check input { position: absolute; opacity: 0; width: 0; height: 0; } .ds-check-box { width: 18px; height: 18px; box-sizing: border-box; border: 2px solid #5C6B84; border-radius: 3px; background: #131922; display: inline-flex; align-items: center; justify-content: center; } .ds-check-box svg { display: none; } .ds-check input:checked + .ds-check-box { background: #1FA392; border-color: #1FA392; } .ds-check input:checked + .ds-check-box svg { display: block; } .ds-check input:focus-visible + .ds-check-box { outline: 2px solid #38C7B4; outline-offset: 2px; } .ds-check input:disabled + .ds-check-box { border-color: #3B4657; } .ds-check input:disabled ~ .ds-check-label { color: #6E7E92; }"
-    },
-    {
-      "name": "Document Panel",
-      "kind": "card",
-      "refersTo": "panel",
-      "description": "The queue: flat panel, one tonal step darker than the canvas, selected row a flat #333333.",
-      "html": "<div class=\"ds-panel\"><div class=\"ds-panel-row ds-panel-row-selected\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"#A7B4C4\" stroke-width=\"1.6\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2\"/><path d=\"M9 8h6M9 12h6M9 16h3\"/></svg><span class=\"ds-panel-name\">the_emish_garden_SK_print.pdf</span><span class=\"ds-panel-size\">460.82 KB</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"#6E7E92\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></div><div class=\"ds-panel-row\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"#A7B4C4\" stroke-width=\"1.6\"><path d=\"M4 5.5A2.5 2.5 0 0 1 6.5 3H15l5 5v13H6.5A2.5 2.5 0 0 1 4 18.5z\"/><path d=\"M15 3v5h5\"/></svg><span class=\"ds-panel-name\">notes.epub</span><span class=\"ds-panel-size\">84 KB</span><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"#6E7E92\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></div></div>",
-      "css": ".ds-panel { background: #1A202A; border: 1px solid #3B4657; border-radius: 4px; padding: 4px 0; } .ds-panel-row { display: flex; align-items: center; gap: 10px; padding: 5px 10px; color: #A7B4C4; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; } .ds-panel-row-selected { background: #333333; color: #E8EDF4; } .ds-panel-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-panel-size { color: #6E7E92; font-size: 12px; } .ds-panel-row svg:last-child { flex: none; cursor: pointer; }"
-    },
-    {
-      "name": "Status Strip",
+      "name": "Tick Box",
       "kind": "custom",
-      "refersTo": "status-strip",
-      "description": "The current send fact, in a sentence: Status Slate band with a 3px teal left edge.",
-      "html": "<div class=\"ds-status\">Your document will be sent in PDF format.</div>",
-      "css": ".ds-status { background: #232B37; border-top: 1px solid #151B23; border-left: 3px solid #38C7B4; padding: 8px 14px; color: #E8EDF4; font: 400 13px/1.4 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; text-align: center; }"
+      "refersTo": "tick-box",
+      "description": "The system's only selection control: a 15px square, hairline when off, solid ink with a knocked-out check when on. No switches, no pills.",
+      "html": "<span class=\"ds-tick\"></span><span class=\"ds-tick ds-tick-on\"><svg viewBox=\"0 0 15 15\" width=\"15\" height=\"15\"><path d=\"M3.6 7.8 L6.45 10.65 L11.7 4.35\" fill=\"none\" stroke=\"#F2F1EC\" stroke-width=\"1.9\" stroke-linecap=\"square\"/></svg></span>",
+      "css": ".ds-tick { display: inline-block; width: 15px; height: 15px; border: 1.2px solid #7D7F84; border-radius: 0; background: transparent; vertical-align: middle; margin-right: 10px; } .ds-tick-on { border: none; background: #16171A; line-height: 0; }"
     },
     {
-      "name": "Header with Wordmark",
+      "name": "Ruled Field",
+      "kind": "input",
+      "refersTo": "field-line",
+      "description": "A form is a ruled line you write on, not a filled box. Press label in a fixed 64px column, Courier value over a hairline that inks and thickens on focus.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">TITLE</span><input class=\"ds-field-input\" value=\"the-selfish-gene\"></label>",
+      "css": ".ds-field { display: flex; align-items: flex-end; } .ds-field-label { width: 64px; padding-bottom: 7px; font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 600; font-size: 9.5px; letter-spacing: 1.3px; color: #52545A; } .ds-field-input { flex: 1; padding: 0 0 4px; background: transparent; border: none; border-bottom: 1px solid #C2C1BB; border-radius: 0; font-family: 'Courier Prime', monospace; font-size: 13px; letter-spacing: -0.2px; color: #16171A; caret-color: #16171A; } .ds-field-input::placeholder { color: #646669; } .ds-field-input:focus { outline: none; border-bottom: 1.6px solid #16171A; }"
+    },
+    {
+      "name": "Device Lane",
       "kind": "nav",
-      "refersTo": "header",
-      "description": "The gradient band: wordmark left, Add files… right, closed by a 1px hairline.",
-      "html": "<header class=\"ds-header\"><span class=\"ds-wordmark\"><span class=\"ds-wordmark-kind\">kind</span><span class=\"ds-wordmark-beamer\">beamer</span></span><button class=\"ds-btn-outline\" type=\"button\">Add files…</button></header>",
-      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 18px; background: linear-gradient(180deg, #2B3442 0%, #222A36 100%); border-bottom: 1px solid #1C1C1C; } .ds-wordmark { font: 600 26px/1.1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; } .ds-wordmark-kind { color: #38C7B4; font-weight: 600; } .ds-wordmark-beamer { color: #E8EDF4; font-weight: 300; } .ds-header .ds-btn-outline { background: transparent; color: #E8EDF4; font: 400 13px/1 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif; padding: 9px 16px; border: 1px solid #5C6B84; border-radius: 999px; cursor: pointer; transition: background 0.15s ease; } .ds-header .ds-btn-outline:hover { background: rgba(92, 107, 132, 0.18); } .ds-header .ds-btn-outline:focus-visible { outline: 2px solid #38C7B4; outline-offset: 2px; }"
+      "refersTo": "lane-row",
+      "description": "One fixed-height row per destination: printed key digit, tick box, name. Hovering inks the whole row ground; ticking takes the digit and name to full ink.",
+      "html": "<div class=\"ds-lane ds-lane-on\"><span class=\"ds-lane-key\">1</span><span class=\"ds-tick ds-tick-on\"><svg viewBox=\"0 0 15 15\" width=\"15\" height=\"15\"><path d=\"M3.6 7.8 L6.45 10.65 L11.7 4.35\" fill=\"none\" stroke=\"#F2F1EC\" stroke-width=\"1.9\" stroke-linecap=\"square\"/></svg></span><span class=\"ds-lane-name\">Juraj&rsquo;s Paperwhite</span></div>",
+      "css": ".ds-lane { display: flex; align-items: center; height: 26px; padding: 0 8px; cursor: pointer; font-family: 'Courier Prime', monospace; font-size: 13px; letter-spacing: -0.2px; color: #52545A; } .ds-lane-key { width: 12px; margin-right: 9px; text-align: right; font-size: 11px; color: #646669; } .ds-lane:hover { background: #D8D7D1; } .ds-lane-on { color: #16171A; } .ds-lane-on .ds-lane-key { color: #16171A; font-weight: 700; }"
+    },
+    {
+      "name": "Well",
+      "kind": "card",
+      "refersTo": "well",
+      "description": "The ruled box where the form expects something to be filled in: one step into the paper, hairline border, square corners. The keyboard's current box takes a 1.2px ink border instead.",
+      "html": "<div class=\"ds-well\"><div class=\"ds-well-row\"><span class=\"ds-mark\"></span>the-selfish-gene.pdf<span class=\"ds-well-size\">4.21 MB</span></div></div>",
+      "css": ".ds-well { background: #E9E8E2; border: 1px solid #C2C1BB; border-radius: 0; padding: 5px 0; } .ds-well-row { display: flex; align-items: center; height: 26px; padding: 0 10px; font-family: 'Courier Prime', monospace; font-size: 13px; font-weight: 700; letter-spacing: -0.2px; color: #16171A; } .ds-mark { width: 6px; height: 6px; background: #16171A; margin-right: 8px; } .ds-well-size { margin-left: auto; width: 82px; text-align: right; font-weight: 400; font-size: 11px; color: #646669; }"
+    },
+    {
+      "name": "Postmark",
+      "kind": "custom",
+      "refersTo": "postmark",
+      "description": "The only drawn-not-printed element, 48px, five states: idle and ready hairline rings, a sending arc sweeping from twelve o'clock, a solid struck disc for delivered, and thickened rings for held.",
+      "html": "<div class=\"ds-postmark\"><svg viewBox=\"0 0 48 48\" width=\"48\" height=\"48\"><circle cx=\"24\" cy=\"24\" r=\"22.5\" fill=\"none\" stroke=\"#16171A\" stroke-width=\"1.2\"/><circle cx=\"24\" cy=\"24\" r=\"18.5\" fill=\"none\" stroke=\"#16171A\" stroke-width=\"0.9\"/><line x1=\"8.5\" y1=\"25\" x2=\"39.5\" y2=\"25\" stroke=\"#16171A\" stroke-width=\"0.8\"/><text x=\"24\" y=\"21.5\" text-anchor=\"middle\" font-family=\"Courier Prime, monospace\" font-size=\"9\" font-weight=\"700\" fill=\"#16171A\">READY</text><text x=\"24\" y=\"34\" text-anchor=\"middle\" font-family=\"Courier Prime, monospace\" font-size=\"7.5\" fill=\"#16171A\">21 SEP</text></svg></div>",
+      "css": ".ds-postmark { width: 48px; height: 48px; transition: transform 190ms cubic-bezier(0.215, 0.61, 0.355, 1); } .ds-postmark:hover { transform: scale(1.22); }"
+    },
+    {
+      "name": "Barred Edge",
+      "kind": "custom",
+      "refersTo": "none",
+      "description": "The airmail border that closes the window top and bottom, and the top and bottom of every dialog slip. It is what makes the window read as addressed post before a word is read.",
+      "html": "<div class=\"ds-barred\"></div><div class=\"ds-barred ds-barred-flip\"></div>",
+      "css": ".ds-barred { height: 7px; background: repeating-linear-gradient(115deg, #16171A 0 14.3px, transparent 14.3px 26px); } .ds-barred-flip { transform: scaleY(-1); margin-top: 4px; }"
+    },
+    {
+      "name": "Dialog Slip",
+      "kind": "card",
+      "refersTo": "slip-dialog",
+      "description": "Settings and sign-in: the back of the label. Ground-coloured, max 480px, square, 1.2px ink border, with its own barred edge top and bottom so it reads as the same stock.",
+      "html": "<div class=\"ds-slip\"><div class=\"ds-barred\"></div><div class=\"ds-slip-body\"><div class=\"ds-slip-head\">SETTINGS</div><div class=\"ds-slip-group\">APPEARANCE</div></div><div class=\"ds-barred ds-barred-flip\"></div></div>",
+      "css": ".ds-slip { max-width: 480px; background: #F2F1EC; border: 1.2px solid #16171A; border-radius: 0; } .ds-slip-body { padding: 18px 20px 20px; } .ds-slip-head { font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 700; font-size: 13px; letter-spacing: 4px; color: #16171A; margin-bottom: 20px; } .ds-slip-group { font-family: 'Libre Franklin', sans-serif; font-variation-settings: 'wght' 600; font-size: 9.5px; letter-spacing: 1.6px; color: #52545A; padding-bottom: 5px; border-bottom: 1px solid #C2C1BB; }"
     }
   ],
   "narrative": {
-    "northStar": "The Quiet Dispatch",
-    "overview": "A dispatch desk at night: documents arrive from wherever they already are, get addressed, and are sent on. Nothing about the app is loud — the darker the room, the better it reads. The palette is one narrow slate family stepped from canvas to well, lit by a single signal teal that means *this is live*.\n\nThe calm is borrowed from the device the app serves. E-ink serenity: low glare, soft contrast, reading-first; the window should feel like paper's opposite number, not a control room. Workmanlike and blunt is the other half of the attitude — dense 13–14px rows, short labels, square-ish slabs, no ornament carrying meaning it does not need to. The one expressive act is the wordmark, and even that is only a colour split.\n\nThe confirmed anti-reference is Amazon's own client: no charcoal-and-orange, no marketing gloss, no imitation of official chrome. This app is openly the unofficial tool.",
+    "northStar": "The Dispatch Label",
+    "overview": "The window is a pre-addressed airmail label printed on e-paper, not an upload dialog. It arrives already filled in — contents, description, addressees from last time — and the only act left is franking it. The barred postal edging closes the window top and bottom, lettered sections A / B / C run down it like fields on a customs declaration, and the send is a postmark pressed into the sheet.\n\nThere is one ink and one ground, and nothing else. Every state the app can be in — selected, focused, ticked, sending, delivered, failed — is carried by fill, stroke, tick or inversion. The press face states what the form printed; the typewriter face states what was filled into it. Night is not a dark theme with tinted greys but the same sheet inverted, the way an e-reader inverts: ink becomes ground and nothing is tinted on the way across.\n\nThe refused defaults are specific and confirmed: the dark rounded card with a dashed cloud-upload drop zone, toggle switches, accent-coloured pills, and the official client's charcoal-and-orange. The slate-and-teal world this replaced is history, not a reference.",
     "keyCharacteristics": [
-      "One dark slate world with narrow tonal steps between surfaces.",
-      "Exactly one expressive colour, Signal Teal, reserved for state and the primary action.",
-      "Borders and tonal steps do all the separating; nothing floats, nothing casts a shadow.",
-      "The platform's UI font at fixed sizes; the wordmark is the only branded type.",
-      "Utility density: short labels, full-width single column, status stated in sentences."
+      "One ink on one ground; no hue anywhere, on either surface.",
+      "Night is a true inversion, not a tinted dark palette.",
+      "Flat: no shadow, no gradient, no radius — every corner is square (0px).",
+      "Two voices: tracked uppercase press type for what was printed, Courier for what was typed.",
+      "Rows share one height so counting needs no measuring.",
+      "One inverted block per page, and it is SEND."
     ],
     "rules": [
-      {
-        "name": "The One Signal Rule",
-        "body": "Signal Teal appears only where something is live or selected: focus, checked, sending, the wordmark's \"kind\", the strip's edge. It is never a background for anything larger than a checkbox or an action pill.",
-        "section": "colors"
-      },
-      {
-        "name": "The Two-Accent Ceiling",
-        "body": "Link Blue exists to mark text links and nothing else. A third accent hue is an implementation mistake, not a design decision.",
-        "section": "colors"
-      },
-      {
-        "name": "The System-Voice Rule",
-        "body": "The platform UI font at fixed sizes is the rule and the wordmark is the only exception. No bundled typeface, no display font, no all-caps labels.",
-        "section": "typography"
-      },
-      {
-        "name": "The No-Shadow Rule",
-        "body": "No drop shadows, glows, blurs or glassmorphism. A surface that needs to separate gets a 1px border or one tonal step, and nothing else.",
-        "section": "elevation"
-      },
-      {
-        "name": "The Slab-or-Pill Rule",
-        "body": "If it holds content it is a slab with a 3–6px corner; if it is an action it is a pill. Nothing between: no 8–16px \"card\" radius, no square action buttons.",
-        "section": "shapes"
-      }
+      { "name": "The No-Hue Rule", "body": "There is no accent colour and none may be added. A state is expressed by fill, stroke weight, tick or inversion — never by a hue. Audit test: a screenshot printed on a mono laser printer must lose nothing.", "section": "colors" },
+      { "name": "The True Inversion Rule", "body": "Night maps role for role onto the paper set. Ink becomes ground, ground becomes ink; no channel is tinted, warmed or cooled on the way across, and no component branches on theme beyond picking its Ink0.", "section": "colors" },
+      { "name": "The Three-Steps-of-Text Rule", "body": "Text has exactly three weights of presence — ink, ink-mid, ink-faint — and drawn outlines get a fourth, mark. A fifth step is not available; if something needs to recede further, it should not be on the label.", "section": "colors" },
+      { "name": "The Two-Voices Rule", "body": "Press type states what the form printed; typed type states what was filled into it. A value the user supplied or a machine measured is never set in the press face, and a legend, button or key cap is never set in Courier.", "section": "typography" },
+      { "name": "The Printed Key Cap Rule", "body": "Wherever a key does the same thing as a control, the key is printed on the control in press caption type at 62% ink (ENTER on SEND, ESC on CLEAR, A on ALL, E on the library row, ⌘O / CTRL+O on ADD). On touch builds the caps are dropped entirely — never faked, never drawn as a key-shaped box.", "section": "typography" },
+      { "name": "The Flat Sheet Rule", "body": "Nothing on the label floats. If an element needs to separate from its neighbour, it gets a hairline, a well, or a heavier strike of its own border — never a shadow.", "section": "elevation" },
+      { "name": "The One Inverted Block Rule", "body": "SEND is the only inverted block on the page. Inversion is how the label marks its single irreversible act; a second inverted block would make the act ambiguous. The settings appearance buttons reuse the solid treatment to mark the one active choice, and nothing else may.", "section": "elevation" }
     ],
     "dos": [
-      "Do put state changes in Signal Teal only: field focus, checked, sending, the wordmark's \"kind\", the status strip's left edge.",
-      "Do separate surfaces with a 1px border or exactly one tonal step (Slate Border #3B4657 on Panel Ink #1A202A over Deep Slate #1F2630).",
-      "Do keep section headings in Muted Slate at 20px/400 with 0.3px letter-spacing, not Paper White.",
-      "Do keep the four bands in order: header, scrolling body, status strip, action bar — the same order on desktop and phone.",
-      "Do state the current send fact in the strip, in a full sentence, at 13px Paper White."
+      "Do express every state with fill, stroke weight, tick or inversion. There is no hue in this system and nothing may introduce one.",
+      "Do map night role-for-role onto paper via Ink0; read colours through Ink0.of(context) rather than branching on brightness.",
+      "Do set printed things (legends, buttons, key caps, tags) in tracked uppercase Libre Franklin, and filled-in things (names, titles, sizes, the state sentence) in Courier Prime.",
+      "Do keep every row at one height — 26px on desktop, 48dp on touch — so counting needs no measuring.",
+      "Do right-align measurements in the fixed Courier column (82px for sizes) so the column never reflows.",
+      "Do make hover and focus a heavier strike of the same rule (1px → 1.6px), or the well as a ground.",
+      "Do draw marks — ticks, crosses, the postmark — with painters, in the label's own geometry.",
+      "Do drop printed key caps on touch builds and grow targets to 48dp; the same label, simply set larger."
     ],
     "donts": [
-      "Don't add shadows, glows, blurs or glassmorphism (The No-Shadow Rule).",
-      "Don't let teal cover more than a checkbox or an action pill; the Send button is the ceiling.",
-      "Don't introduce a third accent hue; Link Blue is the whole budget for text links.",
-      "Don't bundle a font or add a display face; the system UI font is the rule.",
-      "Don't use 8–16px card radii or fully square actions (The Slab-or-Pill Rule).",
-      "Don't adopt the official client's charcoal-and-orange or any Amazon-adjacent brand colour."
+      "Don't add an accent colour, a tint, a gradient or a coloured status (no red error, no green success). HELD is a heavier ring; DELIVERED is a solid disc.",
+      "Don't add shadow, elevation, blur or a translucent scrim. Separation is a hairline, a well, or an inversion.",
+      "Don't round a corner. Radius is 0 across the system, including dialogs and scrollbars.",
+      "Don't invert a second block. SEND owns inversion on the main surface.",
+      "Don't use a toggle switch, a pill, a radio button or a dashed drop zone; selection is the square tick and the drop target is the whole window.",
+      "Don't borrow a glyph from a text font as an icon, and don't reach for an icon set: the drawn vocabulary (TickBox, CrossMark, Postmark, BarredEdge) is the whole icon library.",
+      "Don't introduce motion beyond the 190ms postmark press and the progress sweep; ripples and splashes are switched off globally.",
+      "Don't set a platform UI font. Both faces are bundled so all three platforms print the same label."
     ]
   }
 }

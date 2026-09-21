@@ -51,6 +51,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final FocusNode _root = FocusNode(debugLabel: 'label');
   String? _boundTo;
 
+  /// True while the label runs past the bottom of the window, so the page can
+  /// print that it continues rather than letting a row end in mid-air.
+  bool _moreBelow = false;
+  final ScrollController _queueScroll = ScrollController();
+
   SendPhase _lastPhase = SendPhase.idle;
   Timer? _closeTimer;
   Timer? _noticeTimer;
@@ -93,6 +98,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _root.dispose();
     _title.dispose();
     _author.dispose();
+    _queueScroll.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -130,6 +136,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void _onFocusChanged() {
     if (mounted) setState(() {});
+  }
+
+  bool _noteOverflow(Notification n) {
+    final more = n is ScrollMetricsNotification
+        ? n.metrics.extentAfter > 1
+        : n is ScrollUpdateNotification
+        ? n.metrics.extentAfter > 1
+        : _moreBelow;
+    if (more != _moreBelow) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && more != _moreBelow) setState(() => _moreBelow = more);
+      });
+    }
+    return false;
   }
 
   void _syncControllers() {
@@ -311,25 +331,52 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             _header(c),
             const Rule(strong: true),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  Metrics.gutter,
-                  14,
-                  Metrics.gutter,
-                  14,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Legend(letter: 'A', name: 'CONTENTS'),
-                    _contents(c),
-                    const SizedBox(height: Metrics.sectionGap),
-                    const Legend(letter: 'B', name: 'DESCRIPTION'),
-                    _description(c),
-                    const SizedBox(height: Metrics.sectionGap),
-                    _deliverTo(c),
-                  ],
-                ),
+              child: Stack(
+                children: [
+                  NotificationListener<ScrollMetricsNotification>(
+                    onNotification: _noteOverflow,
+                    child: NotificationListener<ScrollUpdateNotification>(
+                      onNotification: _noteOverflow,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(
+                          Metrics.gutter,
+                          14,
+                          Metrics.gutter,
+                          14,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Legend(letter: 'A', name: 'CONTENTS'),
+                            _contents(c),
+                            const SizedBox(height: Metrics.sectionGap),
+                            const Legend(letter: 'B', name: 'DESCRIPTION'),
+                            _description(c),
+                            const SizedBox(height: Metrics.sectionGap),
+                            _deliverTo(c),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (_moreBelow)
+                    Positioned(
+                      right: Metrics.gutter,
+                      bottom: 0,
+                      child: Container(
+                        color: c.ground,
+                        padding: const EdgeInsets.fromLTRB(8, 3, 2, 2),
+                        child: Text(
+                          'CONTINUES BELOW',
+                          style: press(
+                            size: 8.5,
+                            color: c.inkFaint,
+                            tracking: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             if (state.notice != null) _noticeBand(c),
@@ -414,12 +461,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
+  /// The queue is the only section whose length the user controls, so it is
+  /// the one that is capped: three rows, then it scrolls inside its own box and
+  /// the rest of the label stays where it was.
+  static const int _queueRows = 3;
+
   Widget _contents(Ink0 c) {
     if (state.docs.isEmpty) {
+      final delivered = state.phase == SendPhase.done;
       return Well(
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 12),
         child: Text(
-          touchLayout
+          delivered
+              ? 'Delivered. Drop another document to send it on.'
+              : touchLayout
               ? 'Share a document to KindBeamer, or tap ADD.'
               : 'Drop a document here, or press ${modKey}O to choose one.',
           style: typed(size: 12.5, color: c.inkFaint),
@@ -432,15 +487,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         .map((d) => d.conversionNote)
         .whereType<String>()
         .toSet();
+    final rows = Column(
+      children: [for (var i = 0; i < state.docs.length; i++) _docRow(c, i)],
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Well(
-          child: Column(
-            children: [
-              for (var i = 0; i < state.docs.length; i++) _docRow(c, i),
-            ],
-          ),
+          child: state.docs.length <= _queueRows
+              ? rows
+              : SizedBox(
+                  height: laneHeight * _queueRows,
+                  child: Scrollbar(
+                    controller: _queueScroll,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _queueScroll,
+                      child: rows,
+                    ),
+                  ),
+                ),
         ),
         for (final note in converted)
           Padding(
@@ -497,15 +563,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           _IconTap(
             tooltip: 'Remove ${doc.name}',
             onTap: () => state.removeDoc(i),
-            builder: (hover) => Text(
-              '×',
-              style: press(
-                size: 16,
-                color: hover ? c.ink : c.inkFaint,
-                weight: FontWeight.w400,
-                tracking: 0,
-              ),
-            ),
+            builder: (hover) => CrossMark(strong: hover),
           ),
           const SizedBox(width: 6),
         ],
@@ -808,15 +866,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           _IconTap(
             tooltip: 'Dismiss',
             onTap: state.clearNotice,
-            builder: (hover) => Text(
-              '×',
-              style: press(
-                size: 16,
-                color: hover ? c.ink : c.inkMid,
-                weight: FontWeight.w400,
-                tracking: 0,
-              ),
-            ),
+            builder: (hover) => CrossMark(strong: hover, size: 11),
           ),
         ],
       ),

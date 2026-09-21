@@ -327,7 +327,7 @@ void main() {
     await pump(tester);
     state.addFiles([pdf.path]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('×').first);
+    await tester.tap(find.byType(CrossMark).first);
     await tester.pumpAndSettle();
     expect(state.docs, isEmpty);
     expect(find.text('Nothing to send yet.'), findsOneWidget);

@@ -207,7 +207,7 @@ class _TickPainter extends CustomPainter {
 /// The remove mark: two strokes on the tick's hairline, so the label keeps one
 /// drawn vocabulary and never borrows a glyph from a font.
 class CrossMark extends StatelessWidget {
-  const CrossMark({super.key, required this.strong, this.size = 12});
+  const CrossMark({super.key, required this.strong, this.size = 10});
 
   final bool strong;
   final double size;
@@ -232,7 +232,7 @@ class _CrossPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final p = Paint()
       ..color = ink
-      ..strokeWidth = 1.4
+      ..strokeWidth = 1.2
       ..strokeCap = StrokeCap.square;
     canvas.drawLine(Offset.zero, Offset(size.width, size.height), p);
     canvas.drawLine(Offset(size.width, 0), Offset(0, size.height), p);
