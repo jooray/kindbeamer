@@ -11,7 +11,7 @@ It talks to the same Send to Kindle cloud service the official app uses, so your
 documents arrive over Wi-Fi on the devices you pick, and in your Kindle Library
 if you want them there.
 
-<img src="docs/screenshot-macos.png" alt="KindBeamer on macOS, in paper and night: a dispatch label with a queued PDF, its title and author, seven Kindle devices in two numbered columns with three ticked, and a postmark beside the Send button" width="860">
+<img src="docs/screenshot-macos.png" alt="KindBeamer on macOS: a dispatch label with a queued PDF, its title and author, seven Kindle devices in two numbered columns with three ticked, and a postmark beside the Send button" width="720">
 
 > **Disclaimer:** this project is not affiliated with, endorsed by, or sponsored
 > by Amazon. Use at your own risk; Amazon may change or block the undocumented
