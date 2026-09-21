@@ -1,5 +1,5 @@
-# Migrated from zapstore-cli format
-
 repository: https://github.com/jooray/kindbeamer
-website: https://jooray.github.io/kindbeamer/
+metadata_sources:
+    - github
 pubkey: npub1m2mvvpjugwdehtaskrcl7ksvdqnnhnjur9v6g9v266nss504q7mqvlr8p9
+homepage: https://jooray.github.io/kindbeamer/

@@ -208,9 +208,17 @@ preferences, queue handling), the per-platform release declarations that only
 fail in a release build, and the main window widget tree. CI runs the same
 checks and builds macOS, Android and Linux (x86-64 and arm64) on every push.
 
+## BTW
+
+The book in the screenshot is a real one, and mine.
+[Tamers of Entropy](https://tamersofentropy.net/) is a lunarpunk novel about
+identity, parallel spaces, AI, space and expanding consciousness. Paperback,
+ebook and audiobook, in English, Slovak and Czech. There is a
+[trailer](https://youtu.be/APLe95FRUhg).
+
 ## License
 
-MIT, see [LICENSE](LICENSE). The app icon was generated with Venice
-`nano-banana-2`; the master art is `assets/icon/icon-1024.png`, and
-`tools/make_icons.py` derives the per-platform sets from it (macOS
-`.appiconset`, Android adaptive icon, Linux PNG).
+MIT, see [LICENSE](LICENSE). The app icon is drawn rather than generated:
+`tools/make_icons.py` paints the master art at `assets/icon/icon-1024.png` and
+derives the per-platform sets from it (macOS `.appiconset`, Android adaptive
+icon, Linux PNG).
