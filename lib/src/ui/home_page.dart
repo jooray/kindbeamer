@@ -170,14 +170,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted || _pairing) return;
       _pairing = true;
-      await _pair();
+      // A webview raised in the same breath as the first frame does not
+      // reliably get the pointer stream on macOS: the login page renders but
+      // will not take a click. Letting the window settle first is what makes
+      // it usable, and a pairing that arrives a moment late costs nothing.
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      if (mounted) await _pair();
       _pairing = false;
     });
   }
 
   Future<void> _pair() async {
     if (widget.onPair != null) return widget.onPair!();
-    if (mounted) await showLoginDialog(context, state);
+    if (!mounted) return;
+    // Hand the keyboard over before the webview arrives, so the login page
+    // gets it rather than the label that opened the dialog.
+    FocusManager.instance.primaryFocus?.unfocus();
+    await showLoginDialog(context, state);
+    if (mounted) _root.requestFocus();
   }
 
   void _onFocusChanged() {
@@ -270,6 +280,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    // Keys belong to whatever is on top. With the sign-in webview or a settings
+    // slip open, the label behind it must not answer for them — it would eat
+    // every character meant for an Amazon login field.
+    if (!(ModalRoute.of(context)?.isCurrent ?? true)) {
+      return KeyEventResult.ignored;
+    }
     final key = event.logicalKey;
 
     if (_keysOpen) {

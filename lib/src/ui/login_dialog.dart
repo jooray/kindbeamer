@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -123,9 +124,14 @@ class _LoginDialogState extends State<LoginDialog> {
         vertical: compact ? 10 : 22,
       ),
       child: ConstrainedBox(
+        // The slip has to fit the window it opens in: a 585-tall window with a
+        // 600-tall dialog pushes the webview past the window's own bounds, and
+        // the part that hangs over stops taking clicks entirely.
         constraints: BoxConstraints(
           maxWidth: 640,
-          maxHeight: compact ? media.size.height : 600,
+          maxHeight: compact
+              ? media.size.height
+              : math.min(600, media.size.height - 44),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -272,6 +278,21 @@ class _LoginDialogState extends State<LoginDialog> {
                 children: [
                   Row(
                     children: [
+                      // The embedded browser is not always able to take the
+                      // keyboard, so the way out through the real one is on
+                      // screen rather than something to find out about.
+                      PressButton(
+                        label: 'OPEN IN BROWSER',
+                        dense: true,
+                        onPressed: () {
+                          setState(() => _showPaste = true);
+                          launchUrl(
+                            Uri.parse(_signinUrl),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 8),
                       PressButton(
                         label: _showPaste
                             ? 'HIDE REDIRECT URL'
@@ -282,6 +303,16 @@ class _LoginDialogState extends State<LoginDialog> {
                       ),
                     ],
                   ),
+                  if (_showPaste)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        'Finish signing in over there, then paste the address '
+                        'the browser ends on — it starts sendtokindle:// or '
+                        'amazon.com/sendtokindle/maplanding.',
+                        style: typed(size: 11.5, color: c.inkMid, height: 1.5),
+                      ),
+                    ),
                   if (_showPaste)
                     Padding(
                       padding: const EdgeInsets.only(top: 12),
