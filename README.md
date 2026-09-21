@@ -216,6 +216,33 @@ identity, parallel spaces, AI, space and expanding consciousness. Paperback,
 ebook and audiobook, in English, Slovak and Czech. There is a
 [trailer](https://youtu.be/APLe95FRUhg).
 
+## Related projects
+
+KindBeamer exists because other people worked the protocol out first. None of
+these projects are ours.
+
+- [stkclient](https://github.com/maxdjohnson/stkclient) is a Python library for
+  Amazon's Send to Kindle service. KindBeamer's protocol code is a clean-room
+  Dart port of the approach it takes.
+- [sendKindle](https://github.com/kparal/sendKindle) is the original
+  command-line tool for mailing documents to a Kindle. Unmaintained since 2019,
+  and its author asks anyone who wants it revived to fork it.
+- [kindle-send](https://github.com/nikhil1raghav/kindle-send) sends web pages
+  and documents from the terminal. It turns a URL into an EPUB first, which
+  makes it a good fit for scripted page archiving.
+- [sendtokindle](https://github.com/miracle2k/sendtokindle) is an earlier
+  Ubuntu-only GUI for the same job. Nothing has been committed to it since
+  2016, and its app indicator no longer fits current desktops.
+- [KindleEar](https://github.com/cdhigh/KindleEar) runs Calibre recipes on a
+  schedule and pushes news, RSS feeds and EPUBs to your Kindle.
+- The [Send to Kindle Calibre plugin](https://github.com/bookfere/Send-to-Kindle-Calibre-Plugin)
+  is for people who already live inside Calibre.
+
+They differ mostly in how the file travels. stkclient goes to Amazon's service
+over HTTP, the way KindBeamer does. The others hand the document to Amazon's
+mail gateway, which means a mail account of your own and whatever attachment
+limit it comes with.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). The app icon is drawn rather than generated:
