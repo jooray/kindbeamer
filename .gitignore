@@ -67,3 +67,6 @@ android/local.properties
 
 # Local agent configuration
 .claude/
+
+# Migration leftovers
+*.bak
