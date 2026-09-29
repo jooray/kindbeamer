@@ -7,6 +7,20 @@ open-source replacement for Amazon's *Send to Kindle* desktop app: one Flutter
 codebase covering **macOS (Apple Silicon and Intel)**, **Linux** and
 **Android**, with no Rosetta needed.
 
+<!-- jooray-links:start -->
+### More from me
+
+**Related projects**
+
+- [rss2podcast](https://github.com/jooray/rss2podcast): turn blogs and articles into a podcast
+- [markdown2audio](https://github.com/jooray/markdown2audio): convert Markdown to audio with StyleTTS
+- [livecaster-llm](https://github.com/jooray/livecaster-llm): live co-pilot for podcast hosts
+
+**Full project showcase:** [KindBeamer in my project showcase](https://juraj.bednar.io/showcase/#MED-01), or [all my projects](https://juraj.bednar.io/showcase/).
+
+I write about building things on [my blog](https://juraj.bednar.io/en/blog-en/). I also wrote a cypherpunk novel, [Tamers of Entropy](https://tamersofentropy.net/), and there is a [trailer](https://tamersofentropy.net/#trailer).
+<!-- jooray-links:end -->
+
 It talks to the same Send to Kindle cloud service the official app uses, so your
 documents arrive over Wi-Fi on the devices you pick, and in your Kindle Library
 if you want them there.
