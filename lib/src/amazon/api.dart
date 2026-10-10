@@ -293,22 +293,54 @@ Future<SendToKindleResponse> sendToKindle(
   required String title,
   required String format,
   required bool archive,
+  bool? forceConvert,
 }) async {
-  final res = await _request('/SendToKindle', signer, {
-    'DocumentMetadata': {
-      'author': author,
-      'crc32': 0,
-      'inputFormat': format,
-      'title': title,
-    },
-    'archive': archive,
-    'deliveryMechanism': 'WIFI',
-    'outputFormat': 'MOBI',
-    'stkToken': stkToken,
-    'targetDevices': targetDeviceSerialNumbers,
-  });
+  final res = await _request(
+    '/SendToKindle',
+    signer,
+    sendToKindleBody(
+      stkToken: stkToken,
+      targetDeviceSerialNumbers: targetDeviceSerialNumbers,
+      author: author,
+      title: title,
+      format: format,
+      archive: archive,
+      forceConvert: forceConvert,
+    ),
+  );
   return SendToKindleResponse.fromMap(res);
 }
+
+/// The `SendToKindle` body. With [forceConvert] null it is the body stkclient
+/// sends, which every format has always gone out with. That body's
+/// `outputFormat: MOBI` has the service reflow a PDF, so a PDF goes out the way
+/// the official client sends one instead: no `outputFormat` and no
+/// `deliveryMechanism`, and an explicit `forceConvert` choosing between the
+/// original pages and a reflowed Kindle book (SPECIFICATION.md §5).
+Map<String, dynamic> sendToKindleBody({
+  required String stkToken,
+  required List<String> targetDeviceSerialNumbers,
+  required String author,
+  required String title,
+  required String format,
+  required bool archive,
+  bool? forceConvert,
+}) => {
+  'DocumentMetadata': {
+    'author': author,
+    'crc32': 0,
+    'inputFormat': format,
+    'title': title,
+  },
+  'archive': archive,
+  if (forceConvert == null) ...{
+    'deliveryMechanism': 'WIFI',
+    'outputFormat': 'MOBI',
+  } else
+    'forceConvert': forceConvert,
+  'stkToken': stkToken,
+  'targetDevices': targetDeviceSerialNumbers,
+};
 
 Future<void> logout(AdpSigner signer) async {
   const path = '/FirsProxy/disownFiona?contentDeleted=false';

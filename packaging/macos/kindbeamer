@@ -3,7 +3,8 @@
 # installed KindBeamer.app, with no window to answer.
 #
 #   kindbeamer [--all-devices | --device NAME ...] [--title TITLE]
-#              [--author AUTHOR] [--dry-run] FILE...
+#              [--author AUTHOR] [--original-pdf | --reformat-pdf]
+#              [--dry-run] FILE...
 #
 # The app is sandboxed, so it may only read files that Launch Services hands
 # it. This wrapper opens the files with a fresh instance of the app (`open -n`),
@@ -15,7 +16,7 @@
 set -u
 
 usage() {
-  echo "usage: kindbeamer [--all-devices | --device NAME ...] [--title TITLE] [--author AUTHOR] [--dry-run] FILE..." >&2
+  echo "usage: kindbeamer [--all-devices | --device NAME ...] [--title TITLE] [--author AUTHOR] [--original-pdf | --reformat-pdf] [--dry-run] FILE..." >&2
   exit 2
 }
 
@@ -35,7 +36,7 @@ while [ $# -gt 0 ]; do
     --device|--title|--author)
       [ $# -ge 2 ] || { echo "kindbeamer: error: $1 needs a value" >&2; usage; }
       opts+=("$1" "$2"); shift 2 ;;
-    --all-devices|--dry-run) opts+=("$1"); shift ;;
+    --all-devices|--dry-run|--original-pdf|--reformat-pdf) opts+=("$1"); shift ;;
     --send) shift ;;
     --) shift; while [ $# -gt 0 ]; do files+=("$1"); shift; done ;;
     -*) echo "kindbeamer: error: unknown option $1" >&2; usage ;;

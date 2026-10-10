@@ -10,7 +10,8 @@ import '../state/app_state.dart';
 ///
 /// ```
 /// KindBeamer --send [--all-devices | --device NAME ...] [--title T]
-///            [--author A] [--dry-run] FILE...
+///            [--author A] [--original-pdf | --reformat-pdf] [--dry-run]
+///            FILE...
 /// ```
 class SendRequest {
   const SendRequest({
@@ -19,6 +20,7 @@ class SendRequest {
     this.allDevices = false,
     this.title,
     this.author,
+    this.pdfLayout,
     this.dryRun = false,
   });
 
@@ -30,12 +32,16 @@ class SendRequest {
   final String? title;
   final String? author;
 
+  /// How PDFs go out; null takes the layout chosen in the window last time.
+  final PdfLayout? pdfLayout;
+
   /// Resolve the files and devices, then stop short of uploading.
   final bool dryRun;
 
   static const usage =
       'usage: KindBeamer --send [--all-devices | --device NAME ...] '
-      '[--title TITLE] [--author AUTHOR] [--dry-run] FILE...';
+      '[--title TITLE] [--author AUTHOR] [--original-pdf | --reformat-pdf] '
+      '[--dry-run] FILE...';
 
   /// The request in [args], or null when the launch is an ordinary one. Throws
   /// [FormatException] for a `--send` launch it cannot make sense of.
@@ -47,6 +53,16 @@ class SendRequest {
     var dryRun = false;
     String? title;
     String? author;
+    PdfLayout? layout;
+    void setLayout(PdfLayout l) {
+      if (layout != null && layout != l) {
+        throw const FormatException(
+          'use either --original-pdf or --reformat-pdf',
+        );
+      }
+      layout = l;
+    }
+
     String value(int i, String flag) {
       if (i >= args.length) throw FormatException('$flag needs a value');
       return args[i];
@@ -61,6 +77,10 @@ class SendRequest {
           all = true;
         case '--dry-run':
           dryRun = true;
+        case '--original-pdf':
+          setLayout(PdfLayout.original);
+        case '--reformat-pdf':
+          setLayout(PdfLayout.reformatted);
         case '--device':
           devices.add(value(++i, a));
         case '--title':
@@ -84,6 +104,7 @@ class SendRequest {
       allDevices: all,
       title: title,
       author: author,
+      pdfLayout: layout,
       dryRun: dryRun,
     );
   }
@@ -153,6 +174,8 @@ class SendRequest {
     if (targets is String) return fail(badUsage, targets);
     final chosen = targets as List<OwnedDevice>;
     state.selectedSerials = chosen.map((d) => d.deviceSerialNumber).toSet();
+    // Like the devices, for this send only: the window keeps its own default.
+    if (pdfLayout != null) state.pdfLayout = pdfLayout!;
 
     final doc = state.docs.first;
     if (title != null) doc.title = title!;
@@ -178,8 +201,11 @@ class SendRequest {
     final what = state.docs.length == 1
         ? '"${doc.effectiveTitle}"'
         : '${state.docs.length} documents';
+    final layout = state.hasPdf
+        ? ' (${state.pdfLayout == PdfLayout.original ? 'original PDF formatting' : 'PDF reformatted for Kindle'})'
+        : '';
     if (dryRun) {
-      o.writeln('KindBeamer: dry run, would send $what to $names');
+      o.writeln('KindBeamer: dry run, would send $what to $names$layout');
       return ok;
     }
     if (!await state.send()) {
@@ -189,7 +215,7 @@ class SendRequest {
         t == null ? 'the send did not start' : '${t.sentence} ${t.detail}',
       );
     }
-    o.writeln('KindBeamer: sent $what to $names');
+    o.writeln('KindBeamer: sent $what to $names$layout');
     return ok;
   }
 

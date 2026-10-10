@@ -220,7 +220,7 @@ The ink itself is the primary: **Press Ink** (`{colors.paper-ink}` on paper, `{c
 
 **The Two-Voices Rule.** Press type states what the form printed; typed type states what was filled into it. A value the user supplied or a machine measured is never set in the press face, and a legend, button or key cap is never set in Courier.
 
-**The Printed Key Cap Rule.** Wherever a key does the same thing as a control, the key is printed on the control in press caption type at 62% ink (`ENTER` on SEND, `ESC` on CLEAR, `A` on ALL, `E` on the library row, `⌘O` / `CTRL+O` on ADD). On touch builds the caps are dropped entirely — never faked, never drawn as a key-shaped box.
+**The Printed Key Cap Rule.** Wherever a key does the same thing as a control, the key is printed on the control in press caption type at 62% ink (`ENTER` on SEND, `ESC` on CLEAR, `A` on ALL, `E` on the library row, `R` on the PDF layout row, `⌘O` / `CTRL+O` on ADD). On touch builds the caps are dropped entirely — never faked, never drawn as a key-shaped box.
 
 ## Layout
 
@@ -280,6 +280,7 @@ The remove mark: two strokes drawn on the tick's hairline, so the label keeps on
 - **Well:** well-coloured ground with a 1px rule border, square, 5px vertical padding; the box the keyboard is pointed at takes a 1.2px ink border instead.
 - **Field:** no box at all — a ruled baseline you write on. Press label in a fixed 64px column at the left, Courier value at 13px above a 1px rule; on focus the rule inks to full ink and thickens to 1.6px. The caret is a 1.4px square-ended bar; selection is ink at 22% alpha.
 - **Disabled field:** faint-rule baseline, faint label, unchanged geometry.
+- **Choice row:** a field whose value is picked rather than typed (`LAYOUT`, shown only while a PDF is queued). Press label in the same 64px column, then one tick box per option, each a full row-height hit target. The ticked option's words go to Courier 700 ink, the other stays ink-mid. Options sit side by side and stack below a 500px column. It is the form's "tick one", never a radio button or a segmented switch.
 
 ### Rows (documents and lanes)
 

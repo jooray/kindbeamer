@@ -18,6 +18,10 @@ class DocFormat {
   /// they are uploaded (see `convert/markdown.dart`).
   final bool needsConversion;
 
+  /// A PDF is the one format the service can deliver either as its own pages
+  /// or reflowed, so it is the one that carries a layout choice.
+  bool get isPdf => inputFormat == 'PDF';
+
   static const supported = [
     DocFormat._('pdf', 'PDF', 'PDF'),
     DocFormat._('epub', 'EPUB', 'EPUB'),

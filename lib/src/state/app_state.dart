@@ -20,6 +20,18 @@ enum SendPhase { idle, sending, done, error }
 /// label's defaults.
 enum Appearance { auto, paper, night }
 
+/// How a PDF reaches the Kindle: its own pages as they are, or reflowed by the
+/// service into a Kindle book whose text follows the reader's font size. Only
+/// PDFs have the choice; every other format is converted regardless.
+enum PdfLayout {
+  original('Original PDF formatting'),
+  reformatted('Reformatted for your Kindle');
+
+  const PdfLayout(this.label);
+
+  final String label;
+}
+
 /// A failure the label has to explain, in three parts: what happened in the
 /// app's own words, what to do about it, and the raw text a bug report needs.
 /// Nothing that reaches the window is a stack trace unless the reader asks.
@@ -105,6 +117,9 @@ class AppState extends ChangeNotifier {
   Set<String> selectedSerials = {};
   bool archive = true;
 
+  /// The last layout chosen, kept as the default for the next PDF.
+  PdfLayout pdfLayout = PdfLayout.original;
+
   final List<DocItem> docs = [];
   int selectedIndex = -1;
 
@@ -139,6 +154,9 @@ class AppState extends ChangeNotifier {
 
   bool get converting => docs.any((d) => d.converting);
 
+  /// Whether anything in the queue goes out as a PDF, and so has a layout.
+  bool get hasPdf => docs.any((d) => d.format.isPdf);
+
   bool get canSend =>
       signedIn &&
       docs.isNotEmpty &&
@@ -159,6 +177,10 @@ class AppState extends ChangeNotifier {
             .cast<String>()
             .toSet();
         archive = m['archive'] as bool? ?? true;
+        pdfLayout = PdfLayout.values.firstWhere(
+          (l) => l.name == (m['pdf_layout'] as String? ?? ''),
+          orElse: () => PdfLayout.original,
+        );
         closeOnSuccess = m['close_on_success'] as bool? ?? true;
         appearance = Appearance.values.firstWhere(
           (a) => a.name == (m['appearance'] as String? ?? ''),
@@ -181,6 +203,7 @@ class AppState extends ChangeNotifier {
         json.encode({
           'selected': selectedSerials.toList(),
           'archive': archive,
+          'pdf_layout': pdfLayout.name,
           'close_on_success': closeOnSuccess,
           'appearance': appearance.name,
           'device_serial': deviceId.serial,
@@ -266,6 +289,12 @@ class AppState extends ChangeNotifier {
 
   void setArchive(bool v) {
     archive = v;
+    _savePrefs();
+    notifyListeners();
+  }
+
+  void setPdfLayout(PdfLayout v) {
+    pdfLayout = v;
     _savePrefs();
     notifyListeners();
   }
@@ -404,6 +433,9 @@ class AppState extends ChangeNotifier {
           title: doc.effectiveTitle,
           format: doc.format.inputFormat,
           archive: archive,
+          forceConvert: doc.format.isPdf
+              ? pdfLayout == PdfLayout.reformatted
+              : null,
           onProgress: (sent, total) {
             if (total <= 0) return;
             final pct = (sent * 100 / total).clamp(0, 100).round();

@@ -336,6 +336,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         case 'E':
           state.setArchive(!state.archive);
           return KeyEventResult.handled;
+        case 'R':
+          if (!state.hasPdf) return KeyEventResult.ignored;
+          state.setPdfLayout(
+            state.pdfLayout == PdfLayout.original
+                ? PdfLayout.reformatted
+                : PdfLayout.original,
+          );
+          return KeyEventResult.handled;
       }
     }
     if (event.character == '?') {
@@ -687,6 +695,100 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           hint: DocItem.unknownAuthor,
           enabled: doc != null,
           onChanged: (v) => doc?.author = v,
+        ),
+        if (state.hasPdf) ...[const SizedBox(height: 9), _pdfLayout(c)],
+      ],
+    );
+  }
+
+  /// Two boxes, tick one, as a form prints a choice. The window remembers the
+  /// last one ticked, and it applies to every PDF in the queue; the row is not
+  /// printed at all while nothing queued is a PDF, since nothing else has the
+  /// choice.
+  Widget _pdfLayout(Ink0 c) {
+    Widget option(PdfLayout layout) {
+      final on = state.pdfLayout == layout;
+      return Semantics(
+        checked: on,
+        inMutuallyExclusiveGroup: true,
+        label: layout.label,
+        child: _HoverRow(
+          height: laneHeight,
+          onTap: () => state.setPdfLayout(layout),
+          child: Row(
+            children: [
+              const SizedBox(width: 6),
+              TickBox(on: on),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  layout.label,
+                  overflow: TextOverflow.ellipsis,
+                  style: typed(
+                    size: 13,
+                    color: on ? c.ink : c.inkMid,
+                    weight: on ? FontWeight.w700 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final cap = touchLayout
+        ? null
+        : Padding(
+            padding: const EdgeInsets.only(left: 8, right: 4),
+            child: Text(
+              'R',
+              style: press(size: 9, color: c.inkFaint, tracking: 1.2),
+            ),
+          );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 64,
+          height: laneHeight,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'LAYOUT',
+              style: press(size: 9.5, color: c.inkMid, tracking: 1.3),
+            ),
+          ),
+        ),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, box) {
+              // Side by side while both labels fit whole; stacked on a narrow
+              // window rather than cut short.
+              final options = [
+                for (final layout in PdfLayout.values) option(layout),
+              ];
+              if (box.maxWidth >= 500) {
+                return Row(
+                  children: [
+                    for (final o in options) Expanded(child: o),
+                    ?cap,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: Column(children: options)),
+                  if (cap != null)
+                    SizedBox(
+                      height: laneHeight,
+                      child: Center(child: cap),
+                    ),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );
@@ -1327,6 +1429,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ('1 \u2026 9, 0', 'Tick the device on that line'),
       ('A', 'All devices, or none'),
       ('E', 'Keep a copy in your Kindle Library'),
+      ('R', 'PDF: original formatting, or reformatted for Kindle'),
       ('BACKSPACE', 'Drop the marked document'),
       ('${modKey}O', 'Add files'),
       ('$modKey,', 'Settings'),

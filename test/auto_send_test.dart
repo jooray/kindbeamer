@@ -74,11 +74,62 @@ void main() {
         ['--send', '--device'],
         ['--send', '--all-devices', '--device', 'X', 'a.pdf'],
         ['--send', '--title', 'T', 'a.pdf', 'b.pdf'],
+        ['--send', '--original-pdf', '--reformat-pdf', 'a.pdf'],
       ]) {
         expect(() => SendRequest.parse(args), throwsFormatException);
       }
     });
   });
+
+  test('the PDF layout options are read', () {
+    expect(SendRequest.parse(['--send', 'a.pdf'])!.pdfLayout, isNull);
+    expect(
+      SendRequest.parse(['--send', '--original-pdf', 'a.pdf'])!.pdfLayout,
+      PdfLayout.original,
+    );
+    expect(
+      SendRequest.parse(['--send', '--reformat-pdf', 'a.pdf'])!.pdfLayout,
+      PdfLayout.reformatted,
+    );
+  });
+
+  test(
+    'a PDF goes out in the layout asked for; other formats have none',
+    () async {
+      final client = FakeStkClient(devices: kindles);
+      var state = await signedIn(client);
+      var (code, out, _) = await run(
+        SendRequest.parse(['--send', pdf('kept.pdf')])!,
+        state,
+      );
+      expect(code, SendRequest.ok);
+      expect(client.conversions['kept'], isFalse);
+      expect(out, contains('original PDF formatting'));
+
+      state = await signedIn(client);
+      final epub = File('${tmp.path}/book.epub')..writeAsBytesSync([1, 2, 3]);
+      (code, out, _) = await run(
+        SendRequest.parse([
+          '--send',
+          '--reformat-pdf',
+          pdf('flow.pdf'),
+          epub.path,
+        ])!,
+        state,
+      );
+      expect(code, SendRequest.ok);
+      expect(client.conversions['flow'], isTrue);
+      expect(client.conversions['book'], isNull);
+      expect(out, contains('reformatted'));
+
+      final again = await signedIn(client);
+      expect(
+        again.pdfLayout,
+        PdfLayout.original,
+        reason: 'a send from a script leaves the window its own default',
+      );
+    },
+  );
 
   test('sends to the devices ticked last time by default', () async {
     final client = FakeStkClient(devices: kindles);

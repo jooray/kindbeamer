@@ -76,6 +76,26 @@ void main() {
     expect(second.selectedSerials, {'SERIAL1'});
   });
 
+  test('the PDF layout chosen last is the default after a restart', () async {
+    final first = newState();
+    await first.loadPrefs();
+    expect(first.pdfLayout, PdfLayout.original);
+    first.setPdfLayout(PdfLayout.reformatted);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+
+    final second = newState();
+    await second.loadPrefs();
+    expect(second.pdfLayout, PdfLayout.reformatted);
+  });
+
+  test('only a PDF in the queue has a layout to choose', () {
+    final state = newState();
+    state.addFiles([write('book.epub').path]);
+    expect(state.hasPdf, isFalse);
+    state.addFiles([write('paper.pdf').path]);
+    expect(state.hasPdf, isTrue);
+  });
+
   test(
     'removing a document keeps the selection on the same document',
     () async {

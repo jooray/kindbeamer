@@ -22,6 +22,7 @@ class StkClient {
     required String title,
     required String format,
     required bool archive,
+    bool? forceConvert,
     void Function(int sent, int total)? onProgress,
   }) async {
     final length = await file.length();
@@ -40,6 +41,7 @@ class StkClient {
       title: title,
       format: format,
       archive: archive,
+      forceConvert: forceConvert,
     );
     return res.sku;
   }

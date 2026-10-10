@@ -249,6 +249,34 @@ void main() {
     expect(state.archive, isFalse);
   });
 
+  testWidgets('a PDF prints its layout choice, and R or a tap changes it', (
+    tester,
+  ) async {
+    final client = await signIn(tester);
+    await pump(tester);
+    state.addFiles([write('book.epub', 100).path]);
+    await tester.pumpAndSettle();
+    expect(find.text('Original PDF formatting'), findsNothing);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyR);
+    expect(state.pdfLayout, PdfLayout.original);
+
+    state.addFiles([write('paper.pdf', 100).path]);
+    await tester.pumpAndSettle();
+    expect(find.text('Original PDF formatting'), findsOneWidget);
+    expect(find.text('Reformatted for your Kindle'), findsOneWidget);
+
+    await tester.tap(find.text('Reformatted for your Kindle'));
+    await tester.pumpAndSettle();
+    expect(state.pdfLayout, PdfLayout.reformatted);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyR);
+    await tester.pumpAndSettle();
+    expect(state.pdfLayout, PdfLayout.original);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(client.conversions, {'book': null, 'paper': false});
+  });
+
   testWidgets('a digit typed into a field stays in the field', (tester) async {
     await signIn(tester);
     await pump(tester);

@@ -92,7 +92,7 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
   Kindles and the documents already on them are untouched.
 - Keyboard-first: **Enter** sends, **Esc** clears then closes, **1-9** and
   **0** tick the device on that line, **A** takes all or none, **E** keeps the
-  library copy, **?** prints the key list.
+  library copy, **R** switches a PDF's layout, **?** prints the key list.
 - Drop files anywhere on the window, pick them with a file dialog, or receive
   them from the OS share mechanisms listed below.
 - Multi-document queue: drop a PDF and an EPUB at once, edit the metadata of
@@ -102,6 +102,10 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 - Sign-in with your Amazon account over OAuth (PKCE) in an embedded browser
   window. The long-lived device credentials then go into the OS keychain or
   encrypted storage, and no password is ever stored.
+- PDFs arrive the way they were laid out, page for page, unless you tick
+  *Reformatted for your Kindle* to have Amazon reflow them into a book whose
+  text follows the reader's font size. The choice shows only while a PDF is
+  queued, and the last one is kept for next time.
 - Input formats: PDF, EPUB, MOBI, AZW/AZW3, TXT, RTF, DOC, DOCX, HTML, PNG,
   JPG, GIF, BMP.
 - Markdown as well. A dropped `.md` is typeset into a PDF sized for a 6" reader
@@ -162,7 +166,8 @@ test. Sign in once in the window first.
 
 ```bash
 kindbeamer [--all-devices | --device NAME ...] [--title TITLE] \
-           [--author AUTHOR] [--dry-run] FILE...
+           [--author AUTHOR] [--original-pdf | --reformat-pdf] \
+           [--dry-run] FILE...
 ```
 
 - With no device option it delivers to the devices ticked in the window last
@@ -173,6 +178,9 @@ kindbeamer [--all-devices | --device NAME ...] [--title TITLE] \
 - `--title` (one file only) and `--author` override the metadata. The title
   otherwise comes from the file name. The library copy follows the window's
   setting.
+- `--original-pdf` keeps a PDF's own pages; `--reformat-pdf` has Amazon reflow
+  it for the Kindle. Without either, PDFs follow the window's last choice, and
+  neither flag changes it. Other formats are unaffected.
 - `--dry-run` loads the sign-in, lists the devices and checks the files, then
   stops short of uploading.
 - Exit status: `0` sent, `1` failed, `2` bad usage (unknown option, unknown

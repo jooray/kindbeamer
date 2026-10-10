@@ -193,6 +193,32 @@ All bodies are JSON with a `ClientInfo` block (`appName: ShellExtension`,
 "Archive document in your Kindle Library" checkbox; `targetDevices` are the
 serials ticked in the device list.
 
+**PDFs go out in a different body**, the one the official client sends:
+
+```json
+{
+  "DocumentMetadata": {"author": "…", "crc32": 0, "inputFormat": "PDF", "title": "…"},
+  "archive": true,
+  "forceConvert": false,
+  "stkToken": "…",
+  "targetDevices": ["SERIAL", "…"]
+}
+```
+
+The body above, from stkclient, has the service reflow a PDF into a Kindle book.
+The official Mac client (1.1.1.259) has a "Convert PDF documents to Kindle
+format" setting (`ConvertPdfToMobi`, off by default) that becomes
+`SendToKindleRequest::setForceConvert`, and its request carries `forceConvert`
+but neither `outputFormat` nor `deliveryMechanism`. Sending one PDF three ways
+to a Kindle for Android tablet settled it: the stkclient body arrived reflowed,
+`forceConvert: false` without `outputFormat` arrived as the original pages, and
+`forceConvert: true` arrived reflowed again. The label's `LAYOUT` row ("Original
+PDF formatting" / "Reformatted for your Kindle", persisted as `pdf_layout`,
+default original) and `--original-pdf` / `--reformat-pdf` choose the flag.
+Other formats keep the stkclient body until they have been tried the same way;
+the official client's other fields (`sendTimeMillis`, `batchId`,
+`shouldExtractWebContent`) are not needed.
+
 `title` and `author` must be at least one character each — an empty author is
 refused with `400 … 'documentMetadata.author' failed to satisfy constraint:
 Member must have length greater than or equal to 1` — so a blank title falls back
@@ -302,7 +328,10 @@ inversion); `Appearance` follows the system unless Settings pins one.
 - **A CONTENTS**: the queued files, one typewritten row each with format and
   size in a fixed right-hand column; a converter's note prints under the box
 - **B DESCRIPTION**: `TITLE` and `AUTHOR` on ruled lines, pre-filled from the
-  file name; they edit the marked document
+  file name; they edit the marked document. While a PDF is queued, a `LAYOUT`
+  row offers two tick boxes, *Original PDF formatting* and *Reformatted for your
+  Kindle*. The choice applies to every PDF in the queue and is remembered for
+  the next one (§5); side by side, stacked when the column is narrow
 - **C DELIVER TO**: owned devices as numbered lanes in two columns (one column
   below 520px), `n OF m` and an ALL/NONE control on the legend line, and the
   library copy as the last row of the same box. The lanes are replaced by a
@@ -317,7 +346,7 @@ inversion); `Appearance` follows the system unless Settings pins one.
 - drop and `?` overlays: the window turns over between its own barred edges —
   inverted in paper, plain in night, so a dark room is never flashed
 - keys: `Enter` send (or sign in), `Esc` clear then close, `1`-`9`/`0` tick a
-  lane, `A` all/none, `E` library copy, `Backspace` drop the marked document,
+  lane, `A` all/none, `E` library copy, `R` PDF layout, `Backspace` drop the marked document,
   mod+`O` add, mod+`,` settings, `?` the key list. Digits reaching a focused
   text field are left to it.
 - after a delivery the window closes itself (`close_on_success`, default on);
@@ -353,16 +382,21 @@ for screenshots; it never touches a real session.
 - `oauth_test.dart`: redirect parsing, signin URL parameters (PKCE, client id).
 - `ingest_test.dart`: PDF+EPUB acceptance, rejection/dedup, `file://` handling,
   unsupported-path reporting, human-readable sizes.
-- `app_state_test.dart`: prefs round-trip, device identity persistence and
-  migration, selection after removal, skip notice, send gating.
+- `app_state_test.dart`: prefs round-trip (including the PDF layout), device
+  identity persistence and migration, selection after removal, skip notice, send
+  gating.
+- `send_body_test.dart`: the two `SendToKindle` bodies, stkclient's and the PDF
+  one with `forceConvert`.
+- `auto_send_test.dart`: `--send` parsing, device choice, the PDF layout flags
+  (applied to the send, never saved), dry runs and exit codes.
 - `device_id_test.dart`: the pid derivation against the reference pair, plus the
   shape of generated serials and pids.
 - `platform_capabilities_test.dart`: the per-platform network declarations and
   file-type registrations that only fail in a release build.
 - `home_page_test.dart`: the label's sections and drop target; dropped PDF+EPUB
   populate the queue and drive the franking line; the conversion footnote;
-  metadata editing; send gating and the sign-in prompt; the number, `A` and `E`
-  keys; a digit typed into a field staying in the field; a whole delivery
+  metadata editing; send gating and the sign-in prompt; the number, `A`, `E`
+  and `R` keys; the `LAYOUT` row appearing only for a PDF; a digit typed into a field staying in the field; a whole delivery
   through a stand-in client, ending in a struck postmark and a window that
   closes itself; a failed send keeping the queue and offering `RETRY`; the key
   sheet; `CLEAR` then `CLOSE`.

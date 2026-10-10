@@ -64,6 +64,10 @@ class FakeStkClient extends StkClient {
   Object? listFailure;
 
   final List<String> sent = [];
+
+  /// What each sent title asked of the service: null for a body with no
+  /// `forceConvert`, as every format but PDF has.
+  final Map<String, bool?> conversions = {};
   int listCalls = 0;
 
   @override
@@ -82,9 +86,11 @@ class FakeStkClient extends StkClient {
     required String title,
     required String format,
     required bool archive,
+    bool? forceConvert,
     void Function(int sent, int total)? onProgress,
   }) async {
     if (failWith != null) throw failWith!;
+    conversions[title] = forceConvert;
     onProgress?.call(512, 1024);
     onProgress?.call(1024, 1024);
     sent.add(title);
