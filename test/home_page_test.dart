@@ -26,7 +26,17 @@ void main() {
   });
 
   tearDown(() async {
-    await tmp.delete(recursive: true);
+    // Ticking a device saves the settings without waiting for the write, so
+    // the file can land while the directory is being removed.
+    for (var attempt = 0; ; attempt++) {
+      try {
+        await tmp.delete(recursive: true);
+        return;
+      } on FileSystemException {
+        if (attempt == 4) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
+    }
   });
 
   File write(String name, int size) {
