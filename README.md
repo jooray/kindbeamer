@@ -114,8 +114,8 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 
 | Platform | Mechanisms |
 |---|---|
-| macOS | drag & drop onto the window, Finder *Open With*, dock drop, macOS **Services** menu ("Send with KindBeamer") |
-| Linux | drag & drop, file-manager *Open With* (`.desktop` file with MIME types, see `packaging/linux/`), command-line args |
+| macOS | drag & drop onto the window, Finder *Open With*, dock drop, macOS **Services** menu ("Send with KindBeamer"), the `kindbeamer` command (see [From a script](#from-a-script)) |
+| Linux | drag & drop, file-manager *Open With* (`.desktop` file with MIME types, see `packaging/linux/`), command-line args, `--send` (see [From a script](#from-a-script)) |
 | Android | system **share sheet** (single & multiple files), *Open with* for documents |
 
 ## Usage
@@ -152,6 +152,56 @@ as "KindBeamer (your computer's name)" or "KindBeamer (Android)". Each
 installation registers on its own, so a laptop and a phone can both stay signed
 in. **Settings → Sign out** unregisters the one you are on and deletes its local
 credentials.
+
+### From a script
+
+Launched with `--send`, KindBeamer sends the files it was given and quits,
+with nothing to click. It uses the sign-in and the settings the window keeps,
+prints one line saying what happened, and leaves an exit status a script can
+test. Sign in once in the window first.
+
+```bash
+kindbeamer [--all-devices | --device NAME ...] [--title TITLE] \
+           [--author AUTHOR] [--dry-run] FILE...
+```
+
+- With no device option it delivers to the devices ticked in the window last
+  time (the first device if none is ticked). `--all-devices` takes every
+  device on the account. `--device` matches a device name, case-insensitively,
+  or a serial number, and can be repeated. A send from the command line never
+  changes the ticks the window remembers.
+- `--title` (one file only) and `--author` override the metadata. The title
+  otherwise comes from the file name. The library copy follows the window's
+  setting.
+- `--dry-run` loads the sign-in, lists the devices and checks the files, then
+  stops short of uploading.
+- Exit status: `0` sent, `1` failed, `2` bad usage (unknown option, unknown
+  device, no sendable file), `3` not signed in or the registration was
+  retired. Open the window and sign in to fix the last one.
+
+```console
+$ kindbeamer --device Daylight guide.pdf
+KindBeamer: sent "guide" to Daylight
+```
+
+**macOS.** The app is sandboxed and may only read files that Launch Services
+hands it, so the command is a wrapper script,
+[`packaging/macos/kindbeamer`](packaging/macos/kindbeamer). It opens the files
+with a fresh instance of the installed app (`open -n -W … --args --send …`,
+which works even while the window is open), waits for it to quit, and turns
+its result line into the exit status. Put it on your `PATH`:
+
+```bash
+install -m 755 packaging/macos/kindbeamer ~/.local/bin/kindbeamer
+```
+
+It looks for `/Applications/KindBeamer.app`, then
+`~/Applications/KindBeamer.app`; set `KINDBEAMER_APP` to use another bundle.
+Running `KindBeamer.app/Contents/MacOS/KindBeamer --send FILE` directly fails
+with *cannot read*, because of the sandbox.
+
+**Linux.** No wrapper needed: `./bundle/kindbeamer --send FILE` sends, prints
+the result and exits with the status itself.
 
 ### Where credentials live
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'src/platform/auto_send.dart';
 import 'src/platform/intake.dart';
 import 'src/state/app_state.dart';
 import 'src/state/credentials_store.dart';
@@ -16,6 +17,14 @@ bool get isDesktop =>
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  SendRequest? request;
+  try {
+    request = SendRequest.parse(args);
+  } on FormatException catch (e) {
+    stderr.writeln('KindBeamer: error: ${e.message}\n${SendRequest.usage}');
+    exit(SendRequest.badUsage);
+  }
+
   final supportDir = await getApplicationSupportDirectory();
   final state = AppState(
     supportDir: supportDir,
@@ -24,9 +33,21 @@ Future<void> main(List<String> args) async {
   await state.loadPrefs();
   await state.restoreSession();
 
-  final initial = await Intake.initial(args);
+  final initial = await Intake.initial(request?.paths ?? args);
   state.addFiles(initial);
   Intake.listen(state.addFiles);
+
+  if (request != null) {
+    // No window to answer: send, say how it went, and leave with a status a
+    // script can test.
+    final code = await request.run(
+      state,
+      awaitFiles: () => _filesArrive(state, const Duration(seconds: 5)),
+    );
+    await stdout.flush();
+    await stderr.flush();
+    exit(code);
+  }
 
   if (isDesktop) {
     await windowManager.ensureInitialized();
@@ -45,6 +66,16 @@ Future<void> main(List<String> args) async {
   }
 
   runApp(KindBeamerApp(state: state));
+}
+
+/// Documents opened through Launch Services come by Apple Event, which can
+/// trail the launch by a moment.
+Future<void> _filesArrive(AppState state, Duration limit) async {
+  final deadline = DateTime.now().add(limit);
+  while (state.docs.isEmpty && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    await state.refreshFromPlatform();
+  }
 }
 
 class KindBeamerApp extends StatelessWidget {

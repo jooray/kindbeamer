@@ -1,0 +1,73 @@
+#!/bin/bash
+# kindbeamer: send documents to your Kindles from a script, through the
+# installed KindBeamer.app, with no window to answer.
+#
+#   kindbeamer [--all-devices | --device NAME ...] [--title TITLE]
+#              [--author AUTHOR] [--dry-run] FILE...
+#
+# The app is sandboxed, so it may only read files that Launch Services hands
+# it. This wrapper opens the files with a fresh instance of the app (`open -n`),
+# passes `--send` and the options after `--args`, waits for it to quit, and
+# turns the result line the app prints into an exit status:
+#   0 sent (or dry run passed)   1 failed   2 bad usage   3 not signed in
+#
+# Set KINDBEAMER_APP to use an app bundle other than the installed one.
+set -u
+
+usage() {
+  echo "usage: kindbeamer [--all-devices | --device NAME ...] [--title TITLE] [--author AUTHOR] [--dry-run] FILE..." >&2
+  exit 2
+}
+
+app="${KINDBEAMER_APP:-}"
+if [ -z "$app" ]; then
+  for candidate in /Applications/KindBeamer.app "$HOME/Applications/KindBeamer.app"; do
+    [ -d "$candidate" ] && app="$candidate" && break
+  done
+fi
+[ -n "$app" ] && [ -d "$app" ] || { echo "kindbeamer: error: KindBeamer.app not found (set KINDBEAMER_APP)" >&2; exit 1; }
+
+opts=()
+files=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help) usage ;;
+    --device|--title|--author)
+      [ $# -ge 2 ] || { echo "kindbeamer: error: $1 needs a value" >&2; usage; }
+      opts+=("$1" "$2"); shift 2 ;;
+    --all-devices|--dry-run) opts+=("$1"); shift ;;
+    --send) shift ;;
+    --) shift; while [ $# -gt 0 ]; do files+=("$1"); shift; done ;;
+    -*) echo "kindbeamer: error: unknown option $1" >&2; usage ;;
+    *) files+=("$1"); shift ;;
+  esac
+done
+[ ${#files[@]} -gt 0 ] || { echo "kindbeamer: error: no file to send" >&2; usage; }
+
+abs=()
+for f in "${files[@]}"; do
+  [ -f "$f" ] && [ -r "$f" ] || { echo "kindbeamer: error: cannot read $f" >&2; exit 1; }
+  abs+=("$(cd "$(dirname "$f")" && pwd)/$(basename "$f")")
+done
+
+out="$(mktemp -t kindbeamer.out)" && err="$(mktemp -t kindbeamer.err)" || exit 1
+trap 'rm -f "$out" "$err"' EXIT
+
+# -n: a new instance even if the window is already open, so the options reach
+# it; -W: wait for it to quit.
+open -n -W -g --stdout "$out" --stderr "$err" -a "$app" "${abs[@]}" \
+  --args --send ${opts[@]+"${opts[@]}"}
+
+cat "$out"
+grep -v '^\[IMPORTANT:flutter' "$err" >&2
+
+if grep -q '^KindBeamer: \(sent\|dry run\)' "$out"; then
+  exit 0
+elif grep -q '^KindBeamer: error: not signed in\|no longer registered\|no longer accepts' "$err"; then
+  exit 3
+elif grep -q '^KindBeamer: error: \(unknown option\|no device named\|no file to send\|none of these\|use either\|--\)' "$err"; then
+  exit 2
+else
+  grep -q '^KindBeamer: error:' "$err" || echo "kindbeamer: error: KindBeamer quit without reporting a result" >&2
+  exit 1
+fi
