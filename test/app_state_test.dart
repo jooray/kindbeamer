@@ -88,6 +88,27 @@ void main() {
     expect(second.pdfLayout, PdfLayout.reformatted);
   });
 
+  test(
+    'printed pages wait to be checked unless told to send right away',
+    () async {
+      final first = newState();
+      await first.loadPrefs();
+      expect(first.printAutoSend, isFalse);
+      first.setPrintAutoSend(true);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+
+      // The Android print service reads this key from settings.json itself.
+      final saved =
+          json.decode(File('${tmp.path}/settings.json').readAsStringSync())
+              as Map<String, dynamic>;
+      expect(saved['print_auto_send'], isTrue);
+
+      final second = newState();
+      await second.loadPrefs();
+      expect(second.printAutoSend, isTrue);
+    },
+  );
+
   test('only a PDF in the queue has a layout to choose', () {
     final state = newState();
     state.addFiles([write('book.epub').path]);

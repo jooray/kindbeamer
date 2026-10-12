@@ -35,6 +35,8 @@ class MainActivity : FlutterActivity() {
                         openPrintSettings()
                         result.success(true)
                     }
+                    "requestNotifications" ->
+                        result.success(requestNotifications(call.argument<Boolean>("once") == true))
                     else -> result.notImplemented()
                 }
             }
@@ -58,7 +60,7 @@ class MainActivity : FlutterActivity() {
             .orEmpty()
         if (files.isNotEmpty()) {
             (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                .cancel(PrintToKindleService.NOTIFICATION_ID)
+                .cancel(PrintToKindleService.READY_NOTIFICATION_ID)
         }
         return files.mapNotNull { f ->
             val dest = File(taken, f.name)
@@ -82,6 +84,24 @@ class MainActivity : FlutterActivity() {
         launchPrintSettings()
     }
 
+    /**
+     * Puts up the system's notification prompt (Android 13+) unless the
+     * permission is already there. With [once], only the first time: the
+     * prompt that follows a printed page arriving must not come back with
+     * every page. True when a prompt went up.
+     */
+    private fun requestNotifications(once: Boolean): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            return false
+        }
+        val prefs = getSharedPreferences("kindbeamer_native", Context.MODE_PRIVATE)
+        if (once && prefs.getBoolean(ASKED_KEY, false)) return false
+        prefs.edit().putBoolean(ASKED_KEY, true).apply()
+        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATIONS_ONLY)
+        return true
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_NOTIFICATIONS) launchPrintSettings()
@@ -99,5 +119,7 @@ class MainActivity : FlutterActivity() {
         const val ACTION_PRINTED = "dev.stkn.kindbeamer.PRINTED"
         const val TAKEN_DIR = "taken"
         private const val REQUEST_NOTIFICATIONS = 4711
+        private const val REQUEST_NOTIFICATIONS_ONLY = 4712
+        private const val ASKED_KEY = "asked_notifications_for_printing"
     }
 }

@@ -73,6 +73,25 @@ class Intake {
     }
   }
 
+  /// Asks for permission to post notifications (Android 13+), which is how a
+  /// printed page reaches the app and how a background send reports. With
+  /// [once], asks only the first time it is called this way, so files arriving
+  /// from the printer never nag. True when a system prompt went up.
+  static Future<bool> requestNotifications({bool once = false}) async {
+    if (!Platform.isAndroid) return false;
+    try {
+      return await _channel.invokeMethod<bool>('requestNotifications', {
+            'once': once,
+          }) ??
+          false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Whether [path] is a printed page the window took from the printer's queue.
+  static bool isPrinted(String path) => path.contains('/cache/printed/taken/');
+
   static void dispose() {
     _sub?.cancel();
     _sub = null;

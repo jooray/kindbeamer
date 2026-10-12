@@ -274,17 +274,40 @@ written as `.part`, renamed when complete, files over a day old cleared.
 Browsers name the job after the page title, which the app then offers as the
 title. Then the job completes.
 
+What happens next is `print_auto_send` in `settings.json`, which the service
+reads itself so that the default path needs no Flutter engine.
+
+**Off** (default): the job completes, and the service posts a notification.
 The service cannot bring the app up itself. When a job is queued the print
 dialog has already closed, and Android ≥ 10 blocks the start (`Background
-activity launch blocked … callingUidProcState: BOUND_FOREGROUND_SERVICE`), so
-it posts a notification instead. Tapping it opens `MainActivity` with
+activity launch blocked … callingUidProcState: BOUND_FOREGROUND_SERVICE`).
+Tapping the notification opens `MainActivity` with
 `dev.stkn.kindbeamer.PRINTED`, which nudges Dart with `filesAvailable`. The
 queue lives on disk, not in memory: `takePendingFiles` moves each
 `cache/printed/*.pdf` into `printed/taken/` and returns the new paths. A PDF
 printed while notifications are off, or while the app is not running, is
 therefore picked up at the next start or resume, through the same calls the
-macOS queue uses. Notification permission (Android 13+) is requested from
-Settings → *Print settings*, just before the system printing screen opens.
+macOS queue uses.
+
+**On**: the PDF is written to `printed/sending/`, the job stays started (so
+the system shows its own "Printing…" notification), and the service runs a
+headless `FlutterEngine` on the `printSendMain` entry point (`lib/main.dart`)
+over `MethodChannel('dev.stkn.kindbeamer/print')`. Dart asks for the `job`,
+runs `SendRequest(paths: [path]).run()`, the same path as `--send`, against
+the stored sign-in, the devices ticked last, the library copy and the PDF
+layout, then reports `done` with `ok` and a sentence. On success the file is
+deleted and a "Sent to your Kindle" notification carries that sentence. On
+failure, or after five minutes without an answer, the file moves to
+`printed/` (queued for the window) and the notification says why, opening the
+app when tapped. Either way the print job completes: the document did reach
+KindBeamer, and a failed job would have the spooler offer a *Restart* that
+could duplicate the queued copy.
+
+Notification permission (Android 13+) is requested at two moments, never at
+startup. The first is when the first printed page reaches the window: once,
+remembered in `kindbeamer_native` shared preferences, because the printer is
+usually on without a visit to Settings. The second is when *Send right away*
+is switched on, and when *Print settings* is opened from Settings.
 
 ## 7. Formats
 

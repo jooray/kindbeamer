@@ -5,4 +5,7 @@
     <string name="print_printer_description">Sends what you print to your Kindle</string>
     <string name="print_channel_name">Printed documents</string>
     <string name="print_ready_title">Ready to send to your Kindle</string>
+    <string name="print_sent_title">Sent to your Kindle</string>
+    <string name="print_not_sent_title">Not sent: tap to send it from KindBeamer</string>
+    <string name="print_send_timeout">The send took too long. The page waits in KindBeamer.</string>
 </resources>

@@ -137,6 +137,12 @@ class AppState extends ChangeNotifier {
 
   Appearance appearance = Appearance.auto;
 
+  /// Android: whether a page printed to KindBeamer goes straight to the ticked
+  /// Kindles (the print service sends it in the background) rather than
+  /// waiting in the window. Off by default, so nothing is sent unseen until
+  /// asked for. The print service reads this key from settings.json itself.
+  bool printAutoSend = false;
+
   /// This installation's device identity. Generated once and kept, so signing
   /// in again replaces this machine's entry in the account's device list rather
   /// than adding another — and so a second machine keeps its own.
@@ -182,6 +188,7 @@ class AppState extends ChangeNotifier {
           orElse: () => PdfLayout.original,
         );
         closeOnSuccess = m['close_on_success'] as bool? ?? true;
+        printAutoSend = m['print_auto_send'] as bool? ?? false;
         appearance = Appearance.values.firstWhere(
           (a) => a.name == (m['appearance'] as String? ?? ''),
           orElse: () => Appearance.auto,
@@ -205,6 +212,7 @@ class AppState extends ChangeNotifier {
           'archive': archive,
           'pdf_layout': pdfLayout.name,
           'close_on_success': closeOnSuccess,
+          'print_auto_send': printAutoSend,
           'appearance': appearance.name,
           'device_serial': deviceId.serial,
         }),
@@ -213,6 +221,7 @@ class AppState extends ChangeNotifier {
   }
 
   void addFiles(List<String> paths) {
+    if (paths.any(Intake.isPrinted)) unawaited(_printedArrived());
     final items = Ingest.itemsFor(paths);
     final skipped = Ingest.unsupported(paths).length;
     if (items.isEmpty) {
@@ -266,6 +275,19 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  /// The first printed page to reach the window is the moment to ask for the
+  /// notification that brings the next one here: Android will not let the
+  /// printer open the app itself, and the printer is often switched on
+  /// without ever visiting the settings that would have asked.
+  Future<void> _printedArrived() async {
+    if (await Intake.requestNotifications(once: true)) {
+      notice =
+          'Allow notifications, and the next page you print opens KindBeamer '
+          'from its notification.';
+      notifyListeners();
+    }
+  }
+
   void selectDoc(int i) {
     selectedIndex = i;
     notifyListeners();
@@ -289,6 +311,12 @@ class AppState extends ChangeNotifier {
 
   void setArchive(bool v) {
     archive = v;
+    _savePrefs();
+    notifyListeners();
+  }
+
+  void setPrintAutoSend(bool v) {
+    printAutoSend = v;
     _savePrefs();
     notifyListeners();
   }

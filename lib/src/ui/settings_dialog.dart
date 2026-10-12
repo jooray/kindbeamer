@@ -150,14 +150,40 @@ class _SettingsDialogState extends State<SettingsDialog> {
                             if (Platform.isAndroid) ...[
                               _group(c, 'PRINT TO KINDLE'),
                               Text(
-                                'Print from any app to the KindBeamer printer '
-                                'and the PDF lands here, ready to send. A web '
-                                'page goes as your browser shows it, logins '
-                                'included. Turn the printer on once in the '
-                                'system print settings.',
+                                'Print from any app to the KindBeamer printer. '
+                                'A web page goes as your browser shows it, '
+                                'logins included. Turn the printer on once in '
+                                'the system print settings.',
                                 style: typed(
                                   size: 12,
                                   color: c.inkMid,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              _switchRow(
+                                c,
+                                on: state.printAutoSend,
+                                label:
+                                    'Send printed pages right away to the '
+                                    'ticked Kindles',
+                                onTap: () {
+                                  final on = !state.printAutoSend;
+                                  state.setPrintAutoSend(on);
+                                  // "Sent" and "not sent" come back as notifications.
+                                  if (on) Intake.requestNotifications();
+                                },
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                state.printAutoSend
+                                    ? 'With your last layout and library copy. '
+                                          'If a send fails, the page waits here.'
+                                    : 'Off: a printed page waits here for you '
+                                          'to check and send.',
+                                style: typed(
+                                  size: 11.5,
+                                  color: c.inkFaint,
                                   height: 1.5,
                                 ),
                               ),

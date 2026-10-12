@@ -136,11 +136,20 @@ Turn it on once: **Settings → Print settings** in KindBeamer opens the system'
 printing screen, where KindBeamer is switched on. The first time you print to
 it, Android asks to confirm that documents may pass through the print service.
 
-Android does not let a printer open an app by itself, so after printing a
-**Ready to send to your Kindle** notification appears; tap it. KindBeamer asks
-for permission to show it when you open the print settings from the app. If
-notifications are off, the PDF still waits and is queued the next time you
-open KindBeamer.
+What happens next is up to you, under **Settings → Print to Kindle**:
+
+- **Check it first** (the default). Android does not let a printer open an
+  app by itself, so a **Ready to send to your Kindle** notification appears;
+  tap it and KindBeamer opens with the page queued. KindBeamer asks for
+  permission to show that notification the first time a printed page reaches
+  it. Without notifications the page still waits there, and is queued the
+  next time you open KindBeamer.
+- **Send printed pages right away to the ticked Kindles.** Printing is then
+  the whole job: the page goes to the Kindles you ticked last, with your last
+  layout and library-copy choice. Android's own "Printing…" notification
+  shows it under way, and a **Sent to your Kindle** notification says where
+  it went. If a send fails (not signed in, offline), the page waits in
+  KindBeamer with the reason, a tap away.
 
 ## Usage
 
