@@ -368,10 +368,10 @@ preferences, queue handling), the per-platform release declarations that only
 fail in a release build, and the main window widget tree. CI runs the same
 checks and builds macOS, Android and Linux (x86-64 and arm64) on every push.
 
-The browser extension has its own, with Node 22 or later:
+The browser extension has its own (Node 22 or later):
 
 ```bash
-cd extension && node --test test/
+cd extension && node --test test/*.test.mjs
 ```
 
 They check its request signer and pid derivation against the same reference
