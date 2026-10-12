@@ -28,7 +28,9 @@ const targets = {
       gecko: {
         id: 'kindbeamer@stkn.dev',
         strict_min_version: '128.0',
-        data_collection_permissions: { required: ['none'] },
+        // What leaves the browser, and only for Amazon: the page you send and the
+        // device token that authenticates it (PRIVACY.md).
+        data_collection_permissions: { required: ['websiteContent', 'authenticationInfo'] },
       },
       gecko_android: { strict_min_version: '128.0' },
     },

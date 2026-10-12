@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KindBeamer privacy policy</title>
+<meta name="description" content="What the KindBeamer app and browser extension send, to whom, and what they keep.">
+<link rel="icon" href="icon.png">
+<!-- Generated from PRIVACY.md in the repository; edit that and regenerate. -->
+<style>
+@font-face { font-family: 'LibreFranklin'; src: url('fonts/LibreFranklin-wght.ttf') format('truetype-variations'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'CourierPrime'; src: url('fonts/CourierPrime-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+:root { --ground: #F2F1EC; --ink: #16171A; --ink-mid: #52545A; --rule: #C2C1BB; }
+@media (prefers-color-scheme: dark) { :root { --ground: #101113; --ink: #E9E8E3; --ink-mid: #9B9DA2; --rule: #3B3D41; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: 'CourierPrime', ui-monospace, monospace; font-size: 15px; line-height: 1.6; }
+.barred { height: 9px; background-image: repeating-linear-gradient(115deg, var(--ink) 0 14px, transparent 14px 28px); }
+main { max-width: 720px; margin: 0 auto; padding: 32px 16px 56px; }
+h1, h2 { font-family: 'LibreFranklin', system-ui, sans-serif; letter-spacing: 0.04em; }
+h1 { font-size: 26px; margin: 0 0 8px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-mid); border-bottom: 1px solid var(--rule); padding-bottom: 6px; margin: 32px 0 12px; }
+a { color: inherit; overflow-wrap: anywhere; }
+ul { padding-left: 1.2em; }
+li { margin: 6px 0; }
+.home { font-family: 'LibreFranklin', system-ui, sans-serif; font-weight: 700; text-decoration: none; display: inline-block; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="barred" aria-hidden="true"></div>
+<main>
+<a class="home" href="./">kind<span style="font-weight:300">beamer</span></a>
+<h1>Privacy policy</h1>
+<p><em>KindBeamer app (macOS, Linux, Android) and KindBeamer browser extension (Firefox, Chrome and other Chromium browsers). Last updated 12 October 2026.</em></p>
+<p>KindBeamer is open-source software with no server of its own. Its author receives nothing from it: no documents, no account details, no usage statistics. KindBeamer talks to one party, Amazon, to deliver what you ask it to send.</p>
+<h2>What goes to Amazon</h2>
+<p>Only Amazon's Send to Kindle service, and only for what you start:</p>
+<ul><li><strong>Signing in.</strong> You sign in on Amazon's own sign-in page. KindBeamer never sees your password. Amazon then issues this app or browser its own device credentials, a private key and a token, which register it as a device on your account.</li><li><strong>Your Kindle devices.</strong> KindBeamer asks Amazon for the list of Kindles on your account, so you can choose where to deliver.</li><li><strong>What you send.</strong> When you press Send, the document goes to Amazon, together with the title and author shown on the label and the devices you ticked. That is the file you added, the PDF you printed to KindBeamer, or, in the extension, the article or PDF from the page you beamed.</li><li><strong>Signing out</strong> tells Amazon to unregister the device.</li></ul>
+<p>Amazon handles this data under its own privacy notice.</p>
+<h2>What stays on your device</h2>
+<ul><li>The device credentials Amazon issued, kept in the operating system's keychain or encrypted storage (the app) or in the extension's own storage (the browser). Signing out or uninstalling deletes them.</li><li>Your preferences: the devices you ticked last, the library copy, the PDF layout, appearance, and this installation's device serial number.</li><li>Printed pages (Android) wait in the app's private cache until they are sent, and are deleted after a day.</li></ul>
+<h2>The browser extension</h2>
+<ul><li>It reads a page only when you press its button or shortcut, and only that tab. The article is extracted inside your browser. Nothing leaves the browser until you press <strong>Send</strong>, and then it goes to Amazon only.</li><li>The article's images, and a PDF you beam, are downloaded straight from the sites that host them, by your browser, as you would load them yourself. Access to other sites is optional. The extension asks for it only to fetch those images and PDFs, and you can refuse.</li><li><strong>EPUB</strong> saves the book to your own disk and sends nothing.</li></ul>
+<h2>What KindBeamer does not do</h2>
+<p>No analytics, telemetry, advertising or tracking, and no data shared with or sold to anyone. Apart from Amazon, the only network requests are the ones your own browser makes for a page's images or PDF.</p>
+<p>KindBeamer is not affiliated with, endorsed by, or sponsored by Amazon.</p>
+<h2>Changes and contact</h2>
+<p>Changes to this policy are recorded in the project's history at <a href="https://github.com/jooray/kindbeamer/commits/main/PRIVACY.md">https://github.com/jooray/kindbeamer/commits/main/PRIVACY.md</a>. Questions go to <a href="https://github.com/jooray/kindbeamer/issues">https://github.com/jooray/kindbeamer/issues</a>.</p>
+</main>
+<div class="barred" aria-hidden="true"></div>
+</body>
+</html>

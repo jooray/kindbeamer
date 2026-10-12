@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KindBeamer",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Beam the article you are reading to your Kindle — extracted, with its images, sent straight to Amazon.",
   "homepage_url": "https://github.com/jooray/kindbeamer",
   "icons": {
