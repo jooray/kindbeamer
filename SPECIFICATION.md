@@ -433,7 +433,100 @@ uploads each as an artifact.
   webview or unreadable documents *only in release*, which is a miserable bug to
   chase.
 
-## 12. Roadmap
+## 12. Browser extension
+
+`extension/` is a Manifest V3 extension for Firefox (≥ 128, desktop and
+Android) and Chromium browsers (≥ 116). It shares no code with the app, but
+it uses the same protocol: §3–§5 ported to JavaScript, with the signer and pid
+derivation pinned to the Dart suite's reference vectors
+(`extension/test/signer.test.mjs`).
+
+```
+extension/
+  manifest.json         shared manifest; build.mjs adds each browser's background key
+  build.mjs             dist/{chrome,firefox}/ and a zip of each
+  src/
+    background.js       toolbar button → extraction; sign-in redirect capture
+    extract.js          injected after vendor/Readability.js; evaluates to the article
+    beam.html/css/js    the label as a tab: preview, description, devices, send (EPUB or PDF)
+    article.js          whitelist sanitizer, image fetch + re-encode, XHTML
+    epub.js, zip.js     EPUB 3 (+ NCX) packaging, minimal ZIP writer
+    amazon.js           sign-in URL, token exchange, registration, signed STK calls
+    signer.js           X-ADP-Request-Digest with BigInt
+    device_id.js        serial + Mobipocket pid
+```
+
+Flow:
+
+1. The action injects `vendor/Readability.js` and `extract.js` into the tab
+   (`activeTab` + `scripting`, so no standing access to any site). Before
+   cloning the document for Readability, `extract.js` notes on each live
+   `<img>` the source the browser chose (`currentSrc`, else lazy-load
+   attributes, else the widest `srcset` candidate). The clone has no
+   `currentSrc`, and lazy placeholders would otherwise be all it keeps. The
+   page's `og:image` comes along as a candidate lead image, since Readability
+   often drops the hero picture.
+2. The result goes into `storage.session` under a random id, and
+   `beam.html#<id>` opens beside the page.
+3. The beam page whitelists elements and attributes (the HTML is untrusted
+   and is rendered in an extension page), demotes `<h1>` to `<h2>`, ids each
+   `<h2>` for the table of contents, and drops a lead image the body already
+   shows. Sites serve one image at several sizes, so the duplicate check
+   compares file names with size marks removed: `1200px-`, `-800x600`, `@2x`.
+4. The preview shows its images from the same bytes the book will carry,
+   fetched by the extension, rather than straight from the site. An `<img>`
+   in an extension page goes without the site's cookies, and hotlink checks
+   and `Cross-Origin-Resource-Policy` turn it away.
+5. On **Send** or **EPUB**, images are fetched with `credentials: 'include'`.
+   Access to other sites is an optional `<all_urls>` permission, requested
+   inside the click's user gesture: Firefox only honours a request while the
+   gesture is current. JPEG, PNG and GIF of at most 1600px are kept as they
+   are; anything else is redrawn on a canvas, as PNG for PNG or SVG sources
+   and as JPEG on white otherwise. Undecodable images and those under 8px are
+   dropped.
+6. The book is `OEBPS/article.xhtml`, `nav.xhtml`, `toc.ncx`, `style.css` and
+   `images/N.ext`, with `mimetype` stored first. It goes out as
+   `inputFormat: EPUB` with the stkclient body, the same as an EPUB from the
+   app.
+
+PDFs: when Readability cannot read a tab whose URL is `http(s):` or `file:`,
+the background marks the article `tryPdf`. That happens when Firefox refuses
+injection into its PDF viewer, or when Chrome's viewer reports
+`document.contentType` `application/pdf`. The beam page then fetches the URL
+itself. If the body starts with `%PDF-`, the file goes out unchanged:
+`inputFormat: PDF`, with `forceConvert` set by the remembered *Layout* choice
+(`pdfLayout`), as in §5. If the fetch fails and the URL looks like a PDF, the
+page offers one click that requests just that origin, from the optional
+`<all_urls>`. Firefox titles a PDF tab `<PDF title> - <file name>`, so the
+suggested title strips the file name; Chrome uses the file name, which then
+loses `.pdf`. `file:` PDFs cannot be fetched (Firefox never allows it, Chrome
+only behind a per-extension switch), and the page says to use the app.
+
+What differs from the app:
+
+- **Sign-in** opens `https://www.amazon.com/ap/signin?…` in an ordinary tab.
+  `tabs.onUpdated` sees the `…/sendtokindle/maplanding?openid.oa2.authorization_code=…`
+  commit, because the extension holds `https://*.amazon.com/*`. The background
+  closes the tab before the page can bounce to `sendtokindle://`, then
+  exchanges the code and registers. Credentials landing in `storage.local` is
+  how every open beam tab learns of it, and a failure is reported through
+  `storage.session.signinError`.
+- **Device identity.** Each install mints its own serial, kept across sign-out.
+  It registers as `KindBeamer (<browser> on <OS>)`.
+- **Headers.** The browser sets `User-Agent` and `Accept-Encoding` itself, and
+  extension requests carry `Origin: moz-extension://…` / `chrome-extension://…`.
+  Amazon accepts all of that: `GetListOfOwnedDevices` and `GetUploadUrl` were
+  checked with each Origin. Registration posts a `Blob` typed `text/xml`, so the
+  header stays bare (§3).
+- **Hosts.** Every endpoint is a subdomain of `amazon.com`, the presigned
+  upload included (`zme-caps.amazon.com`), so one host permission covers
+  them all.
+- **Upload** uses `XMLHttpRequest` in the beam page for progress events.
+  The service-worker fallback is `fetch`.
+- **Storage.** Credentials sit in `storage.local`, where the browser keeps them
+  per profile with no keychain behind them.
+
+## 13. Roadmap
 
 - USB/MTP transfer for 2024+ Kindles (no mass-storage mode on macOS).
 - Library management (list/delete personal documents).
@@ -443,4 +536,8 @@ uploads each as an artifact.
   calls the latter its "Legacy STK Service"); worth moving to before Amazon
   retires it.
 - Localization.
+- Android: accept a shared URL (browsers share `text/plain` with the URL in
+  `EXTRA_TEXT` and the title in `EXTRA_SUBJECT`). Load it in a headless
+  webview, run the extension's Readability + EPUB path, and send. A
+  `PrintService` printer would cover pages behind a login, as a PDF.
 - Notarized macOS build + signed Android release in CI.

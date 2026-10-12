@@ -1,0 +1,10 @@
+{
+  "name": "kindbeamer-extension",
+  "private": true,
+  "type": "module",
+  "description": "KindBeamer browser extension: beam the article you are reading to your Kindle.",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/"
+  }
+}

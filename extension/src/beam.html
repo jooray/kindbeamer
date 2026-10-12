@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KindBeamer</title>
+<link rel="icon" href="icons/icon-32.png">
+<link rel="stylesheet" href="beam.css">
+<script type="module" src="beam.js"></script>
+</head>
+<body>
+<div class="edge" aria-hidden="true"></div>
+<div class="layout">
+  <main class="label" aria-label="Delivery label">
+    <header class="masthead">
+      <span class="wordmark"><b>kind</b>beamer</span>
+      <span class="account" id="account" hidden>
+        <span id="account-name"></span>
+        <button type="button" class="press dense" id="signout">Sign out</button>
+      </span>
+    </header>
+
+    <section class="section" aria-labelledby="legend-b">
+      <h2 class="legend" id="legend-b"><span class="key">B</span>Description</h2>
+      <label class="field"><span class="field-label">Title</span>
+        <input id="title" type="text" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span class="field-label">Author</span>
+        <input id="author" type="text" autocomplete="off" spellcheck="false"></label>
+      <div class="field static" id="layout-row" hidden><span class="field-label">Layout</span>
+        <div class="ticks">
+          <label class="tick-row"><input type="radio" name="layout" value="original" checked><span class="tick" aria-hidden="true"></span>Original PDF formatting</label>
+          <label class="tick-row"><input type="radio" name="layout" value="reformat"><span class="tick" aria-hidden="true"></span>Reformatted for your Kindle</label>
+        </div>
+      </div>
+      <div class="field static" id="images-row"><span class="field-label">Images</span>
+        <div class="ticks" id="image-ticks">
+          <label class="tick-row"><input type="checkbox" id="images" checked><span class="tick" aria-hidden="true"></span><span id="images-label">Include images</span></label>
+          <label class="tick-row" id="lead-row" hidden><input type="checkbox" id="lead" checked><span class="tick" aria-hidden="true"></span>Lead image</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="legend-c">
+      <div class="legend-line">
+        <h2 class="legend" id="legend-c"><span class="key">C</span>Deliver to</h2>
+        <span class="count" id="count"></span>
+        <button type="button" class="press dense" id="all" hidden>All</button>
+      </div>
+      <div class="well" id="deliver">
+        <div class="lanes" id="lanes"></div>
+        <div class="trouble" id="trouble" hidden>
+          <p class="trouble-text" id="trouble-text"></p>
+          <details id="trouble-details"><summary>Details</summary><pre id="trouble-raw"></pre></details>
+          <button type="button" class="press" id="trouble-action"></button>
+        </div>
+        <div class="signin" id="signin" hidden>
+          <p>Sign in with your Amazon account to send to your Kindles. KindBeamer registers this browser as a device of its own; your password goes only to Amazon.</p>
+          <button type="button" class="press solid" id="signin-button">Sign in with Amazon</button>
+          <p class="signin-note" id="signin-note" hidden></p>
+        </div>
+        <label class="tick-row library"><input type="checkbox" id="archive" checked><span class="tick" aria-hidden="true"></span>Also keep a copy in your Kindle Library</label>
+        <label class="tick-row library"><input type="checkbox" id="close-after" checked><span class="tick" aria-hidden="true"></span>Close this tab after a delivery</label>
+      </div>
+    </section>
+
+    <footer class="franking">
+      <div class="rule"><div class="rule-fill" id="progress"></div></div>
+      <div class="franking-row">
+        <div class="postmark" id="postmark" data-state="idle" aria-hidden="true">
+          <span class="postmark-word" id="postmark-word">Ready</span>
+          <span class="postmark-date" id="postmark-date"></span>
+        </div>
+        <div class="state">
+          <p class="sentence" id="sentence" role="status" aria-live="polite">Reading the article…</p>
+          <p class="facts" id="facts"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="press" id="download" disabled>EPUB<span class="cap">⇩</span></button>
+          <button type="button" class="press solid" id="send" disabled>Send<span class="cap">Enter</span></button>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <section class="preview-column" aria-labelledby="legend-a">
+    <h2 class="legend" id="legend-a"><span class="key">A</span>Article <span class="source" id="source"></span></h2>
+    <article class="preview" id="preview" lang="en"></article>
+  </section>
+</div>
+<div class="edge" aria-hidden="true"></div>
+</body>
+</html>

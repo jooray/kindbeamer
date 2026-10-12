@@ -219,6 +219,74 @@ macOS build signed with a self-managed key, the app falls back to a mode-600
 file in its application-support directory, and **Settings** says which of the
 two it used.
 
+## Browser extension
+
+KindBeamer also comes as a browser extension for Firefox and for Chrome, Edge,
+Brave and other Chromium browsers. It sends the page you are reading to your
+Kindle. Press the KindBeamer button in the toolbar, or **Alt+Shift+B**, and a
+tab opens next to the page:
+
+- **An article** arrives with only the article itself: no menus, sidebars or
+  comments, just the text and its pictures, previewed the way the book will
+  read. Check the title and author, tick your Kindles and press **Send**.
+  **EPUB** saves the same book to disk instead.
+- **A PDF** open in the browser goes out as the file itself, with the same
+  *Original PDF formatting* / *Reformatted for your Kindle* choice as the app
+  (**R** switches it). If the browser has not let the extension read that
+  site yet, an **Allow** button asks for access to just that site.
+
+How it does it:
+
+- The article is read with [Readability](https://github.com/mozilla/readability),
+  the engine behind Firefox's Reader View, from the page as your browser shows
+  it. Pages behind a login or a subscription you hold work too, as long as you
+  can read them.
+- Images are fetched and packed into an EPUB, re-encoded where Kindle would
+  not take them (WebP, AVIF, SVG) and scaled to at most 1600px. Images hosted
+  on another site need access to all sites, which the extension asks for the
+  first time you send. If you decline, those images are left out.
+- It talks to Amazon itself, the same way the app does. Sign in once with your
+  Amazon account and the browser registers as a device of its own, named like
+  *KindBeamer (Firefox on macOS)*. No email address and no server in between.
+- It stores nothing but the device credentials and your last choices, in the
+  extension's own storage.
+
+### Installing the extension
+
+The files are on the
+[extension releases](https://github.com/jooray/kindbeamer/releases?q=extension&expanded=true)
+page. After installing, pin the button to the toolbar from the extensions menu
+(the puzzle piece) if the browser put it there.
+
+**Firefox.** Firefox keeps an add-on permanently only when Mozilla has signed it.
+
+- If the release has a `kindbeamer-firefox-*.xpi`, that is the signed build.
+  Click it in Firefox (or drag it onto a Firefox window) and confirm **Add**.
+  It stays installed across restarts.
+- With only the `.zip`, Firefox can load it temporarily: open
+  `about:debugging#/runtime/this-firefox`, choose *Load Temporary Add-on…* and
+  pick the zip. Firefox drops it when it restarts.
+- Firefox Developer Edition and Nightly can keep the unsigned zip permanently.
+  Set `xpinstall.signatures.required` to `false` in `about:config`, then
+  install the zip from `about:addons` → ⚙ → *Install Add-on From File…*.
+
+**Chrome, Edge, Brave, Vivaldi** (permanent):
+
+1. Unzip `kindbeamer-chrome-*.zip` to a folder you will keep. The browser loads
+   the extension from that folder every time it starts, so don't delete it.
+2. Open `chrome://extensions` (`edge://extensions` in Edge) and turn on
+   **Developer mode**.
+3. Choose **Load unpacked** and pick the folder.
+
+To update, unzip the new release over the same folder and press the reload
+arrow on the extension's card. The extension keeps its sign-in.
+
+To build the extension yourself:
+
+```bash
+cd extension && node build.mjs      # dist/firefox, dist/chrome and a zip of each
+```
+
 ## How it works
 
 See [SPECIFICATION.md](SPECIFICATION.md) for the architecture and a full
@@ -279,6 +347,15 @@ filtering, dedup), Markdown conversion, app state (device identity,
 preferences, queue handling), the per-platform release declarations that only
 fail in a release build, and the main window widget tree. CI runs the same
 checks and builds macOS, Android and Linux (x86-64 and arm64) on every push.
+
+The browser extension has its own, with Node 22 or later:
+
+```bash
+cd extension && node --test test/
+```
+
+They check its request signer and pid derivation against the same reference
+vectors, and the EPUB it writes (with `epubcheck`, when it is installed).
 
 ## BTW
 
