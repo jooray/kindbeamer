@@ -336,7 +336,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> refreshFromPlatform() async {
-    final pending = await Intake.takeMacPending();
+    final pending = await Intake.takePending();
     if (pending.isNotEmpty) addFiles(pending);
   }
 

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../platform/intake.dart';
 import '../state/app_state.dart';
 import 'label_parts.dart';
 import 'theme.dart';
@@ -143,6 +146,33 @@ class _SettingsDialogState extends State<SettingsDialog> {
                               ),
                             ),
                             const SizedBox(height: 17),
+
+                            if (Platform.isAndroid) ...[
+                              _group(c, 'PRINT TO KINDLE'),
+                              Text(
+                                'Print from any app to the KindBeamer printer '
+                                'and the PDF lands here, ready to send. A web '
+                                'page goes as your browser shows it, logins '
+                                'included. Turn the printer on once in the '
+                                'system print settings.',
+                                style: typed(
+                                  size: 12,
+                                  color: c.inkMid,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  PressButton(
+                                    label: 'PRINT SETTINGS',
+                                    dense: true,
+                                    onPressed: Intake.openPrintSettings,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 17),
+                            ],
 
                             _group(c, 'APPEARANCE'),
                             Row(

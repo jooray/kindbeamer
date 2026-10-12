@@ -33,6 +33,32 @@ void main() {
     }
   });
 
+  test(
+    'Android declares the KindBeamer printer the way the system binds it',
+    () {
+      final manifest = read('android/app/src/main/AndroidManifest.xml');
+      expect(manifest, contains('android:name=".PrintToKindleService"'));
+      expect(
+        manifest,
+        contains('android.permission.BIND_PRINT_SERVICE'),
+        reason: 'the print spooler only binds a service guarded by it',
+      );
+      expect(manifest, contains('android.printservice.PrintService'));
+      expect(manifest, contains('@xml/printservice'));
+      expect(
+        manifest,
+        contains('android.permission.POST_NOTIFICATIONS'),
+        reason:
+            'a printed PDF reaches the app through a notification, since '
+            'Android blocks a print service from opening it directly',
+      );
+      expect(
+        File('android/app/src/main/res/xml/printservice.xml').existsSync(),
+        isTrue,
+      );
+    },
+  );
+
   test('both macOS entitlements allow outgoing connections', () {
     for (final path in [
       'macos/Runner/Release.entitlements',

@@ -4,6 +4,9 @@
          the release build silently cannot: a blank sign-in webview and
          every API call failing. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- The "ready to send" notice after printing to KindBeamer; asked for
+         only when the user sets the printer up (MainActivity). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="KindBeamer"
         android:name="${applicationName}"
@@ -91,6 +94,22 @@
                 <data android:mimeType="image/bmp"/>
             </intent-filter>
         </activity>
+        <!-- "Print → KindBeamer" from any app: the printed PDF is queued like a
+             shared file, so a browser page goes over with the reader's own
+             logins (PrintToKindleService). Off until the user turns it on
+             under Settings → Printing. -->
+        <service
+            android:name=".PrintToKindleService"
+            android:label="@string/print_service_label"
+            android:permission="android.permission.BIND_PRINT_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.printservice.PrintService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.printservice"
+                android:resource="@xml/printservice"/>
+        </service>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

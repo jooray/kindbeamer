@@ -254,7 +254,37 @@ twice.
 | macOS Services menu | `NSServices` entry (`sendFilesToKindle`) in `Info.plist`; `AppDelegate` installs an `NSPasteboard` service provider |
 | macOS Open With / dock drop / `open -a` | `CFBundleDocumentTypes` (pdf, epub, kindle formats, text, images) + `application(_:open:)` in `AppDelegate` |
 | Android share sheet & open-with | `ACTION_SEND` / `SEND_MULTIPLE` / `VIEW` intent filters with document MIME types; `receive_sharing_intent` streams media file paths into the same ingest |
+| Android printing | `PrintToKindleService` (see below) leaves the printed PDF in `cache/printed/`; `MainActivity` hands it over on the intake channel |
 | Linux Open With | `.desktop` file with `MimeType=` list (`packaging/linux/`) + argv intake |
+
+### Android print service
+
+`PrintToKindleService` (`android/app/src/main/kotlin/dev/stkn/kindbeamer/`)
+is a `PrintService` that offers one printer, *KindBeamer (Send to Kindle)*.
+The service is guarded by `BIND_PRINT_SERVICE`, described by
+`res/xml/printservice.xml`, and enabled under Settings → Printing. The printer
+takes Kindle-shaped (3:4) paper: *Kindle page* 6 × 8 in (default), *Kindle
+Scribe page* 7.5 × 10 in, and A5, at 300 dpi with no minimum margins. Letter
+and A4 are left out on purpose. The print dialog keeps the previous printer's
+paper whenever the new printer also offers it, so with Letter on the list the
+6 × 8 in default would never be chosen.
+
+`onPrintJobQueued` copies the spooled PDF to `cache/printed/<job label>.pdf`:
+written as `.part`, renamed when complete, files over a day old cleared.
+Browsers name the job after the page title, which the app then offers as the
+title. Then the job completes.
+
+The service cannot bring the app up itself. When a job is queued the print
+dialog has already closed, and Android ≥ 10 blocks the start (`Background
+activity launch blocked … callingUidProcState: BOUND_FOREGROUND_SERVICE`), so
+it posts a notification instead. Tapping it opens `MainActivity` with
+`dev.stkn.kindbeamer.PRINTED`, which nudges Dart with `filesAvailable`. The
+queue lives on disk, not in memory: `takePendingFiles` moves each
+`cache/printed/*.pdf` into `printed/taken/` and returns the new paths. A PDF
+printed while notifications are off, or while the app is not running, is
+therefore picked up at the next start or resume, through the same calls the
+macOS queue uses. Notification permission (Android 13+) is requested from
+Settings → *Print settings*, just before the system printing screen opens.
 
 ## 7. Formats
 
@@ -538,6 +568,6 @@ What differs from the app:
 - Localization.
 - Android: accept a shared URL (browsers share `text/plain` with the URL in
   `EXTRA_TEXT` and the title in `EXTRA_SUBJECT`). Load it in a headless
-  webview, run the extension's Readability + EPUB path, and send. A
-  `PrintService` printer would cover pages behind a login, as a PDF.
+  webview, run the extension's Readability + EPUB path, and send. (Pages
+  behind a login are covered by the print service, §6.)
 - Notarized macOS build + signed Android release in CI.

@@ -120,7 +120,27 @@ keep such things and point the `.desktop` file in `packaging/linux/` at it for
 |---|---|
 | macOS | drag & drop onto the window, Finder *Open With*, dock drop, macOS **Services** menu ("Send with KindBeamer"), the `kindbeamer` command (see [From a script](#from-a-script)) |
 | Linux | drag & drop, file-manager *Open With* (`.desktop` file with MIME types, see `packaging/linux/`), command-line args, `--send` (see [From a script](#from-a-script)) |
-| Android | system **share sheet** (single & multiple files), *Open with* for documents |
+| Android | system **share sheet** (single & multiple files), *Open with* for documents, **Print → KindBeamer** from any app (see [Printing to your Kindle](#printing-to-your-kindle-android)) |
+
+### Printing to your Kindle (Android)
+
+KindBeamer is also a printer. Print from any app that can print (in Chrome,
+**⋮ → Share → Print**), choose **KindBeamer (Send to Kindle)**, and the PDF
+lands in KindBeamer ready to send. A web page goes exactly as your browser shows it,
+so pages behind a login or a paywall come out whole, and the paper defaults
+to a Kindle-shaped 6 × 8 in page (a Kindle Scribe page and A5 are offered
+too). Leave the layout on *Original PDF formatting* for page-perfect copies,
+or tick *Reformatted for your Kindle* to have Amazon reflow the text.
+
+Turn it on once: **Settings → Print settings** in KindBeamer opens the system's
+printing screen, where KindBeamer is switched on. The first time you print to
+it, Android asks to confirm that documents may pass through the print service.
+
+Android does not let a printer open an app by itself, so after printing a
+**Ready to send to your Kindle** notification appears; tap it. KindBeamer asks
+for permission to show it when you open the print settings from the app. If
+notifications are off, the PDF still waits and is queued the next time you
+open KindBeamer.
 
 ## Usage
 

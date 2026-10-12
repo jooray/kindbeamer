@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="print_service_label">KindBeamer</string>
+    <string name="print_printer_name">KindBeamer (Send to Kindle)</string>
+    <string name="print_printer_description">Sends what you print to your Kindle</string>
+    <string name="print_channel_name">Printed documents</string>
+    <string name="print_ready_title">Ready to send to your Kindle</string>
+</resources>
