@@ -95,6 +95,13 @@ Captions:
 2. The same at night: the page follows the system's dark mode.
 3. A PDF from the web, sent with its original layout or reflowed.
 
+## Version notes
+
+> First release on addons.mozilla.org. Sends the article you are reading to
+> your Kindle as an EPUB with its images, or a PDF open in Firefox as the file
+> (original layout or reflowed). It signs in to Amazon directly, with no email
+> address, and the EPUB can also be saved to disk.
+
 ## Notes to reviewer
 
 > To try it without an Amazon account: open any article (for example
@@ -111,4 +118,20 @@ Captions:
 > only to download the article's images and PDFs from the sites hosting them.
 >
 > No remote code. vendor/Readability.js is @mozilla/readability 0.6.0 from npm,
-> unmodified. Source: https://github.com/jooray/kindbeamer/tree/main/extension
+> unmodified (the library behind Firefox Reader View). Source:
+> https://github.com/jooray/kindbeamer/tree/main/extension
+>
+> The two "unsafe assignment to innerHTML" warnings are both inside that
+> library: Readability.js:1549 restores its own cached copy of the page between
+> extraction passes, and :1928 unwraps <noscript> image fallbacks. Both work on
+> a detached copy made with document.cloneNode(true) (extract.js), which
+> renders nothing, runs no scripts and loads nothing. The extension's own code
+> does not use innerHTML. Article HTML is parsed with DOMParser into an inert
+> document and passed through an element/attribute whitelist (article.js)
+> before it is shown or packaged.
+>
+> Test account: there is no test Amazon account to share. Sending needs the
+> reviewer's own Amazon account; registering adds a device named
+> "KindBeamer (Firefox on …)" to it, which Sign out removes again. Everything
+> except the final upload can be checked without an account through the EPUB
+> button.
