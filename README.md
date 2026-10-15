@@ -33,6 +33,11 @@ if you want them there.
 
 ## Install
 
+### Browser extension
+
+Firefox: [Firefox Add-ons](https://addons.mozilla.org/addon/kindbeamer/).
+Chrome and other Chromium browsers: see [Installing the extension](#installing-the-extension).
+
 ### Android
 
 Install it from [Zapstore](https://zapstore.dev/apps/dev.stkn.kindbeamer),
@@ -282,24 +287,13 @@ How it does it:
 
 ### Installing the extension
 
-The files are on the
-[extension releases](https://github.com/jooray/kindbeamer/releases?q=extension&expanded=true)
-page. After installing, pin the button to the toolbar from the extensions menu
-(the puzzle piece) if the browser put it there.
+**Firefox:** install it from
+[Firefox Add-ons](https://addons.mozilla.org/addon/kindbeamer/), which also
+keeps it updated.
 
-**Firefox.** Firefox keeps an add-on permanently only when Mozilla has signed it.
-
-- If the release has a `kindbeamer-firefox-*.xpi`, that is the signed build.
-  Click it in Firefox (or drag it onto a Firefox window) and confirm **Add**.
-  It stays installed across restarts.
-- With only the `.zip`, Firefox can load it temporarily: open
-  `about:debugging#/runtime/this-firefox`, choose *Load Temporary Add-on…* and
-  pick the zip. Firefox drops it when it restarts.
-- Firefox Developer Edition and Nightly can keep the unsigned zip permanently.
-  Set `xpinstall.signatures.required` to `false` in `about:config`, then
-  install the zip from `about:addons` → ⚙ → *Install Add-on From File…*.
-
-**Chrome, Edge, Brave, Vivaldi** (permanent):
+**Chrome, Edge, Brave, Vivaldi** and other Chromium browsers: the files are on
+the [extension releases](https://github.com/jooray/kindbeamer/releases?q=extension&expanded=true)
+page.
 
 1. Unzip `kindbeamer-chrome-*.zip` to a folder you will keep. The browser loads
    the extension from that folder every time it starts, so don't delete it.
@@ -309,6 +303,9 @@ page. After installing, pin the button to the toolbar from the extensions menu
 
 To update, unzip the new release over the same folder and press the reload
 arrow on the extension's card. The extension keeps its sign-in.
+
+In either browser, pin the button to the toolbar from the extensions menu (the
+puzzle piece) if the browser put it there.
 
 To build the extension yourself:
 
