@@ -65,7 +65,7 @@ from the last one.
 
 **Support email:** leave empty.
 **Support website:** https://github.com/jooray/kindbeamer/issues
-**Homepage:** https://jooray.github.io/kindbeamer/
+**Homepage:** https://cypherpunk.today/kindbeamer/
 
 **License:** MIT/X11 License
 
@@ -81,7 +81,7 @@ from the last one.
 > remove the extension. Images and PDFs are downloaded by your browser from
 > the sites that host them. No analytics, no tracking, no data to the
 > developer or anyone else. Full policy:
-> https://jooray.github.io/kindbeamer/privacy.html
+> https://cypherpunk.today/kindbeamer/privacy.html
 
 ## Screenshots
 
