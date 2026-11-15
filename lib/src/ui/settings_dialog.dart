@@ -299,7 +299,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                                   label: 'HELP',
                                   dense: true,
                                   onPressed: () => _open(
-                                    'https://github.com/jooray/kindbeamer',
+                                    'https://cypherpunk.today/kindbeamer/',
                                   ),
                                 ),
                                 const SizedBox(width: 8),
