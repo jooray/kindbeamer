@@ -1,7 +1,7 @@
 # Privacy policy
 
 *KindBeamer app (macOS, Linux, Android) and KindBeamer browser extension
-(Firefox, Chrome and other Chromium browsers). Last updated 12 October 2026.*
+(Firefox, Chrome and other Chromium browsers). Last updated 15 November 2026.*
 
 KindBeamer is open-source software with no server of its own. Its author
 receives nothing from it: no documents, no account details, no usage
@@ -33,6 +33,8 @@ Amazon handles this data under its own privacy notice.
   (the browser). Signing out or uninstalling deletes them.
 - Your preferences: the devices you ticked last, the library copy, the PDF
   layout, appearance, and this installation's device serial number.
+- A small counter for the support note (below): days of use, sends, how often
+  the note was shown, and whether you turned it off.
 - Printed pages (Android) wait in the app's private cache until they are sent,
   and are deleted after a day.
 
@@ -47,11 +49,24 @@ Amazon handles this data under its own privacy notice.
   those images and PDFs, and you can refuse.
 - **EPUB** saves the book to your own disk and sends nothing.
 
+## The support note
+
+After you have used the app for a few days, a small note may appear in the
+window while a document is being sent, asking whether you want to support
+KindBeamer's development, with an e-book as thanks. It appears at most three
+times. *Not now* closes it, and *Don't ask again* turns it off for good. The
+app makes no network request for the note. If you tap *Support* (on the note,
+or in Settings, where the entry stays), your own browser opens a page at
+hackyourself.io/support. The link carries only the app's name, whether the app
+is showing its light or dark appearance, and where you tapped. Paying and
+getting the book happen on that page, in your browser, not in the app.
+
 ## What KindBeamer does not do
 
 No analytics, telemetry, advertising or tracking, and no data shared with or
 sold to anyone. Apart from Amazon, the only network requests are the ones
-your own browser makes for a page's images or PDF.
+your own browser makes for a page's images or PDF, and the page you open
+yourself by tapping *Support*.
 
 KindBeamer is not affiliated with, endorsed by, or sponsored by Amazon.
 

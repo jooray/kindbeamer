@@ -5,22 +5,32 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../platform/intake.dart';
 import '../state/app_state.dart';
+import '../support/support_controller.dart';
+import '../support/support_copy.dart';
 import 'label_parts.dart';
 import 'theme.dart';
 
-Future<void> showSettingsDialog(BuildContext context, AppState state) async {
+Future<void> showSettingsDialog(
+  BuildContext context,
+  AppState state, {
+  SupportController? support,
+}) async {
   await showDialog<void>(
     context: context,
-    builder: (_) => SettingsDialog(state: state),
+    builder: (_) => SettingsDialog(state: state, support: support),
   );
 }
 
 /// The back of the label: the few defaults worth keeping between sends, and
 /// the plain facts about what this app is.
 class SettingsDialog extends StatefulWidget {
-  const SettingsDialog({super.key, required this.state});
+  const SettingsDialog({super.key, required this.state, this.support});
 
   final AppState state;
+
+  /// Gives the dialog its permanent Support entry. It opens the checkout and changes nothing about the
+  /// asking, so it still works for a reader who said "don't ask again".
+  final SupportController? support;
 
   @override
   State<SettingsDialog> createState() => _SettingsDialogState();
@@ -251,6 +261,37 @@ class _SettingsDialogState extends State<SettingsDialog> {
                                 height: 1.5,
                               ),
                             ),
+                            if (widget.support != null) ...[
+                              const SizedBox(height: 17),
+                              _group(c, 'SUPPORT'),
+                              Text(
+                                'KindBeamer is free and open source. If it '
+                                'saves you time, support it and get an e-book.',
+                                style: typed(
+                                  size: 12,
+                                  color: c.inkMid,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  PressButton(
+                                    label: SupportCopy.forLanguage(
+                                      'en',
+                                      'KindBeamer',
+                                    ).menu.toUpperCase(),
+                                    dense: true,
+                                    onPressed: () =>
+                                        widget.support!.openCheckout(
+                                          dark:
+                                              Theme.of(context).brightness ==
+                                              Brightness.dark,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ],
                             const SizedBox(height: 14),
                             Row(
                               children: [

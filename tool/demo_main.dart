@@ -6,8 +6,9 @@
 //   build/macos/Build/Products/Debug/KindBeamer.app/Contents/MacOS/KindBeamer \
 //     <scene> [night]
 //
-// Scenes: empty · signedout · ready · queue · sending · delivered · error ·
+// Scenes: empty · signedout · ready · queue · sending · delivered · ask · error ·
 //         drop · keys · settings · rejected · offline
+// (`ask` is `sending` for a reader who is due the support ask.)
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -16,7 +17,11 @@ import 'package:flutter/rendering.dart';
 import 'package:kindbeamer/src/amazon/models.dart';
 import 'package:kindbeamer/src/state/app_state.dart';
 import 'package:kindbeamer/src/state/credentials_store.dart';
+import 'package:kindbeamer/src/support/support_controller.dart';
+import 'package:kindbeamer/src/support/support_engine.dart';
+import 'package:kindbeamer/src/support/support_store.dart';
 import 'package:kindbeamer/src/ui/home_page.dart';
+import 'package:kindbeamer/src/ui/support_ask.dart';
 import 'package:kindbeamer/src/ui/theme.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -95,7 +100,7 @@ Future<void> main(List<String> args) async {
       doc('river-of-gods.epub', 2410).path,
       doc('field-notes-2026.md', 38).path,
     ]);
-  } else if (scene == 'sending') {
+  } else if (scene == 'sending' || scene == 'ask') {
     state.addFiles([doc('tamers-of-entropy-en.pdf', 4310).path]);
     state.phase = SendPhase.sending;
     state.progress = 0.62;
@@ -139,6 +144,19 @@ Future<void> main(List<String> args) async {
     });
   }
 
+  // A reader who has used the app for days and delivered plenty is due the ask; everyone else is not.
+  final askController = SupportController(
+    config: kindBeamerSupport,
+    store: MemorySupportStore(
+      scene == 'ask'
+          ? const SupportState(activeDays: 9, actions: 9)
+          : const SupportState(),
+    ),
+  );
+  if (scene == 'ask') {
+    askController.evaluate(momentOfValue: true);
+  }
+
   runApp(
     RepaintBoundary(
       key: _frame,
@@ -155,6 +173,7 @@ Future<void> main(List<String> args) async {
         home: HomePage(
           state: state,
           onRequestClose: () async {},
+          support: askController,
           // The capture wants the label behind the pairing flow, not the
           // webview the real app opens here.
           onPair: () async {},

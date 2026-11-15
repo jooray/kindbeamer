@@ -10,9 +10,11 @@ import 'package:window_manager/window_manager.dart';
 
 import '../state/app_state.dart';
 import '../state/documents.dart';
+import '../support/support_controller.dart';
 import 'label_parts.dart';
 import 'login_dialog.dart';
 import 'settings_dialog.dart';
+import 'support_ask.dart';
 import 'theme.dart';
 
 /// The window is one dispatch label: contents, description, addressees,
@@ -25,9 +27,14 @@ class HomePage extends StatefulWidget {
     this.onRequestClose,
     this.openOverlay,
     this.onPair,
+    this.support,
   });
 
   final AppState state;
+
+  /// The support ask's controller, injectable so a test can bring its own store and launcher. Left out in
+  /// the app, which makes its own.
+  final SupportController? support;
 
   /// Opens one of the states a screenshot cannot reach by itself — `drop`,
   /// `keys` or `settings`. Set only by the harness in `tool/demo_main.dart`.
@@ -69,8 +76,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final ScrollController _queueScroll = ScrollController();
   final ScrollController _bodyScroll = ScrollController();
 
+  late final SupportController _support =
+      widget.support ?? SupportController(config: kindBeamerSupport);
+
   SendPhase _lastPhase = SendPhase.idle;
   Timer? _closeTimer;
+
+  /// A delivery finished while the support ask was up: close once it is gone.
+  bool _closePending = false;
   Timer? _noticeTimer;
 
   AppState get state => widget.state;
@@ -81,6 +94,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(_support.launch());
+    _support.addListener(_onSupportChanged);
     _lastPhase = state.phase;
     state.addListener(_onStateChanged);
     // The ruled line under a field inks itself when the field is being typed
@@ -97,7 +112,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         _keysOpen = true;
       case 'settings':
         WidgetsBinding.instance.addPostFrameCallback(
-          (_) => showSettingsDialog(context, state),
+          (_) => showSettingsDialog(context, state, support: _support),
         );
     }
   }
@@ -112,6 +127,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _titleFocus.dispose();
     _authorFocus.dispose();
     _root.dispose();
+    _support.removeListener(_onSupportChanged);
+    if (widget.support == null) _support.dispose();
     _title.dispose();
     _author.dispose();
     _queueScroll.dispose();
@@ -124,23 +141,37 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
     if (lifecycleState == AppLifecycleState.resumed) {
       state.refreshFromPlatform();
+      unawaited(_support.launch());
     }
   }
 
   /// A delivered send takes the window with it, unless Settings says otherwise.
-  /// The delay is there so the postmark is seen to land.
+  /// The delay is there so the postmark is seen to land. While the support ask
+  /// is on screen the window waits for it (see [_onSupportChanged]).
   void _onStateChanged() {
-    if (state.phase != SendPhase.done) _closeTimer?.cancel();
+    if (state.phase != SendPhase.done) {
+      _closeTimer?.cancel();
+      _closePending = false;
+    }
+    // A new job after a delivery, or a failure: the ask belonged to that send.
+    if ((_lastPhase == SendPhase.done && state.phase != SendPhase.done) ||
+        state.phase == SendPhase.error) {
+      _support.surfaceGone();
+    }
+    // A send starts. The upload is the one moment the reader has nothing
+    // else to do, and has just used the app: the right time to ask.
+    if (state.phase == SendPhase.sending && _lastPhase != SendPhase.sending) {
+      unawaited(_offerSupport());
+    }
     if (state.phase == SendPhase.done &&
         _lastPhase != SendPhase.done &&
         state.closeOnSuccess) {
-      _closeTimer?.cancel();
-      _closeTimer = Timer(const Duration(milliseconds: 1250), () async {
-        if (!mounted) return;
-        if (state.phase == SendPhase.done && state.docs.isEmpty) {
-          await (widget.onRequestClose ?? _closeApp)();
-        }
-      });
+      if (_support.visible) {
+        // The window would take the ask with it: wait until it is gone.
+        _closePending = true;
+      } else {
+        _scheduleClose();
+      }
     }
     if (state.phase == SendPhase.error && _lastPhase != SendPhase.error) {
       _sendDetail = true;
@@ -154,6 +185,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
     _lastPhase = state.phase;
     _maybePair();
+  }
+
+  /// A send is the moment of value: count it, and if the rules say it is time,
+  /// show the support strip in the contents while the document uploads.
+  Future<void> _offerSupport() async {
+    await _support.recordAction();
+    await _support.evaluate(momentOfValue: true);
+  }
+
+  /// The ask appeared or went away. If it appeared after the delivery had
+  /// already scheduled the window's closing, the closing waits; once the ask is
+  /// gone (Not now, Support, Don't ask again) the window closes as it always
+  /// did.
+  void _onSupportChanged() {
+    if (_support.visible) {
+      if (_closeTimer?.isActive ?? false) {
+        _closeTimer!.cancel();
+        _closePending = true;
+      }
+    } else if (_closePending) {
+      _closePending = false;
+      if (state.phase == SendPhase.done && state.closeOnSuccess) {
+        _scheduleClose();
+      }
+    }
+  }
+
+  void _scheduleClose() {
+    _closeTimer?.cancel();
+    _closeTimer = Timer(const Duration(milliseconds: 1250), () async {
+      if (!mounted) return;
+      if (state.phase == SendPhase.done && state.docs.isEmpty) {
+        await (widget.onRequestClose ?? _closeApp)();
+      }
+    });
   }
 
   /// A registration Amazon has stopped accepting cannot be retried, argued
@@ -297,7 +363,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         return KeyEventResult.handled;
       }
       if (key == LogicalKeyboardKey.comma) {
-        showSettingsDialog(context, state);
+        showSettingsDialog(context, state, support: _support);
         return KeyEventResult.handled;
       }
       return KeyEventResult.ignored;
@@ -440,6 +506,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             children: [
                               const Legend(letter: 'A', name: 'CONTENTS'),
                               _contents(c),
+                              // The support ask, when it is due: a strip under the contents while they upload.
+                              KindBeamerSupportStrip(controller: _support),
                               const SizedBox(height: Metrics.sectionGap),
                               const Legend(letter: 'B', name: 'DESCRIPTION'),
                               _description(c),
@@ -556,7 +624,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             label: 'SETTINGS',
             cap: '$modKey,',
             dense: true,
-            onPressed: () => showSettingsDialog(context, state),
+            onPressed: () =>
+                showSettingsDialog(context, state, support: _support),
           ),
         ],
       ),

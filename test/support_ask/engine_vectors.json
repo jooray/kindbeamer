@@ -1,0 +1,495 @@
+{
+  "about": "Each case replays events against the engine and checks shouldAsk at the 'ask' steps. Events: launch(day), action(n), shown(day), tapped, declined. 'ask' steps carry ctx and the expected answer.",
+  "trigger": {
+    "minDays": 3,
+    "minActions": 3,
+    "cooldownDays": [
+      14,
+      45
+    ],
+    "maxAsks": 3
+  },
+  "cases": [
+    {
+      "name": "a brand new user is never asked",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "action",
+          5
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-01",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "three days of use and three actions: asked at the moment of value",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": true
+          },
+          true
+        ]
+      ]
+    },
+    {
+      "name": "enough use but not at a moment of value",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": false
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "never while the user is busy",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": true,
+            "busy": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "enough days but too few actions",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          2
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "many launches on one day count as one day",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "action",
+          9
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-01",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "calendar days without use do not count",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-09"
+        ],
+        [
+          "action",
+          9
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-09",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "after the first ask: quiet for 14 days, then again",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "shown",
+          "2026-11-03"
+        ],
+        [
+          "launch",
+          "2026-11-16"
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-16",
+            "momentOfValue": true
+          },
+          false
+        ],
+        [
+          "launch",
+          "2026-11-17"
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-17",
+            "momentOfValue": true
+          },
+          true
+        ]
+      ]
+    },
+    {
+      "name": "after the second ask: quiet for 45 days",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "shown",
+          "2026-11-03"
+        ],
+        [
+          "shown",
+          "2026-11-17"
+        ],
+        [
+          "launch",
+          "2026-12-31"
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-12-31",
+            "momentOfValue": true
+          },
+          false
+        ],
+        [
+          "launch",
+          "2027-01-01"
+        ],
+        [
+          "ask",
+          {
+            "today": "2027-01-01",
+            "momentOfValue": true
+          },
+          true
+        ]
+      ]
+    },
+    {
+      "name": "three asks in a lifetime, then never",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "shown",
+          "2026-11-03"
+        ],
+        [
+          "shown",
+          "2026-11-17"
+        ],
+        [
+          "shown",
+          "2027-01-01"
+        ],
+        [
+          "launch",
+          "2028-01-01"
+        ],
+        [
+          "ask",
+          {
+            "today": "2028-01-01",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "tapping Support ends the asking",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "shown",
+          "2026-11-03"
+        ],
+        [
+          "tapped"
+        ],
+        [
+          "launch",
+          "2027-06-01"
+        ],
+        [
+          "ask",
+          {
+            "today": "2027-06-01",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "'don't ask again' ends the asking for good",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "shown",
+          "2026-11-03"
+        ],
+        [
+          "declined"
+        ],
+        [
+          "launch",
+          "2027-06-01"
+        ],
+        [
+          "ask",
+          {
+            "today": "2027-06-01",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "a hosted plan or paid account silences the ask",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          3
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": true,
+            "isSupporter": true
+          },
+          false
+        ]
+      ]
+    },
+    {
+      "name": "'don't ask again' also wins over a user who is otherwise due and has never been asked",
+      "steps": [
+        [
+          "launch",
+          "2026-11-01"
+        ],
+        [
+          "launch",
+          "2026-11-02"
+        ],
+        [
+          "launch",
+          "2026-11-03"
+        ],
+        [
+          "action",
+          9
+        ],
+        [
+          "declined"
+        ],
+        [
+          "ask",
+          {
+            "today": "2026-11-03",
+            "momentOfValue": true
+          },
+          false
+        ]
+      ]
+    }
+  ]
+}
